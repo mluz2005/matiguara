@@ -1,0 +1,4 @@
+Audios de la ayuda "¿Cómo se juega?" en GUARANÍ.
+El botón "Guaraní" de cada paso aparece SOLO si el archivo existe en esta carpeta.
+Nombre exacto: ver la columna "Archivo guaraní" de GUION_AUDIOS_AYUDA.csv (ejemplo: flash_1.mp3).
+Formato: MP3. Frase corta, sin ruido de fondo.

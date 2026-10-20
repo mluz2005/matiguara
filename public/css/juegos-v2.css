@@ -1,0 +1,285 @@
+/* =========================================================================
+   MatiGuará · REDISEÑO v2 — Suma de Frutas, Flash Matemático, pantalla final
+   y menú de juegos.  (Se carga ADEMÁS de memoria-v2.css, que trae las
+   fuentes, variables, mascota, burbuja, confeti y escenas.)
+   Todo está prefijado con .mv2 / .mv2-ej / .mv2-res / .mv2-menu: no pisa
+   nada del resto de la app.
+   ========================================================================= */
+
+/* ── Mundos nuevos: huerta (Suma) y relámpago (Flash) ─────────────────── */
+.mv2-wS { --cielo-a:#C9EEFF; --cielo-b:#FFF4D1; --suelo:#8BD16B; --dorso-a:#35A862; --dorso-b:#146B3C; --realce:#FFC94D; --tinte:#E6F7DA; --acento:#E5383B; }
+.mv2-wF { --cielo-a:#D9D2FF; --cielo-b:#FFF3C4; --suelo:#9C86F0; --dorso-a:#8E6BD1; --dorso-b:#4F3499; --realce:#FFE08A; --tinte:#EDE8FF; --acento:#6A45D6; }
+
+/* =========================================================================
+   PANTALLA DE EJERCICIO
+   ========================================================================= */
+.mv2-ej { --ancho: min(780px, 100vw - 32px); gap: 12px; }
+
+/* HUD: mascota + globo · puntos */
+.mv2-ej-hud { display: flex; align-items: center; gap: 10px; }
+.mv2-ej-hud .mv2-guara-wrap { flex: 1 1 auto; }
+.mv2-ej-hud .mv2-burbuja { max-width: 420px; }
+.mv2-burbuja .pts {
+    display: inline-block; margin-top: 4px; padding: 0 10px; border-radius: 12px;
+    background: #FFF1C2; border: 2.5px solid var(--navy); font: 800 .95rem var(--fuente-titulo);
+}
+.mv2-burbuja.bien  { background: #E6F8EC; }
+.mv2-burbuja.bien::before { background: #E6F8EC; }
+.mv2-burbuja.casi  { background: #FFF6DB; }
+.mv2-burbuja.casi::before { background: #FFF6DB; }
+.mv2-ej-stats { display: flex; flex-direction: column; gap: 6px; flex: none; }
+.mv2-chip {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 2px 12px;
+    font: 800 1.1rem var(--fuente-titulo); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+@media (max-width: 480px) {
+    .mv2-ej-stats { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; }
+    .mv2-ej-hud { align-items: flex-start; flex-wrap: wrap; }
+    .mv2-ej-hud .mv2-guara-wrap { flex-basis: 100%; }
+}
+
+/* Fila de progreso */
+.mv2-ej-prog { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.mv2-ej-juego { font: 800 .95rem var(--fuente-texto); padding: 4px 12px; white-space: nowrap; }
+.mv2-ej-juego .dif { color: #B8860B; letter-spacing: 1px; }
+.mv2-camino { flex: 1 1 140px; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.mv2-camino .num { font: 800 1rem var(--fuente-titulo); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.mv2-camino .pista { flex: 1; height: 18px; border: 3px solid var(--navy); border-radius: 12px; background: #fff; overflow: hidden; }
+.mv2-camino .pista > div { height: 100%; border-radius: 8px; background: linear-gradient(180deg, #FFE08A, #FFC94D); transition: width .5s; }
+.btn-musica-ejercicio {
+    background: #fff; border: 3px solid var(--navy); border-radius: 16px; box-shadow: 0 3px 0 var(--navy);
+    padding: 2px 12px; min-height: 40px; font: 800 .95rem var(--fuente-texto); color: var(--navy); cursor: pointer;
+}
+.btn-musica-ejercicio:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--navy); }
+
+/* Pizarra (la pregunta) */
+.mv2-pizarra { position: relative; padding: 14px 14px 12px; text-align: center; background: #FFFDF4; border-radius: 26px; box-shadow: 0 6px 0 var(--navy); }
+
+/* Cuenta atrás de Flash: barra que se vacía */
+.mv2-cuenta { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; padding: 6px 12px; background: #fff; border: 3px solid var(--navy); border-radius: 18px; }
+.mv2-cuenta .et { font: 800 .95rem var(--fuente-texto); white-space: nowrap; color: #6A45D6; }
+.mv2-cuenta .pista { flex: 1; height: 18px; border: 3px solid var(--navy); border-radius: 12px; background: #EDE8FF; overflow: hidden; }
+.mv2-cuenta .pista > div { height: 100%; width: 100%; border-radius: 8px; background: linear-gradient(180deg, #5FD38A, #1E9B52); }
+.mv2-cuenta .pista > div.medio { background: linear-gradient(180deg, #FFD36B, #F29A1E); }
+.mv2-cuenta .pista > div.poco  { background: linear-gradient(180deg, #FF9E8F, #E2453F); }
+.mv2-cuenta .n { font: 800 1.7rem var(--fuente-titulo); min-width: 1.4em; text-align: center; line-height: 1; font-variant-numeric: tabular-nums; }
+.mv2-cuenta.fin .et { color: #8A5A00; }
+
+/* Zona de la cuenta */
+.operandos-flash { transition: opacity .45s ease, transform .45s ease; min-height: 88px; display: flex; justify-content: center; align-items: center; }
+.operandos-flash.oculto { opacity: 0; transform: scale(.85); pointer-events: none; }
+.mv2-zona { position: relative; margin-bottom: 8px; }
+.mv2-oculta {
+    position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; opacity: 0; transition: opacity .45s .15s;
+    font: 800 clamp(2.6rem, 11vw, 4rem) var(--fuente-titulo); color: #6A45D6;
+}
+.mv2-zona.listo .mv2-oculta { opacity: 1; animation: mv2-late 1.4s ease-in-out infinite; }
+
+/* Frutas (Suma) */
+.escena-frutas { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; width: 100%; }
+.grupo-frutas {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 4px; padding: 10px 12px 12px;
+    background: #FFF1CF; border: 3px solid var(--navy); border-radius: 8px 8px 22px 22px;
+    box-shadow: 0 4px 0 #A8691F, inset 0 -8px 0 rgba(168,105,31,.22);
+    font-size: clamp(1.7rem, 7vw, 2.6rem); line-height: 1.1; max-width: min(100%, 330px);
+}
+.grupo-frutas.chico { font-size: clamp(1.4rem, 5.6vw, 2rem); }
+.grupo-frutas .fruta { display: inline-block; animation: mv2-brota .5s calc(var(--k, 0) * 60ms) both cubic-bezier(.3,1.6,.5,1); }
+@keyframes mv2-brota { 0% { transform: scale(0) } 100% { transform: scale(1) } }
+.signo-escena, .mv2-signo {
+    display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; flex: none;
+    background: var(--oro); border: 3px solid var(--navy); box-shadow: 0 3px 0 var(--navy);
+    font: 800 2rem/1 var(--fuente-titulo); color: var(--navy);
+}
+.mv2-igual { font: 800 clamp(1.8rem, 8vw, 2.6rem) var(--fuente-titulo); color: #A8691F; display: inline-flex; align-items: center; gap: 6px; }
+.mv2-igual i { font-style: normal; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; background: #fff; border: 3px dashed var(--navy); color: #C0322D; }
+.fruta-sacada { position: relative; display: inline-block; }
+.fruta-sacada .fruta { opacity: .35; filter: grayscale(1); display: inline-block; animation: none; }
+.fruta-sacada::after {
+    content: '✕'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: #C0392B; font-weight: 900; font-size: 1.1em; line-height: 1; -webkit-text-stroke: 1px #fff;
+}
+
+/* Números grandes (fichas) */
+.mv2-fichas, .expresion-flash { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; }
+.mv2-ficha, .expresion-flash .pieza.num {
+    display: grid; place-items: center; min-width: clamp(58px, 16vw, 92px); padding: 2px 12px;
+    background: #fff; border: 4px solid var(--navy); border-radius: 20px; box-shadow: 0 5px 0 var(--navy);
+    font: 800 clamp(2.2rem, 9.5vw, 3.8rem)/1.15 var(--fuente-titulo); color: var(--navy); white-space: nowrap;
+}
+.mv2-ficha.fruta-ico { background: transparent; border: 0; box-shadow: none; min-width: 0; padding: 0; font-size: clamp(2.2rem, 9vw, 3.4rem); }
+.mv2-ficha.b, .expresion-flash .pieza.num:nth-of-type(3) { background: #D8F1FF; }
+.mv2-ficha.c { background: #FFE3EF; }
+.mv2-ficha.a { background: #FFF1C2; }
+.expresion-flash { font-size: 1rem; }
+.expresion-flash .pieza.num:nth-of-type(1) { background: #FFF1C2; }
+.expresion-flash .pieza.num:nth-of-type(5) { background: #FFE3EF; }
+.expresion-flash .pieza.signo, .expresion-flash .pieza.igual, .expresion-flash .pieza.interrogante {
+    font: 800 clamp(2rem, 8vw, 3rem) var(--fuente-titulo); color: #0E6B7D; display: inline-block;
+}
+.expresion-flash .pieza.igual { color: #A8691F; }
+.expresion-flash .pieza.interrogante { color: #C0322D; }
+
+/* Textos bilingües: MISMO tamaño e importancia (RN-06) */
+.mv2-texto { margin-top: 6px; display: grid; gap: 6px; }
+.mv2-texto .linea {
+    display: flex; align-items: center; justify-content: center; gap: 10px; padding: 6px 12px; border-radius: 16px; text-align: left;
+}
+.mv2-texto .es { background: #E4ECFB; }
+.mv2-texto .gn { background: #DDF3F6; }
+.mv2-texto .etiqueta-idioma {
+    flex: none; font: 800 .8rem var(--fuente-texto); color: #fff; padding: 2px 10px; border-radius: 12px; letter-spacing: .3px;
+}
+.mv2-texto .es .etiqueta-idioma { background: var(--navy); }
+.mv2-texto .gn .etiqueta-idioma { background: var(--teal); }
+.texto-bilingue { margin: 0; font: 800 clamp(1.15rem, 4.4vw, 1.4rem)/1.25 var(--fuente-texto); color: var(--navy); text-wrap: balance; }
+.mv2-audio { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.mv2-btn-audio {
+    min-height: 46px; padding: 2px 16px; border-radius: 16px; border: 3px solid var(--navy); background: #fff;
+    box-shadow: 0 3px 0 var(--navy); font: 800 1rem var(--fuente-texto); color: var(--navy); cursor: pointer;
+}
+.mv2-btn-audio.gn { border-color: var(--teal); box-shadow: 0 3px 0 var(--teal); color: #0A5160; }
+.mv2-btn-audio:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--navy); }
+.mv2-btn-audio[disabled] { background: #F1F3F7; border-color: #9AA6BD; box-shadow: 0 3px 0 #9AA6BD; color: #5F6F8F; cursor: default; }
+
+/* Respuestas */
+.mv2-pregunta { text-align: center; font: 800 1.15rem var(--fuente-titulo); margin: 4px 0 10px; }
+.mv2-opciones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 10px; }
+@media (min-width: 640px) { .mv2-opciones { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.btn-opcion {
+    position: relative; overflow: hidden; min-height: 84px; padding: 6px 4px; cursor: pointer;
+    border: 4px solid var(--navy); border-radius: 24px; box-shadow: 0 6px 0 var(--navy);
+    font: 800 clamp(2rem, 8vw, 2.8rem)/1 var(--fuente-titulo); color: var(--navy);
+    transition: transform .12s, box-shadow .12s; -webkit-tap-highlight-color: transparent;
+}
+.mv2-opciones > :nth-child(1) .btn-opcion, .mv2-opciones > .btn-opcion:nth-child(1) { background: #FF9C8C; }
+.mv2-opciones > :nth-child(2) .btn-opcion, .mv2-opciones > .btn-opcion:nth-child(2) { background: #FFD36B; }
+.mv2-opciones > :nth-child(3) .btn-opcion, .mv2-opciones > .btn-opcion:nth-child(3) { background: #8BE0AE; }
+.mv2-opciones > :nth-child(4) .btn-opcion, .mv2-opciones > .btn-opcion:nth-child(4) { background: #C3B5FA; }
+@media (hover: hover) { .btn-opcion:not(.seleccionada):hover { transform: translateY(-3px); box-shadow: 0 9px 0 var(--navy); } }
+.btn-opcion:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--navy); }
+.btn-opcion:focus-visible { outline: 5px solid var(--oro); outline-offset: 3px; }
+.btn-opcion .tecla {
+    display: none; position: absolute; left: 8px; top: 6px; width: 24px; height: 24px; border-radius: 8px;
+    background: rgba(255,255,255,.85); border: 2px solid var(--navy); font: 800 .85rem/20px var(--fuente-texto);
+}
+@media (pointer: fine) { .btn-opcion .tecla { display: block; } }
+.btn-opcion.seleccionada {
+    background: var(--navy) !important; color: #fff !important; transform: translateY(3px) scale(1.03);
+    box-shadow: 0 3px 0 var(--navy), 0 0 0 5px rgba(255,201,77,.7);
+}
+.btn-opcion.seleccionada .tecla { background: var(--oro); color: var(--navy); }
+.btn-opcion.seleccionada::after {
+    content: ''; position: absolute; left: 0; bottom: 0; height: 10px; width: 0; background: var(--oro);
+    animation: llenarBarra var(--retardo, 1200ms) linear forwards;
+}
+.btn-opcion.enviando { pointer-events: none; }
+@keyframes llenarBarra { from { width: 0; } to { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .btn-opcion.seleccionada::after { animation: none; width: 100%; } }
+.ayuda-respuesta { text-align: center; margin: 0; min-height: 1.4em; font: 800 .98rem var(--fuente-texto); color: var(--navy); }
+
+.mv2-libre { width: min(220px, 70%); margin: 0 auto 12px; display: block; text-align: center; height: 74px; font: 800 2rem var(--fuente-titulo); color: var(--navy); border: 4px solid var(--navy); border-radius: 20px; box-shadow: 0 5px 0 var(--navy); }
+.mv2-btn {
+    display: block; width: 100%; padding: 12px 16px; text-align: center; text-decoration: none; cursor: pointer;
+    font: 800 1.2rem var(--fuente-titulo); color: var(--navy); background: #fff;
+    border: 4px solid var(--navy); border-radius: 20px; box-shadow: 0 5px 0 var(--navy); transition: transform .1s, box-shadow .1s;
+}
+.mv2-btn:hover { color: var(--navy); filter: brightness(1.04); }
+.mv2-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--navy); }
+.mv2-btn:focus-visible { outline: 5px solid var(--oro); outline-offset: 3px; }
+.mv2-btn.verde { background: #7ED9A6; }
+.mv2-btn.amarillo { background: #FFD84D; }
+.mv2-btn.celeste { background: #BEE0FF; }
+
+/* =========================================================================
+   PANTALLA FINAL (compartida por los tres juegos)
+   ========================================================================= */
+.mv2-res { --ancho: min(640px, 100vw - 32px); align-items: stretch; }
+.mv2-res-cartel { position: relative; margin-top: 92px; padding: 0 16px 20px; text-align: center; background: #fff; border: 4px solid var(--navy); border-radius: 32px; box-shadow: 0 8px 0 var(--navy); }
+.mv2-res-cartel .guara-grande { width: 150px; margin: -98px auto 0; }
+.mv2-res-cartel .guara-grande .mv2-guara { width: 100%; }
+.mv2-res-cartel h2 { font: 800 clamp(1.9rem, 7vw, 2.6rem)/1.05 var(--fuente-titulo); margin: 6px 0 0; }
+.mv2-res-cartel h2.gn { font-size: clamp(1.2rem, 4.4vw, 1.6rem); color: var(--teal); margin-top: 2px; }
+.mv2-res-cartel p.sub { margin: 6px 0 0; font-weight: 700; font-size: 1.1rem; color: #44546F; }
+.mv2-res-cartel .mv2-estrellas { margin: 10px 0 4px; }
+.mv2-res-superado { display: inline-block; margin-top: 8px; padding: 6px 18px; border-radius: 18px; border: 3px solid var(--navy); background: linear-gradient(135deg, #8BE0AE, #7ED9E6); box-shadow: 0 4px 0 var(--navy); font: 800 1.2rem var(--fuente-titulo); }
+.mv2-res-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.mv2-res-stat { padding: 8px 4px 6px; border-radius: 20px; border: 3px solid var(--navy); box-shadow: 0 4px 0 var(--navy); }
+.mv2-res-stat .ico { font-size: 1.7rem; line-height: 1.1; }
+.mv2-res-stat b { display: block; font: 800 1.9rem/1.05 var(--fuente-titulo); font-variant-numeric: tabular-nums; }
+.mv2-res-stat span { font: 800 .85rem var(--fuente-texto); color: var(--tinta-suave); }
+.mv2-res-stat.v { background: #D5F2DF; } .mv2-res-stat.a { background: #FFF1C2; } .mv2-res-stat.c { background: #D5ECFF; }
+.mv2-res-extra { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
+.mv2-res-ficha { padding: 4px 14px; border-radius: 16px; border: 3px solid var(--navy); background: #FFF1C2; font: 800 1rem var(--fuente-texto); }
+.mv2-res-logros { margin-top: 12px; padding: 8px 10px; border-radius: 20px; border: 3px solid var(--navy); background: linear-gradient(135deg, #FFF1C2, #D5F2DF); }
+.mv2-res-logros h5 { margin: 0 0 4px; font: 800 1.1rem var(--fuente-titulo); }
+.mv2-res-juego { margin: 12px 0 0; font-weight: 700; font-size: .95rem; color: var(--tinta-suave); }
+.mv2-res-botones { display: grid; gap: 14px; margin-top: 16px; }
+@media (min-width: 560px) { .mv2-res-botones.dos { grid-template-columns: 1fr 1fr; } .mv2-res-botones .ancho { grid-column: 1 / -1; } }
+
+/* =========================================================================
+   MENÚ DE JUEGOS (los tres)
+   ========================================================================= */
+.mv2-menu .titulo-juegos { font: 800 clamp(1.5rem, 5vw, 2rem) var(--fuente-titulo); margin: 4px 0 14px; text-align: center; }
+.mv2-menu .grado { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.mv2-menu .grado b { padding: 4px 14px; border-radius: 16px; background: var(--navy); color: #fff; font: 800 1rem var(--fuente-texto); }
+.mv2-menu .grado small { color: var(--tinta-suave); font-weight: 700; }
+.mv2-juegos { display: grid; grid-template-columns: 1fr; gap: 18px; align-items: start; padding-bottom: 10px; }
+@media (min-width: 860px) { .mv2-juegos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.mv2-juego { border: 4px solid var(--navy); border-radius: 28px; box-shadow: 0 7px 0 var(--navy); overflow: hidden; background: #fff; }
+.mv2-juego-cab { padding: 14px 12px 12px; text-align: center; border-bottom: 4px dashed var(--navy); background: linear-gradient(180deg, var(--cielo-a), var(--cielo-b)); }
+.mv2-juego-ico {
+    display: inline-grid; place-items: center; width: 80px; height: 80px; border-radius: 50%; font-size: 2.7rem; line-height: 1;
+    background: #fff; border: 4px solid var(--navy); box-shadow: 0 4px 0 var(--navy);
+}
+.mv2-juego-cab h3 { margin: 8px 0 0; font: 800 1.3rem/1.1 var(--fuente-titulo); }
+.mv2-juego-cab h3.gn { font-size: 1.1rem; color: var(--teal); margin-top: 0; }
+.mv2-juego-cab .btn-como-se-juega { margin-top: 10px; }
+.mv2-juego-racha { text-align: center; margin-top: 8px; }
+.mv2-juego-racha span { display: inline-block; padding: 2px 12px; border-radius: 14px; background: #FFF1C2; border: 3px solid var(--navy); font: 800 .95rem var(--fuente-texto); }
+.mv2-juego-cuerpo { padding: 12px 12px 16px; background: var(--tinte); }
+.mv2-menu .mv2-niveles { display: grid; grid-template-columns: repeat(var(--c, 3), minmax(0, 1fr)); gap: 10px; }
+.mv2-menu .mv2-niveles.flash { --c: 5; gap: 8px; }
+@media (max-width: 480px) { .mv2-menu .mv2-niveles.flash { --c: 5; gap: 6px; } .mv2-menu .mv2-niveles.flash button { font-size: 1.15rem; } }
+.mv2-menu .mv2-niveles button {
+    width: 100%; min-height: 64px; border-radius: 16px; border: 3px solid var(--navy); background: #fff; color: var(--navy);
+    font: 800 1.35rem var(--fuente-titulo); line-height: 1; box-shadow: 0 4px 0 var(--navy); cursor: pointer; padding: 6px 2px;
+}
+.mv2-menu .mv2-niveles button small { display: block; font: 700 .72rem var(--fuente-texto); letter-spacing: .5px; color: #B8860B; margin-top: 3px; }
+.mv2-menu .mv2-niveles button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--navy); }
+.mv2-menu .mv2-niveles button.cerrado { background: #E8ECF4; color: #5F6F8F; box-shadow: 0 4px 0 #8896B3; border-color: #8896B3; }
+.mv2-menu .mv2-niveles button.cerrado small { color: #8896B3; }
+.mv2-menu .mv2-niveles button:focus-visible { outline: 4px solid var(--oro); outline-offset: 3px; }
+.mv2-menu .mv2-juego .mapa { padding: 0; }
+.mv2-menu .mv2-juego .mapa .pasos { gap: 8px; }
+.mv2-juego-cuerpo .mapa { background: none; }
+
+/* ── Ajustes de compactación y mapa ancho ─────────────────────────────── */
+@media (min-width: 820px) {
+    .mv2-ej { gap: 10px; padding-block: 2px 20px; }
+    .mv2-ej .mv2-guara { width: 72px; }
+    .mv2-ej-stats { flex-direction: row; }
+    .mv2-ej-hud .mv2-burbuja { padding: 6px 12px; }
+    .mv2-pizarra { padding: 10px 14px 10px; }
+    .btn-opcion { min-height: 74px; }
+    .mv2-pregunta { margin: 0 0 8px; }
+    .operandos-flash { min-height: 76px; }
+    .mv2-texto { gap: 4px; }
+    .mv2-audio { margin-top: 8px; }
+}
+@media (min-width: 860px) {
+    .mv2-juegos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .mv2-juego.memoria { grid-column: 1 / -1; }
+    .mv2-juego.memoria .mapa { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+    .mv2-juego.memoria .mapa .pasos { gap: 6px; }
+    .mv2-menu .mv2-niveles { --c: 6; }
+    .mv2-menu .mv2-niveles.flash { --c: 5; }
+}
+@media (min-width: 820px) {
+    /* castellano y guaraní lado a lado: mismo tamaño, menos altura */
+    .mv2-texto { grid-template-columns: 1fr 1fr; }
+    .mv2-texto .linea { flex-direction: column; gap: 2px; padding: 6px 10px 8px; text-align: center; }
+}
+@media (min-width: 820px) and (max-height: 820px) {
+    .mv2-pregunta { display: none; }
+}

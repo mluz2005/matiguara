@@ -1,0 +1,388 @@
+/* =========================================================================
+   memoria-v2.css — Rediseño visual de "Encuentra el par" (MatiGuará)
+   -------------------------------------------------------------------------
+   AISLADO: todo cuelga de .mv2 (el tablero) o .mv2-menu (el menú). Este
+   archivo solo se carga desde las vistas *-v2, así que no puede alterar
+   Suma de Frutas, Flash Matemático, ni ninguna otra pantalla.
+
+   Mantiene el lenguaje que ya tiene la app: borde azul marino grueso,
+   sombra dura tipo juguete (0 5px 0) y la paleta #1B3361 / #0E6B7D / #177040.
+   ========================================================================= */
+
+/* Fuentes locales (Baloo 2 y Nunito, licencia OFL): el juego no depende de Google Fonts.
+   Los 3 subconjuntos cubren castellano y guaraní (ñ, ẽ, ĩ, ỹ, õ, ũ y la tilde combinada de g̃). */
+@font-face { font-family: 'Baloo 2'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('../fonts/baloo-2-latin-ext-700-normal.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Baloo 2'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('../fonts/baloo-2-vietnamese-700-normal.woff2') format('woff2'); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+@font-face { font-family: 'Baloo 2'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('../fonts/baloo-2-latin-700-normal.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Baloo 2'; font-style: normal; font-weight: 800; font-display: swap;
+  src: url('../fonts/baloo-2-latin-ext-800-normal.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Baloo 2'; font-style: normal; font-weight: 800; font-display: swap;
+  src: url('../fonts/baloo-2-vietnamese-800-normal.woff2') format('woff2'); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+@font-face { font-family: 'Baloo 2'; font-style: normal; font-weight: 800; font-display: swap;
+  src: url('../fonts/baloo-2-latin-800-normal.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url('../fonts/nunito-latin-ext-600-normal.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url('../fonts/nunito-vietnamese-600-normal.woff2') format('woff2'); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url('../fonts/nunito-latin-600-normal.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('../fonts/nunito-latin-ext-700-normal.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('../fonts/nunito-vietnamese-700-normal.woff2') format('woff2'); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('../fonts/nunito-latin-700-normal.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 800; font-display: swap;
+  src: url('../fonts/nunito-latin-ext-800-normal.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 800; font-display: swap;
+  src: url('../fonts/nunito-vietnamese-800-normal.woff2') format('woff2'); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 800; font-display: swap;
+  src: url('../fonts/nunito-latin-800-normal.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+
+
+/* El layout comparte estas decoraciones con toda la app; aquí se apagan
+   porque cada mundo trae su propia escena. (Solo afecta a las vistas v2.) */
+body:has(.mv2) .decoracion-lateral, body:has(.mv2) .franja-frutas { display: none !important; }
+
+/* .mv2-overlay vive fuera de .mv2 (cuelga del body), por eso hereda aquí las variables */
+.mv2, .mv2-menu, .mv2-overlay {
+    --navy: #1B3361;
+    --teal: #0E6B7D;
+    --verde: #177040;
+    --oro: #FFC94D;
+    --crema: #FFFDF4;
+    --tinta-suave: #3F5A8C;
+    --fuente-titulo: 'Baloo 2', 'Nunito', 'Trebuchet MS', system-ui, sans-serif;
+    --fuente-texto: 'Nunito', 'Trebuchet MS', system-ui, sans-serif;
+    font-family: var(--fuente-texto);
+    color: var(--navy);
+}
+.mv2 *, .mv2 *::before, .mv2 *::after,
+.mv2-menu *, .mv2-menu *::before, .mv2-menu *::after,
+.mv2-overlay *, .mv2-overlay *::before, .mv2-overlay *::after { box-sizing: border-box; }
+
+/* ── Mundos (cambian cada 2 niveles) ───────────────────────────────────── */
+.mv2-w1 { --cielo-a:#BDEBFF; --cielo-b:#E9FAD9; --suelo:#7CCB6B; --dorso-a:#35A862; --dorso-b:#146B3C; --realce:#FFC94D; --tinte:#E6F7DA; }
+.mv2-w2 { --cielo-a:#AEE0FF; --cielo-b:#DDF4FF; --suelo:#4FB4E8; --dorso-a:#3B8FD6; --dorso-b:#1B3361; --realce:#FFD966; --tinte:#DDF1FF; }
+.mv2-w3 { --cielo-a:#FFE9A8; --cielo-b:#FFF6DC; --suelo:#E9B659; --dorso-a:#F29A38; --dorso-b:#B8561A; --realce:#FFFFFF; --tinte:#FFF1C9; }
+.mv2-w4 { --cielo-a:#CFC8FF; --cielo-b:#F1EEFF; --suelo:#B9A8F5; --dorso-a:#8E6BD1; --dorso-b:#4F3499; --realce:#FFE08A; --tinte:#EDE8FF; }
+.mv2-w5 { --cielo-a:#FFC9E0; --cielo-b:#FFF0F6; --suelo:#F59ABF; --dorso-a:#E0578F; --dorso-b:#8F1F55; --realce:#FFE08A; --tinte:#FFE3EF; }
+
+.mv2 {
+    --ancho: min(1040px, 100vw - 40px);
+    position: relative;
+    width: var(--ancho);
+    /* centra el bloque aunque el layout lo limite a 600 px */
+    margin-left: calc((100% - var(--ancho)) / 2);
+    min-height: calc(100vh - 230px);
+    padding-block: 6px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ── Escena de fondo (reemplaza el papel tapiz de frutas) ──────────────── */
+.mv2-escena {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+    background: linear-gradient(180deg, var(--cielo-a) 0%, var(--cielo-b) 72%);
+}
+.mv2-escena::after {
+    content: ""; position: absolute; left: -12%; right: -12%; bottom: -16vh; height: 34vh;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0; background: var(--suelo); opacity: .9;
+}
+.mv2-escena span {
+    position: absolute; font-size: clamp(1.8rem, 4.5vw, 3.4rem); opacity: .55;
+    animation: mv2-deriva 9s ease-in-out infinite;
+}
+.mv2-escena .e1 { top: 16%; left: 3%; }
+.mv2-escena .e2 { top: 46%; left: 6%; animation-delay: -2s; }
+.mv2-escena .e3 { bottom: 14%; left: 10%; animation-delay: -4s; }
+.mv2-escena .e4 { top: 14%; right: 4%; animation-delay: -1s; }
+.mv2-escena .e5 { top: 50%; right: 5%; animation-delay: -3s; }
+.mv2-escena .e6 { bottom: 12%; right: 11%; animation-delay: -5s; }
+@keyframes mv2-deriva { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-12px) rotate(3deg); } }
+@media (max-width: 699px) { .mv2-escena .e2, .mv2-escena .e5 { display: none; } }
+
+/* ── Pegatina (bloque con borde y relieve, igual que tarjeta-infantil) ─── */
+.mv2-pegatina {
+    background: #fff; border: 3px solid var(--navy); border-radius: 20px;
+    box-shadow: 0 4px 0 var(--navy);
+}
+
+/* ── HUD ───────────────────────────────────────────────────────────────── */
+.mv2-hud {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    grid-template-areas: "guara tiempo" "info info";
+    gap: 10px 14px; align-items: center;
+}
+@media (min-width: 820px) {
+    .mv2-hud { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-areas: "guara info tiempo"; }
+}
+
+.mv2-guara-wrap { grid-area: guara; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.mv2-guara { width: clamp(64px, 11vw, 96px); flex: none; transform-origin: 50% 90%; animation: mv2-respira 2.8s ease-in-out infinite; }
+/* Mascota con imágenes: una por expresión; solo se ve la del estado actual */
+.mv2-guara { aspect-ratio: 1 / 1.08; }
+.mv2-guara img { display: none; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; }
+.mv2-guara[data-estado="idle"]  .p-idle,
+.mv2-guara[data-estado="feliz"] .p-feliz,
+.mv2-guara[data-estado="uy"]    .p-uy { display: block; }
+@keyframes mv2-respira { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
+
+.mv2-guara .ojos-feliz, .mv2-guara .ojos-uy, .mv2-guara .mejillas { display: none; }
+.mv2-guara[data-estado="feliz"] { animation: mv2-salta .7s cubic-bezier(.3,1.6,.5,1); }
+.mv2-guara[data-estado="feliz"] .ojos-idle, .mv2-guara[data-estado="uy"] .ojos-idle { display: none; }
+.mv2-guara[data-estado="feliz"] .ojos-feliz, .mv2-guara[data-estado="feliz"] .mejillas { display: inline; }
+.mv2-guara[data-estado="uy"] { animation: mv2-ay .5s ease; }
+.mv2-guara[data-estado="uy"] .ojos-uy { display: inline; }
+@keyframes mv2-salta { 0% { transform: translateY(0) rotate(0) } 35% { transform: translateY(-18px) rotate(-8deg) } 70% { transform: translateY(0) rotate(5deg) } 100% { transform: translateY(0) rotate(0) } }
+@keyframes mv2-ay { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-6px) rotate(-4deg) } 75% { transform: translateX(6px) rotate(4deg) } }
+
+.mv2-burbuja {
+    position: relative; min-width: 0; flex: 1 1 auto; line-height: 1.15;
+    background: #fff; border: 3px solid var(--navy); border-radius: 18px; padding: 8px 12px;
+    box-shadow: 0 4px 0 var(--navy);
+}
+.mv2-burbuja::before {
+    content: ""; position: absolute; left: -11px; top: 50%; width: 16px; height: 16px;
+    background: #fff; border-left: 3px solid var(--navy); border-bottom: 3px solid var(--navy);
+    transform: translateY(-50%) rotate(45deg);
+}
+.mv2-burbuja b { display: block; font-family: var(--fuente-titulo); font-size: clamp(1rem, 2.6vw, 1.25rem); font-weight: 800; }
+.mv2-burbuja i { display: block; font-style: normal; font-weight: 700; font-size: clamp(.85rem, 2.1vw, 1rem); color: var(--teal); }
+.mv2-burbuja.late { animation: mv2-late .35s ease; }
+@keyframes mv2-late { 0% { transform: scale(.92) } 60% { transform: scale(1.05) } 100% { transform: scale(1) } }
+
+.mv2-info { grid-area: info; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+.mv2-mundo {
+    display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+    padding: 5px 16px; font-weight: 800; font-size: 1rem;
+}
+.mv2-mundo .ico { font-size: 1.5rem; line-height: 1; }
+.mv2-mundo .dif { color: #B8860B; letter-spacing: 1px; font-size: .95rem; }
+.mv2-mundo small { font-weight: 700; color: var(--tinta-suave); font-size: .9rem; }
+
+.mv2-marcadores { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: nowrap; }
+.mv2-progreso { display: flex; gap: 6px; padding: 6px 12px; align-items: center; }
+.mv2-hueco {
+    width: clamp(30px, 6vw, 40px); height: clamp(30px, 6vw, 40px); border-radius: 50%;
+    border: 3px dashed #9DB0D4; display: grid; place-items: center; font-size: 1.25rem; line-height: 1;
+    background: #F2F6FF; transition: background .2s;
+}
+.mv2-progreso.muchos { gap: 4px; padding: 6px 10px; }
+.mv2-progreso.muchos .mv2-hueco { width: 28px; height: 28px; font-size: 1rem; }
+.mv2-progreso.muchos .mv2-hueco.lleno b { font-size: .95rem; }
+.mv2-hueco.lleno { border: 3px solid var(--navy); background: var(--oro); animation: mv2-pop .5s cubic-bezier(.3,1.6,.5,1); }
+.mv2-hueco.lleno b { font-family: var(--fuente-titulo); font-size: 1.1rem; }
+.mv2-puntos {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; min-height: 46px;
+    font-family: var(--fuente-titulo); font-weight: 800; font-size: 1.15rem; font-variant-numeric: tabular-nums;
+}
+.mv2-puntos { position: relative; }
+.mv2-combo { position: absolute; right: -10px; top: -14px; padding: 0 8px; border-radius: 12px; background: #FFF1C2; border: 3px solid var(--navy); box-shadow: 0 3px 0 var(--navy); font-size: 1rem; white-space: nowrap; z-index: 2; animation: mv2-pop .4s cubic-bezier(.3,1.6,.5,1); }
+.mv2-combo[hidden] { display: none; }
+
+/* Tiempo: barra horizontal que se vacía (reemplaza el aro de 70 px) */
+.mv2-tiempo { grid-area: tiempo; padding: 8px 14px 10px; display: flex; flex-direction: column; gap: 4px; position: relative; min-width: 0; }
+.mv2-tiempo-fila { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.mv2-tiempo-fila span { font-weight: 800; font-size: .9rem; color: var(--tinta-suave); }
+.mv2-tiempo-fila b { font-family: var(--fuente-titulo); font-size: 1.6rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.mv2-barra { height: 18px; border-radius: 12px; border: 3px solid var(--navy); background: #E7EEFB; overflow: hidden; }
+.mv2-barra > div {
+    height: 100%; width: 100%; border-radius: 8px; background: linear-gradient(180deg, #5FD38A, #1E9B52);
+    transition: width 1s linear, background .4s;
+}
+.mv2-tiempo.medio .mv2-barra > div { background: linear-gradient(180deg, #FFD36B, #F29A1E); }
+.mv2-tiempo.poco  .mv2-barra > div { background: linear-gradient(180deg, #FF9E8F, #E2453F); }
+.mv2-tiempo.poco b { color: #C0322D; }
+.mv2-tiempo.vistazo .mv2-barra > div { background: linear-gradient(180deg, #FFE08A, #FFC94D); }
+.mv2-tiempo.vistazo .mv2-tiempo-fila span { color: #8A5A00; }
+.mv2-tiempo.poco { animation: mv2-late 1s ease-in-out infinite; }
+.mv2-extra {
+    position: absolute; right: 14px; bottom: -22px; font-family: var(--fuente-titulo); font-weight: 800; font-size: 1.3rem;
+    color: #177040; background: #E3F8EA; border: 3px solid #177040; border-radius: 14px; padding: 0 10px;
+    animation: mv2-baja 1.1s ease-out forwards; pointer-events: none; z-index: 3;
+}
+@keyframes mv2-baja { 0% { opacity: 0; transform: translateY(-8px) } 15% { opacity: 1 } 100% { opacity: 0; transform: translateY(18px) } }
+
+/* ── Mesa de cartas ────────────────────────────────────────────────────── */
+.mv2-mesa { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding-block: 6px; }
+
+
+.mv2-tablero {
+    --gap: 10px; --cols: var(--cols-m, 4); --filas: var(--filas-m, 2);
+    --cw: max(88px, min(var(--cw-max, 170px), calc((100vh - 400px) / (var(--filas) * 1.2))));
+    display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap);
+    width: 100%;
+    max-width: calc(var(--cols) * var(--cw) + (var(--cols) - 1) * var(--gap) + 4px);
+    margin-inline: auto; padding-bottom: 8px; /* espacio para la sombra dura */
+}
+@media (min-width: 700px) {
+    .mv2-tablero { --gap: 16px; --cols: var(--cols-d, 4); --filas: var(--filas-d, 2); }
+}
+@media (max-width: 699px) {
+    .mv2-tablero { --cw: var(--cw-max, 170px); }
+}
+
+/* ── Carta ─────────────────────────────────────────────────────────────── */
+.carta-memoria.mv2-carta {
+    flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap) - 4px) / var(--cols));
+    aspect-ratio: 5 / 6;
+    perspective: 900px; cursor: pointer; container-type: inline-size;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .18s ease;
+}
+@media (hover: hover) { .mv2-carta:not(.volteada):not(.encontrada):hover { transform: translateY(-5px) rotate(-1deg); } }
+.mv2-carta:focus-visible { outline: 4px solid var(--oro); outline-offset: 4px; border-radius: 24px; }
+
+.mv2 .carta-memoria-inner {
+    position: relative; width: 100%; height: 100%;
+    transform-style: preserve-3d; border-radius: 20px;
+    transition: transform .5s cubic-bezier(.34,1.35,.5,1);
+}
+.mv2 .carta-memoria.volteada .carta-memoria-inner { transform: rotateY(180deg); }
+
+.mv2 .carta-cara {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column;
+    border-radius: clamp(14px, 12cqw, 26px); border: 4px solid var(--navy);
+    box-shadow: 0 6px 0 var(--navy); backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden;
+}
+.mv2-carta:active:not(.volteada):not(.encontrada) .carta-dorso { box-shadow: 0 2px 0 var(--navy); transform: translateY(4px); }
+
+/* Dorso: telaraña de ñandutí (encaje paraguayo) sobre el color del mundo */
+.mv2 .carta-dorso {
+    background:
+        repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.26) 0 1.6deg, transparent 1.6deg 22.5deg),
+        repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,.30) 0 2px, transparent 2px 17px),
+        linear-gradient(150deg, var(--dorso-a), var(--dorso-b));
+}
+.mv2-dorso-logo {
+    position: relative; width: 54%; aspect-ratio: 1 / 1; flex: none; border-radius: 50%; background: #fff;
+    border: 3px solid var(--navy); box-shadow: 0 3px 0 rgba(27,51,97,.55); overflow: hidden;
+}
+.mv2-dorso-logo img { position: absolute; left: 50%; top: 54%; width: 84%; height: auto; transform: translate(-50%, -50%); display: block; }
+
+.mv2 .carta-frente { background: var(--crema); transform: rotateY(180deg); gap: 0; }
+.mv2-emoji { font-size: clamp(2.2rem, 8vw, 4rem); line-height: 1; filter: drop-shadow(0 3px 0 rgba(27,51,97,.18)); }
+@supports (font-size: 1cqw) { .mv2-emoji { font-size: 46cqw; } }
+
+/* Número (naranja cálido) y cantidad (celeste): así el niño distingue el tipo de carta */
+.mv2 .carta-frente.t-numeral { background: radial-gradient(circle at 50% 35%, #FFF6D2, #FFE08A); }
+.mv2 .carta-frente.t-cantidad { background: radial-gradient(circle at 50% 35%, #F3FAFF, #CFE9FF); }
+.mv2-numeral { font-family: var(--fuente-titulo); font-weight: 800; line-height: .9; font-size: 3.4rem; color: var(--navy); text-shadow: 0 3px 0 rgba(27,51,97,.18); }
+@supports (font-size: 1cqw) { .mv2-numeral { font-size: 58cqw; } }
+.mv2-cantidad {
+    --q: 3; display: grid; grid-template-columns: repeat(var(--q), auto); gap: 2px 4px; justify-content: center; align-content: center;
+    line-height: 1; font-size: 1.4rem; max-width: 92%;
+}
+@supports (font-size: 1cqw) { .mv2-cantidad { font-size: min(36cqw, calc(66cqw / var(--q))); } }
+
+/* Etiqueta bilingüe: aparece SOLO cuando el par se encontró (no regala pistas) */
+.mv2-cinta {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 3px 4px 5px; text-align: center; line-height: 1.05;
+    background: var(--navy); color: #fff; font-weight: 800; font-size: .8rem;
+    transform: translateY(101%); transition: transform .35s .15s cubic-bezier(.3,1.4,.5,1);
+}
+.mv2-cinta small { display: block; font-weight: 700; color: var(--oro); font-size: .92em; }
+@supports (font-size: 1cqw) { .mv2-cinta { font-size: 11.5cqw; } }
+.mv2-carta.encontrada .mv2-cinta { transform: translateY(0); }
+
+/* Estados */
+.mv2 .carta-memoria.encontrada .carta-frente {
+    border-color: #C98F00; background: radial-gradient(circle at 50% 30%, #FFFBE6, #FFE9A6);
+    box-shadow: 0 6px 0 #C98F00, 0 0 0 5px rgba(255,201,77,.55);
+}
+.mv2 .carta-memoria.encontrada .carta-frente.t-numeral,
+.mv2 .carta-memoria.encontrada .carta-frente.t-cantidad { background: radial-gradient(circle at 50% 30%, #FFFBE6, #FFE9A6); }
+.mv2 .carta-memoria.encontrada .carta-memoria-inner { animation: mv2-feliz .7s cubic-bezier(.3,1.5,.5,1); }
+@keyframes mv2-feliz {
+    0% { transform: rotateY(180deg) scale(1) } 40% { transform: rotateY(180deg) scale(1.12) rotate(-3deg) }
+    70% { transform: rotateY(180deg) scale(.97) rotate(2deg) } 100% { transform: rotateY(180deg) scale(1) }
+}
+.mv2 .carta-memoria.error .carta-memoria-inner { animation: mv2-sacude .42s ease; }
+.mv2 .carta-memoria.error .carta-frente { border-color: #E2453F; box-shadow: 0 6px 0 #B02E29; }
+@keyframes mv2-sacude {
+    0%,100% { transform: rotateY(180deg) translateX(0) } 20% { transform: rotateY(180deg) translateX(-8px) }
+    50% { transform: rotateY(180deg) translateX(8px) } 80% { transform: rotateY(180deg) translateX(-4px) }
+}
+@keyframes mv2-pop { 0% { transform: scale(.4) } 70% { transform: scale(1.18) } 100% { transform: scale(1) } }
+
+/* Ayuda corta (no un párrafo): se apaga sola tras la primera jugada */
+.mv2-ayuda {
+    text-align: center; padding: 8px 16px; font-weight: 800; font-size: 1rem; line-height: 1.25;
+    max-width: 560px; transition: opacity .5s, transform .5s;
+}
+.mv2-ayuda small { display: block; font-weight: 700; color: var(--teal); font-size: .92rem; }
+.mv2-ayuda.oculta { opacity: 0; transform: translateY(6px); pointer-events: none; height: 0; padding: 0; overflow: hidden; }
+
+/* ── Confeti de frutas ─────────────────────────────────────────────────── */
+.mv2-confeti { position: fixed; z-index: 2500; pointer-events: none; font-size: 1.7rem; line-height: 1; will-change: transform, opacity; }
+
+/* ── Cartel (intro, transición y resultado) ────────────────────────────── */
+.mv2-overlay {
+    position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px;
+    background: rgba(27,51,97,.55); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    animation: mv2-aparece .25s ease;
+}
+@keyframes mv2-aparece { from { opacity: 0 } to { opacity: 1 } }
+.mv2-cartel {
+    width: min(440px, 100%); text-align: center; padding: 18px 20px 22px;
+    background: #fff; border: 4px solid var(--navy); border-radius: 30px; box-shadow: 0 8px 0 var(--navy);
+    animation: mv2-pop .45s cubic-bezier(.3,1.5,.5,1);
+    font-family: var(--fuente-texto); color: var(--navy);
+}
+.mv2-cartel .guara-grande { width: 108px; margin: -62px auto 0; }
+.mv2-cartel .guara-grande svg { width: 100%; height: auto; display: block; overflow: visible; }
+.mv2-cartel .emoji-grande { font-size: 3rem; line-height: 1.1; }
+.mv2-cartel h3 { font-family: var(--fuente-titulo); font-weight: 800; font-size: clamp(1.5rem, 5vw, 2rem); margin: 6px 0 2px; line-height: 1.1; text-wrap: balance; }
+.mv2-cartel p { margin: 6px 0 0; font-weight: 700; font-size: 1.05rem; }
+.mv2-cartel p.gn { color: var(--teal); font-size: .98rem; margin-top: 2px; }
+.mv2-estrellas { display: flex; justify-content: center; gap: 6px; margin: 8px 0 2px; }
+.mv2-estrella { font-size: 3rem; line-height: 1; filter: grayscale(1) opacity(.35); }
+.mv2-estrella.gana { filter: none; animation: mv2-pop .6s calc(var(--i) * .22s + .2s) both cubic-bezier(.3,1.7,.5,1); }
+.mv2-puntitos span { display: inline-block; width: 10px; height: 10px; margin: 0 3px; border-radius: 50%; background: var(--teal); animation: mv2-salto 1s infinite; }
+.mv2-puntitos span:nth-child(2) { animation-delay: .15s } .mv2-puntitos span:nth-child(3) { animation-delay: .3s }
+@keyframes mv2-salto { 0%,60%,100% { transform: translateY(0) } 30% { transform: translateY(-8px) } }
+
+/* ── Accesibilidad: menos movimiento ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .mv2 *, .mv2 *::before, .mv2 *::after, .mv2-overlay, .mv2-overlay * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    .mv2-escena span { animation: none !important; }
+}
+
+/* =========================================================================
+   MENÚ: mapa de mundos para "Encuentra el par" (solo esa tarjeta)
+   ========================================================================= */
+.mv2-menu .mapa { display: flex; flex-direction: column; gap: 10px; padding: 12px 12px 16px; }
+.mv2-menu .mundo { border: 3px solid var(--navy); border-radius: 18px; padding: 8px 10px 10px; box-shadow: 0 4px 0 var(--navy); background: var(--tinte); }
+.mv2-menu .mundo h5 { margin: 0 0 6px; font: 800 1rem var(--fuente-titulo); display: flex; align-items: center; gap: 6px; color: var(--navy); }
+.mv2-menu .mundo h5 small { font: 700 .85rem var(--fuente-texto); color: var(--teal); }
+.mv2-menu .pasos { display: flex; gap: 10px; }
+.mv2-menu .paso { flex: 1 1 0; }
+.mv2-menu .paso button {
+    width: 100%; min-height: 64px; border-radius: 16px; border: 3px solid var(--navy); background: #fff; color: var(--navy);
+    font: 800 1.35rem var(--fuente-titulo); line-height: 1; box-shadow: 0 4px 0 var(--navy); cursor: pointer; padding: 6px 2px;
+}
+.mv2-menu .paso button small { display: block; font: 700 .8rem var(--fuente-texto); letter-spacing: 1px; color: #B8860B; margin-top: 3px; }
+.mv2-menu .paso button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--navy); }
+.mv2-menu .paso button.cerrado { background: #E8ECF4; color: #5F6F8F; box-shadow: 0 4px 0 #8896B3; border-color: #8896B3; }
+.mv2-menu .paso button.cerrado small { color: #8896B3; }
+.mv2-menu .paso button:focus-visible { outline: 4px solid var(--oro); outline-offset: 3px; }
+
+/* El menú también se ensancha: en el layout compartido todo queda en 600 px */
+.mv2-menu { --ancho: min(1040px, 100vw - 40px); width: var(--ancho); margin-left: calc((100% - var(--ancho)) / 2); }
+
+@media (max-width: 480px) {
+    .mv2 { gap: 10px; }
+    .mv2-tiempo-fila { flex-direction: column; align-items: flex-start; gap: 0; }
+    .mv2-tiempo-fila span { white-space: nowrap; font-size: .85rem; }
+    .mv2-tiempo-fila b { font-size: 1.5rem; }
+    .mv2-mundo small { display: none; }
+    .mv2-marcadores { flex-wrap: wrap; }
+    .mv2-progreso.muchos .mv2-hueco { width: 24px; height: 24px; }
+    .mv2-progreso.muchos { gap: 3px; padding: 6px 8px; }
+}

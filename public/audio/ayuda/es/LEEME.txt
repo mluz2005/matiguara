@@ -1,0 +1,3 @@
+Audios de la ayuda "¿Cómo se juega?" en CASTELLANO (opcional).
+Si un archivo existe aquí, se usa en lugar de la voz del dispositivo.
+Nombre exacto: ver la columna "Archivo castellano" de GUION_AUDIOS_AYUDA.csv (ejemplo: flash_1.mp3).
