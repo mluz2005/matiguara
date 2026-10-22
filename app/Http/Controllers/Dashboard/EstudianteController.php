@@ -19,6 +19,7 @@ use App\Services\SesionService;
 use App\Services\SistemaAdaptativoService;
 use App\Support\DesbloqueoNiveles;
 use App\Support\FrutasJuego;
+use App\Support\PistasSumaFrutas;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -149,10 +150,21 @@ class EstudianteController extends Controller
         }
 
         $nivel           = $sesion->nivel;
-        $respondidos     = $this->sesionRepo->contarEjerciciosRespondidos($sesion);
+
+        // Segunda oportunidad (Suma de Frutas): el mismo ejercicio vuelve a mostrarse con una pista.
+        // El ejercicio fallado todavía no cuenta como respondido ni se repite la opción ya elegida.
+        $esReintento     = $this->sesionService->esReintento($sesion, $ejercicio);
+        $pista           = $esReintento ? PistasSumaFrutas::para($ejercicio) : null;
+
+        $respondidos     = $this->sesionRepo->contarEjerciciosRespondidos($sesion) - ($esReintento ? 1 : 0);
         $totalEjercicios = $nivel->total_ejercicios;
         $porcentaje      = $totalEjercicios > 0 ? round(($respondidos / $totalEjercicios) * 100) : 0;
         $opciones        = collect($ejercicio->opciones_json ?? [])->shuffle()->values();
+
+        if ($esReintento) {
+            $fallida  = $this->sesionRepo->respuestaDelPrimerIntento($sesion, $ejercicio->id);
+            $opciones = $opciones->reject(fn ($o) => (string) $o === (string) $fallida)->values();
+        }
 
         $puntaje  = $sesion->puntaje_obtenido;
         $aciertos = $sesion->aciertos;
@@ -166,7 +178,7 @@ class EstudianteController extends Controller
         return view('estudiante.ejercicio', compact(
             'sesion','ejercicio','nivel','opciones',
             'respondidos','totalEjercicios','porcentaje',
-            'puntaje','aciertos','escena'
+            'puntaje','aciertos','escena','esReintento','pista'
         ));
     }
 
@@ -187,6 +199,24 @@ class EstudianteController extends Controller
         $resultado = $this->sesionService->registrarRespuesta(
             $sesion, $ejercicio, $datos['respuesta'], $datos['tiempo_ms'] ?? null
         );
+
+        // Primer fallo en Suma de Frutas: se vuelve a mostrar el mismo ejercicio con una pista.
+        // No cuenta todavía para la racha ni para la regla 3/2 (cuenta el resultado final del ejercicio).
+        if ($resultado['reintento_pendiente']) {
+            $progresoPrimero = $this->retroService->obtenerProgreso(
+                $estudiante->id, $sesion->juego_id, $sesion->nivel_id, $sesion->nivel->grado
+            );
+            $mensajePrimero = $this->retroService->obtenerYRegistrar('error', $progresoPrimero, true, false);
+
+            return redirect()->route('estudiante.sesion.ejercicio', $sesion->id)
+                ->with('ultimo_resultado', [
+                    'es_correcto' => false,
+                    'puntos'      => 0,
+                    'mensaje_es'  => $mensajePrimero?->texto_es,
+                    'mensaje_gn'  => $mensajePrimero?->texto_gn,
+                    'reintento'   => true,
+                ]);
+        }
 
         $esCorrect    = $resultado['es_correcto'];
         $esPrimerInto = $resultado['numero_intento'] === 1;

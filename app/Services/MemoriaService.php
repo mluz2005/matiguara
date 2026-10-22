@@ -16,7 +16,7 @@ use Illuminate\Support\Collection;
  * Lógica propia del juego "Encuentra el par". Reutiliza SesionService
  * para todo lo genérico (iniciar/cerrar sesión, actualizar racha) y solo
  * implementa lo específico de este juego: generación del mazo, cálculo
- * de puntaje con bonus de tiempo, y su propia evaluación 3/2 (porque
+ * de puntaje (10 por acierto, sin bono de velocidad), y su propia evaluación 3/2 (porque
  * opera sobre movimientos_memoria, no sobre movimientos_sesion).
  *
  * POR QUÉ NO SE REUTILIZA SistemaAdaptativoService DIRECTAMENTE:
@@ -33,10 +33,6 @@ use Illuminate\Support\Collection;
 class MemoriaService
 {
     private const PUNTOS_ACIERTO        = 10;
-    private const BONUS_VELOCIDAD_RAPIDA = 5;  // <= 3 segundos
-    private const BONUS_VELOCIDAD_MEDIA  = 2;  // <= 8 segundos
-    private const LIMITE_RAPIDO_MS       = 3000;
-    private const LIMITE_MEDIO_MS        = 8000;
 
     /** Segundos que se suman al reloj del cliente por cada acierto (RF — bonus de tiempo) */
     public const BONUS_TIEMPO_SEG = 4;
@@ -154,7 +150,7 @@ class MemoriaService
             'tiempo_respuesta_ms'  => $tiempoMs,
         ]);
 
-        $puntos = $this->calcularPuntos($esAcierto, $tiempoMs);
+        $puntos = $this->calcularPuntos($esAcierto);
 
         $this->sesiones->acumularResultado($sesion, $puntos, $esAcierto);
 
@@ -165,21 +161,12 @@ class MemoriaService
         ];
     }
 
-    private function calcularPuntos(bool $esAcierto, ?int $tiempoMs): int
+    private function calcularPuntos(bool $esAcierto): int
     {
-        if (!$esAcierto) return 0;
-
-        $puntos = self::PUNTOS_ACIERTO;
-
-        if ($tiempoMs !== null) {
-            if ($tiempoMs <= self::LIMITE_RAPIDO_MS) {
-                $puntos += self::BONUS_VELOCIDAD_RAPIDA;
-            } elseif ($tiempoMs <= self::LIMITE_MEDIO_MS) {
-                $puntos += self::BONUS_VELOCIDAD_MEDIA;
-            }
-        }
-
-        return $puntos;
+        // Sin bono de velocidad: en un juego de memoria apurar al niño premia
+        // el azar y castiga al que se concentra. El tiempo ya está en el reloj
+        // del nivel (y cada acierto suma segundos: BONUS_TIEMPO_SEG).
+        return $esAcierto ? self::PUNTOS_ACIERTO : 0;
     }
 
     // =========================================================================

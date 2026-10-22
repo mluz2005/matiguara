@@ -73,7 +73,9 @@ class SistemaAdaptativoService
     public function evaluar(SesionJuego $sesion): array
     {
         // Obtener los últimos movimientos para evaluar la racha actual
-        $ultimosMovimientos = $this->sesiones->ultimosMovimientos(
+        // Se evalúa el resultado FINAL de cada ejercicio (si hubo reintento, el
+        // primer fallo no cuenta como un error más).
+        $ultimosMovimientos = $this->sesiones->ultimosResultadosPorEjercicio(
             $sesion,
             max(self::UMBRAL_ACIERTOS, self::UMBRAL_ERRORES)
         );

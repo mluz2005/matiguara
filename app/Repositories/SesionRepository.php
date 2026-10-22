@@ -129,6 +129,50 @@ class SesionRepository
             ->get();
     }
 
+    /**
+     * Ejercicio que la partida dejó con el primer intento errado y todavía
+     * sin segundo intento: es el último movimiento de la partida. Devuelve
+     * el id del ejercicio, o null si no hay un reintento pendiente.
+     */
+    public function contenidoPendienteDeReintento(SesionJuego $sesion): ?int
+    {
+        $ultimo = $sesion->movimientos()->orderByDesc('id')->first();
+
+        if ($ultimo && (int) $ultimo->numero_intento === 1 && !$ultimo->es_correcto) {
+            return (int) $ultimo->contenido_id;
+        }
+
+        return null;
+    }
+
+    /** Respuesta que el estudiante dio en su primer intento de un ejercicio (o null). */
+    public function respuestaDelPrimerIntento(SesionJuego $sesion, int $contenidoId): ?string
+    {
+        return $sesion->movimientos()
+            ->where('contenido_id', $contenidoId)
+            ->where('numero_intento', 1)
+            ->orderBy('id')
+            ->value('respuesta_dada');
+    }
+
+    /**
+     * Resultado final de cada ejercicio (su último intento), de más reciente
+     * a más antiguo. Con un solo intento por ejercicio equivale a
+     * ultimosMovimientos(); con reintento, el primer fallo no cuenta aparte.
+     */
+    public function ultimosResultadosPorEjercicio(SesionJuego $sesion, int $cantidad): Collection
+    {
+        $ids = $sesion->movimientos()
+            ->selectRaw('MAX(id) as id')
+            ->groupBy('contenido_id')
+            ->pluck('id');
+
+        return MovimientoSesion::whereIn('id', $ids)
+            ->orderBy('id', 'desc')
+            ->take($cantidad)
+            ->get();
+    }
+
     // ── Consultas para el diagnóstico pedagógico ─────────────────────────
 
     /**

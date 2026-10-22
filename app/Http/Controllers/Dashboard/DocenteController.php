@@ -203,8 +203,11 @@ class DocenteController extends Controller
         $asignacion = $docente?->asignacionActiva;
 
         $estudiantes = $this->docentes->matriculasActivasDelAnio($docente?->id, date('Y'))
-            ->map(fn($m) => $m->estudiante)
-            ->filter()
+            ->filter(fn ($m) => $m->estudiante)
+            ->map(function ($m) {
+                $m->estudiante->grado_matricula = $m->grado;   // cada alumno puede estar en un grado distinto
+                return $m->estudiante;
+            })
             ->sortBy('apellido')
             ->map(function ($est) {
                 $r = $this->sesiones->resumenCompletadas($est->id);
@@ -270,9 +273,20 @@ class DocenteController extends Controller
             'apellido' => ['required','string','max:100'],
             'pin'      => ['required','string','regex:/^\d{4}$/','confirmed'],
             'email_tutor' => ['nullable','email:rfc','max:191', $this->reglaCorreoDeFamilia()],
+            // Grado en el que se matricula. Opcional: si no viene, el de la asignación de la docente.
+            // Permite inscribir de entrada a un niño en 2.° o 3.° (sin tener que "pasarlo de grado").
+            'grado'    => ['nullable','integer','between:1,' . MatriculaService::GRADO_FINAL],
         ], [
             'email_tutor.email' => 'El correo del padre, madre o tutor no es válido. Revisalo.',
+            'grado.between'     => 'El grado debe ser 1.°, 2.° o 3.°.',
         ]);
+
+        $grado = (int) ($datos['grado'] ?? $asignacion->grado);
+        if (!$this->juegos->hayNivelesDelGrado($grado)) {
+            return back()->withInput()->withErrors([
+                'grado' => "Todavía no hay niveles de juego cargados para {$grado}.° grado.",
+            ]);
+        }
 
         $correoTutor = $this->normalizarCorreo($datos['email_tutor'] ?? null);
         if ($correoTutor !== null && !$this->existeColumnaCorreo()) {
@@ -281,7 +295,7 @@ class DocenteController extends Controller
 
         $codigoBase   = strtoupper(substr($asignacion->institucion->codigo ?? 'ESC', 0, 3));
         $turnoLetra   = strtoupper(substr($asignacion->turno, 0, 1));
-        $prefijo      = "{$codigoBase}-{$asignacion->grado}{$turnoLetra}-";
+        $prefijo      = "{$codigoBase}-{$grado}{$turnoLetra}-";
         $codigoAcceso = $this->siguienteCodigoAcceso($prefijo);
 
         $datosEstudiante = [
@@ -302,7 +316,7 @@ class DocenteController extends Controller
             'estudiante_id'  => $estudiante->id,
             'institucion_id' => $asignacion->institucion_id,
             'docente_id'     => $docente->id,
-            'grado'          => $asignacion->grado,
+            'grado'          => $grado,
             'anio_lectivo'   => date('Y'),
             'activo'         => true,
             'fecha_inicio'   => now()->toDateString(),
@@ -317,7 +331,7 @@ class DocenteController extends Controller
         session()->put('ficha_pin.' . $estudiante->id, $datos['pin']);
 
         return redirect()->route('docente.cuentas')
-            ->with('mensaje', "✅ Cuenta creada: {$estudiante->nombre_completo} — Código: {$codigoAcceso}{$aviso}")
+            ->with('mensaje', "✅ Cuenta creada: {$estudiante->nombre_completo} ({$grado}.° grado) — Código: {$codigoAcceso}{$aviso}")
             ->with('ficha_id', $estudiante->id);
     }
 

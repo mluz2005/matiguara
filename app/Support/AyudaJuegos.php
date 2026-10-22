@@ -36,6 +36,8 @@ class AyudaJuegos
                  'es' => 'Las frutas con ❌ se sacan.',            'gn' => 'Umi ❌ ojepe\'a.'],
                 ['clave' => 'suma_4',  'dibujo' => ['[3]', '[4]', '[5*]', '👆'],
                  'es' => 'Tocá la respuesta correcta.',            'gn' => 'Eiporavo pe mbohovái iporãva.'],
+                ['clave' => 'suma_5',  'dibujo' => ['❌', '💡', '🔁'],
+                 'es' => 'Si te equivocás, ¡tenés otra oportunidad con una pista!', 'gn' => 'Ejavy ramo, ¡eipyhy jey peteĩ pista ndive!'],
             ],
             'Flash Matemático' => [
                 ['clave' => 'flash_1', 'dibujo' => ['👀', '7 + 4'],

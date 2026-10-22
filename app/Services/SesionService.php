@@ -27,10 +27,17 @@ use Carbon\Carbon;
  *
  * SISTEMA DE PUNTAJE:
  *   Respuesta correcta en 1er intento:     10 puntos base
- *   + bonus por velocidad (< 5 seg):       +5 puntos
- *   + bonus por velocidad (5-15 seg):      +2 puntos
+ *   + bonus por velocidad (< 5 seg):       +5 puntos  (SOLO en Flash Matemático)
+ *   + bonus por velocidad (5-15 seg):      +2 puntos  (SOLO en Flash Matemático)
  *   Respuesta correcta en reintento:        5 puntos
  *   Respuesta incorrecta:                   0 puntos
+ *   En los demás juegos no hay bono de velocidad: premia el acierto, no apurarse.
+ *
+ * SEGUNDA OPORTUNIDAD CON PISTA (Suma de Frutas):
+ *   Si el primer intento falla, el mismo ejercicio se vuelve a mostrar una vez
+ *   con una pista (App\Support\PistasSumaFrutas). El primer fallo no suma a los
+ *   contadores de la partida ni a la regla 3/2: cuenta el resultado final del
+ *   ejercicio. Flash Matemático no tiene reintento (es un juego de velocidad).
  *
  * ACCESO A DATOS: este servicio no construye consultas propias; lee y escribe
  * a través de SesionRepository, EjercicioRepository y EstudianteRepository
@@ -49,6 +56,9 @@ class SesionService
     private const BONUS_VELOCIDAD_MEDIA        = 2;   // 5-15 segundos
     private const LIMITE_TIEMPO_RAPIDO_MS      = 5000;   // 5 segundos en ms
     private const LIMITE_TIEMPO_MEDIO_MS       = 15000;  // 15 segundos en ms
+
+    /** Juegos que ofrecen segunda oportunidad con pista cuando el primer intento falla. */
+    public const JUEGOS_CON_REINTENTO = ['Suma de Frutas'];
 
     public function __construct(
         private SesionRepository $sesiones,
@@ -100,6 +110,12 @@ class SesionService
      */
     public function obtenerProximoEjercicio(SesionJuego $sesion): ?ContenidoNivel
     {
+        // Si el niño acaba de fallar, se le vuelve a mostrar el mismo ejercicio (con pista).
+        $pendiente = $this->ejercicioPendienteDeReintento($sesion);
+        if ($pendiente) {
+            return $pendiente;
+        }
+
         // IDs de ejercicios ya respondidos en esta sesión
         $respondidosIds = $this->sesiones->idsEjerciciosRespondidos($sesion);
 
@@ -155,8 +171,12 @@ class SesionService
             $tipoError = $this->clasificarError($ejercicio, $respuesta, $tiempoMs);
         }
 
-        // Calcular puntaje
-        $puntos = $this->calcularPuntos($esCorrect, $numeroIntento, $tiempoMs);
+        // Calcular puntaje (el bono de velocidad solo existe en Flash Matemático)
+        $conBonusVelocidad = (bool) ($sesion->nivel?->tiempo_mostrar_ms);
+        $puntos = $this->calcularPuntos($esCorrect, $numeroIntento, $tiempoMs, $conBonusVelocidad);
+
+        // ¿Primer fallo en un juego con segunda oportunidad? Todavía no es el resultado final.
+        $reintentoPendiente = !$esCorrect && $numeroIntento === 1 && $this->permiteReintento($sesion);
 
         // Crear el registro de movimiento
         $movimiento = $this->sesiones->registrarMovimiento([
@@ -170,16 +190,44 @@ class SesionService
             'timestamp_mov'      => now(),
         ]);
 
-        // Actualizar contadores de la sesión
+        // Actualizar contadores de la sesión con el resultado FINAL del ejercicio
         // (el repositorio recarga la sesión para reflejar los incrementos)
-        $this->sesiones->acumularResultado($sesion, $puntos, $esCorrect);
+        if (!$reintentoPendiente) {
+            $this->sesiones->acumularResultado($sesion, $puntos, $esCorrect);
+        }
 
         return [
-            'movimiento'     => $movimiento,
-            'es_correcto'    => $esCorrect,
-            'puntos'         => $puntos,
-            'numero_intento' => $numeroIntento,
+            'movimiento'          => $movimiento,
+            'es_correcto'         => $esCorrect,
+            'puntos'              => $puntos,
+            'numero_intento'      => $numeroIntento,
+            'reintento_pendiente' => $reintentoPendiente,
         ];
+    }
+
+    /** ¿El juego de la partida ofrece segunda oportunidad con pista? */
+    public function permiteReintento(SesionJuego $sesion): bool
+    {
+        return in_array($sesion->juego?->nombre_es, self::JUEGOS_CON_REINTENTO, true);
+    }
+
+    /** Ejercicio al que el niño debe volver a responder (con pista), o null. */
+    public function ejercicioPendienteDeReintento(SesionJuego $sesion): ?ContenidoNivel
+    {
+        if (!$this->permiteReintento($sesion)) {
+            return null;
+        }
+
+        $id = $this->sesiones->contenidoPendienteDeReintento($sesion);
+
+        return $id ? $this->ejercicios->buscar($id) : null;
+    }
+
+    /** ¿Este ejercicio se está mostrando por segunda vez, con pista? */
+    public function esReintento(SesionJuego $sesion, ContenidoNivel $ejercicio): bool
+    {
+        return $this->permiteReintento($sesion)
+            && $this->sesiones->contenidoPendienteDeReintento($sesion) === (int) $ejercicio->id;
     }
 
     /**
@@ -353,17 +401,17 @@ class SesionService
      * @param  int|null $tiempoMs
      * @return int
      */
-    private function calcularPuntos(bool $esCorrect, int $numeroIntento, ?int $tiempoMs): int
+    private function calcularPuntos(bool $esCorrect, int $numeroIntento, ?int $tiempoMs, bool $conBonusVelocidad = false): int
     {
         if (!$esCorrect) {
             return 0;
         }
 
         if ($numeroIntento === 1) {
-            // Primer intento correcto: puntos base + bonus por velocidad
+            // Primer intento correcto: puntos base (+ bonus por velocidad solo en Flash)
             $puntos = self::PUNTOS_CORRECTO_1ER_INTENTO;
 
-            if ($tiempoMs !== null) {
+            if ($conBonusVelocidad && $tiempoMs !== null) {
                 if ($tiempoMs <= self::LIMITE_TIEMPO_RAPIDO_MS) {
                     $puntos += self::BONUS_VELOCIDAD_RAPIDA;
                 } elseif ($tiempoMs <= self::LIMITE_TIEMPO_MEDIO_MS) {

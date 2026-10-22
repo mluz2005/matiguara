@@ -68,6 +68,19 @@
               <input type="text" name="apellido" class="form-control rounded-3"
                      value="{{ old('apellido') }}" required placeholder="Ej: López">
             </div>
+            @php $gradoPorDefecto = (int) old('grado', $asignacion->grado ?? 1); @endphp
+            <div class="mb-3">
+              <label class="form-label fw-semibold small" for="selGrado">Grado en el que empieza</label>
+              <select name="grado" id="selGrado" class="form-select rounded-3">
+                @foreach([1 => '1.er grado', 2 => '2.° grado', 3 => '3.er grado'] as $g => $etiqueta)
+                  <option value="{{ $g }}" @selected($gradoPorDefecto === $g)>{{ $etiqueta }}</option>
+                @endforeach
+              </select>
+              <div class="form-text">
+                Elegí el grado que ya cursa el niño/a: juega con los niveles de ese grado desde el primer día.
+              </div>
+              @error('grado')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+            </div>
             <div class="mb-3">
               <label class="form-label fw-semibold small">
                 PIN (4 dígitos — elegir junto al estudiante)
@@ -213,6 +226,7 @@
                 <tr>
                   <th class="ps-3 py-2 small">Nombre</th>
                   <th class="py-2 small">Código</th>
+                  <th class="text-center py-2 small">Grado</th>
                   <th class="text-center py-2 small">Estado</th>
                   <th class="text-center py-2 small">Acción</th>
                 </tr>
@@ -247,6 +261,7 @@
                     <td>
                       <code class="small">{{ $mat->estudiante->codigo_acceso }}</code>
                     </td>
+                    <td class="text-center small">{{ $mat->grado }}.°</td>
                     <td class="text-center">
                       @if($mat->estudiante->activo)
                         <span class="badge rounded-pill bg-success">Activo</span>
@@ -270,7 +285,7 @@
                   </tr>
                 @empty
                   <tr>
-                    <td colspan="4" class="text-center text-muted py-4">
+                    <td colspan="5" class="text-center text-muted py-4">
                       Sin cuentas registradas aún.
                     </td>
                   </tr>

@@ -68,6 +68,7 @@ class AyudaAdultos
              'pasos' => [
                  'En el menú, entrá a **Cuentas** (o tocá el botón **Nueva cuenta** en Mi Panel o en Mis Estudiantes).',
                  'Completá **Nombre** y **Apellido**.',
+                 'Elegí el **grado en el que empieza** (1.°, 2.° o 3.°). Viene marcado el de tu clase, pero si el niño o la niña ya cursa 2.° o 3.°, elegilo acá y juega con los niveles de ese grado desde el primer día.',
                  'Elegí un **PIN de 4 números, junto con el estudiante**, y escribilo de nuevo en **Confirmar PIN**.',
                  'Escribí el **correo del padre, madre o tutor**. Es opcional: si hoy no lo tenés, lo cargás después.',
                  'Tocá **Crear cuenta y matrícula**.',
@@ -77,7 +78,7 @@ class AyudaAdultos
              'notas' => [
                  'El PIN no se puede volver a ver. Si el niño lo olvida, se cambia por uno nuevo (ver "Cambiar el PIN").',
                  'Justo después de crear la cuenta (o de cambiar un PIN) aparece el botón **Imprimir ficha con el PIN**: el PIN se muestra **una sola vez**. Si abrís la ficha más tarde, el PIN no sale y tiene casillas para anotarlo a mano junto con el niño o la niña.',
-                 'El estudiante queda matriculado en tu grado.',
+                 'Si no cambiás el grado, el estudiante queda matriculado en el grado de tu clase. Cada alumno puede estar en un grado distinto: la columna **Grado** de la lista lo muestra.',
                  'Si dos hermanos tienen el **mismo correo de familia**, la familia los ve a los dos con un solo ingreso.',
                  'El correo de una cuenta de docente o de administración **no se puede usar** como correo de familia.',
              ]],

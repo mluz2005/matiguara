@@ -22,7 +22,7 @@
     Reemplaza a ejercicio.blade.php para Suma de Frutas y Flash Matemático.
     Recibe EXACTAMENTE las mismas variables ($sesion, $ejercicio, $nivel,
     $opciones, $respondidos, $totalEjercicios, $porcentaje, $puntaje,
-    $aciertos, $escena) y mantiene los mismos ids, formulario, campos
+    $aciertos, $escena, y —en Suma de Frutas— $esReintento y $pista) y mantiene los mismos ids, formulario, campos
     ocultos, funciones JS (seleccionar, enviarRespuesta, toggleMusicaJuego…),
     teclas 1-4, envío automático y audio. Solo cambia cómo se ve.
 
@@ -39,6 +39,9 @@
 
 @section('contenido')
 @php
+    // Segunda oportunidad con pista (Suma de Frutas): llegan del controlador; valores por defecto por si no vienen.
+    $esReintento = $esReintento ?? false;
+    $pista       = $pista ?? null;
     // Con la escena de frutas la pregunta cambia según la fruta ("¿Cuántas naranjas hay en total?").
     // En los demás juegos se usa el enunciado guardado, como siempre.
     $textoEs = !empty($escena) ? $escena['texto_es'] : $ejercicio->enunciado_es;
@@ -194,6 +197,21 @@
                 <p class="texto-bilingue" id="textoGn">{{ $textoGn }}</p>
             </div>
         </div>
+
+        {{-- Segunda oportunidad: pista de estrategia (solo Suma de Frutas, tras un primer error) --}}
+        @if(!empty($pista))
+            <div class="mv2-pista" role="note" aria-live="polite"
+                 style="margin:.7rem auto;max-width:34rem;padding:.75rem 1rem;border-radius:1rem;background:#FFF6D6;border:2px dashed #E9B824;text-align:left;line-height:1.4;">
+                <b>💡 Pista · ¡Tenés otra oportunidad!</b>
+                <div style="font-size:1.08rem;">{{ $pista['es'] }}</div>
+                <div style="font-size:1.08rem;font-style:italic;">{{ $pista['gn'] }}</div>
+                <button type="button" class="mv2-btn-audio" style="margin-top:.4rem;"
+                        onclick="AudioService.leerEnunciado({{ \Illuminate\Support\Js::from($pista['es']) }}, 'es')"
+                        title="Escuchar la pista">
+                    🔊 Escuchar la pista
+                </button>
+            </div>
+        @endif
 
         {{-- Botones de audio (RF-06) --}}
         <div class="mv2-audio">

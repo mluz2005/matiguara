@@ -42,19 +42,19 @@ class MemoriaServiceTest extends RepositorioTestCase
         }
     }
 
-    public function test_registrar_movimiento_calcula_puntos_con_bonus_y_acumula_en_la_sesion()
+    public function test_registrar_movimiento_da_10_puntos_fijos_por_acierto_sin_bonus_de_velocidad()
     {
         $e      = $this->escenarioMemoria();
         $srv    = $this->servicio();
         $sesion = $this->nuevaSesion($e);
         [$a, $b] = $e['tarjetas']->take(2)->all();
 
-        $r = $srv->registrarMovimiento($sesion, $a->id, $a->id, 2500);   // <= 3 s
+        $r = $srv->registrarMovimiento($sesion, $a->id, $a->id, 1500);   // muy rápido
         $this->assertTrue($r['es_acierto']);
-        $this->assertSame(15, $r['puntos']);
+        $this->assertSame(10, $r['puntos']);
 
-        $r = $srv->registrarMovimiento($sesion, $a->id, $a->id, 6000);   // <= 8 s
-        $this->assertSame(12, $r['puntos']);
+        $r = $srv->registrarMovimiento($sesion, $a->id, $a->id, 6000);   // medio
+        $this->assertSame(10, $r['puntos']);
 
         $r = $srv->registrarMovimiento($sesion, $a->id, $a->id, 9000);   // lento
         $this->assertSame(10, $r['puntos']);
@@ -64,7 +64,7 @@ class MemoriaServiceTest extends RepositorioTestCase
         $this->assertSame(0, $r['puntos']);
 
         $sesion = $sesion->fresh();
-        $this->assertSame(37, (int) $sesion->puntaje_obtenido);
+        $this->assertSame(30, (int) $sesion->puntaje_obtenido);
         $this->assertSame(3, (int) $sesion->aciertos);
         $this->assertSame(1, (int) $sesion->errores);
         $this->assertDatabaseCount('movimientos_memoria', 4);

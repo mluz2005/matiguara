@@ -27,7 +27,7 @@
         @if($asignacion)
           <span class="badge ms-2 rounded-pill"
                 style="background:#1B3361;font-size:.875rem">
-            {{ $grado }}° Grado
+            Clase de {{ $grado }}° Grado
           </span>
         @endif
       </h2>
@@ -55,6 +55,7 @@
             <tr>
               <th class="py-3 ps-3">Estudiante</th>
               <th>Código</th>
+              <th class="text-center">Grado</th>
               <th class="text-center">Sesiones</th>
               <th class="text-center">% Aciertos</th>
               <th class="text-center">Estado</th>
@@ -66,6 +67,7 @@
             <tr>
               <td class="ps-3 fw-bold">{{ $est->apellido }}, {{ $est->nombre }}</td>
               <td><code class="text-muted">{{ $est->codigo_acceso }}</code></td>
+              <td class="text-center">{{ $est->grado_matricula ?? $grado }}.°</td>
               <td class="text-center">
                 <span class="badge bg-light text-dark">{{ $est->sesiones_total }}</span>
               </td>

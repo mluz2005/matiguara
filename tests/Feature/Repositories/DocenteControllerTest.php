@@ -157,6 +157,87 @@ class DocenteControllerTest extends RepositorioTestCase
         $this->assertTrue((bool) $mat->activo);
     }
 
+    public function test_crear_cuenta_sin_grado_usa_el_de_la_asignacion_de_la_docente()
+    {
+        $this->post(route('docente.cuentas.crear'), [
+            'nombre' => 'Sol', 'apellido' => 'Vera', 'pin' => '1234', 'pin_confirmation' => '1234',
+        ])->assertRedirect(route('docente.cuentas'));
+
+        $sol = Estudiante::where('nombre', 'Sol')->firstOrFail();
+        $this->assertSame(
+            (int) $this->docente->asignacionActiva->grado,
+            (int) Matricula::where('estudiante_id', $sol->id)->value('grado')
+        );
+    }
+
+    public function test_crear_cuenta_permite_matricular_de_entrada_en_2_y_3_grado()
+    {
+        $this->seed(\Database\Seeders\MemoriaJuegoSeeder::class);
+        $this->seed(\Database\Seeders\ContenidoGrados23Seeder::class);
+
+        foreach ([2, 3] as $grado) {
+            $this->post(route('docente.cuentas.crear'), [
+                'nombre' => "Alumno{$grado}", 'apellido' => 'Directo', 'pin' => '1234', 'pin_confirmation' => '1234',
+                'grado' => $grado,
+            ])->assertRedirect(route('docente.cuentas'))
+              ->assertSessionHas('mensaje');
+
+            $est = Estudiante::where('nombre', "Alumno{$grado}")->firstOrFail();
+            $mat = Matricula::where('estudiante_id', $est->id)->firstOrFail();
+
+            $this->assertSame($grado, (int) $mat->grado);
+            $this->assertTrue((bool) $mat->activo);
+            $this->assertSame((int) $this->docente->id, (int) $mat->docente_id);
+            $this->assertMatchesRegularExpression("/^EEB-{$grado}M-\\d{3}$/", $est->codigo_acceso, 'El código lleva el grado elegido.');
+        }
+
+        // La lista muestra cada grado
+        $this->get(route('docente.cuentas'))->assertOk()
+            ->assertViewHas('matriculas', fn ($m) => $m->pluck('grado')->contains(2) && $m->pluck('grado')->contains(3));
+    }
+
+    public function test_alumno_matriculado_directo_en_2_grado_tiene_abierto_el_primer_nivel_de_2_grado()
+    {
+        $this->seed(\Database\Seeders\MemoriaJuegoSeeder::class);
+        $this->seed(\Database\Seeders\ContenidoGrados23Seeder::class);
+
+        $this->post(route('docente.cuentas.crear'), [
+            'nombre' => 'Directo', 'apellido' => 'Segundo', 'pin' => '1234', 'pin_confirmation' => '1234', 'grado' => 2,
+        ]);
+        $est = Estudiante::where('nombre', 'Directo')->firstOrFail();
+
+        $this->actingAs($est, 'estudiante');
+        $r = $this->get(route('estudiante.juegos'))->assertOk();
+
+        $this->assertSame(2, (int) $r->viewData('matricula')->grado, 'La matrícula activa del alumno es de 2.° grado.');
+
+        $nivel1 = \App\Models\Nivel::where('grado', 2)->where('numero_nivel', 1)
+            ->whereHas('juego', fn ($q) => $q->where('nombre_es', 'Suma de Frutas'))->firstOrFail();
+        $this->assertTrue(\App\Support\DesbloqueoNiveles::estaAbierto($est->id, $nivel1), 'El primer nivel de 2.° está abierto.');
+    }
+
+    public function test_crear_cuenta_rechaza_un_grado_fuera_de_rango()
+    {
+        foreach ([0, 4, 'x'] as $malo) {
+            $this->post(route('docente.cuentas.crear'), [
+                'nombre' => 'Mal', 'apellido' => 'Grado', 'pin' => '1234', 'pin_confirmation' => '1234', 'grado' => $malo,
+            ])->assertSessionHasErrors('grado');
+        }
+        $this->assertFalse(Estudiante::where('nombre', 'Mal')->exists());
+    }
+
+    public function test_crear_cuenta_rechaza_un_grado_sin_niveles_cargados()
+    {
+        // En la base de pruebas solo hay contenido de 1.° (no se siembra ContenidoGrados23Seeder).
+        $this->assertFalse(\App\Models\Nivel::whereIn('grado', [2, 3])->exists());
+
+        $this->post(route('docente.cuentas.crear'), [
+            'nombre' => 'Sin', 'apellido' => 'Niveles', 'pin' => '1234', 'pin_confirmation' => '1234', 'grado' => 3,
+        ])->assertSessionHasErrors('grado');
+
+        $this->assertFalse(Estudiante::where('nombre', 'Sin')->exists());
+    }
+
     public function test_crear_cuenta_rechaza_correo_de_personal()
     {
         $this->post(route('docente.cuentas.crear'), [

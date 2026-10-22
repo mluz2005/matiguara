@@ -32,7 +32,14 @@ class FrutasJuego
     public const MAX_FRUTAS_POR_GRUPO = 10;
 
     /**
-     * Catálogo de frutas.
+     * Catálogo de frutas, elegidas por ser comunes en la mesa y el patio de
+     * una familia paraguaya (mango, coco, guayaba, banana/pakova, naranja,
+     * sandía, piña, limón, palta, manzana). Se evitaron uva, frutilla y
+     * durazno por ser menos cotidianas. El mamón y la mandioca también son
+     * muy típicos, pero no tienen emoji; si se agregan imágenes propias,
+     * se suman acá.
+     * IMPORTANTE: mantener 10 frutas (o un número sin divisores comunes con 3),
+     * para que las 5 preguntas de una partida lleven frutas distintas.
      *   es / es_pl : nombre en castellano (singular / plural)
      *   genero     : 'f' o 'm' (para "cuántas" / "cuántos")
      *   gn         : nombre en guaraní  ← A VALIDAR
@@ -42,12 +49,12 @@ class FrutasJuego
         ['emoji' => '🍌', 'es' => 'banana',   'es_pl' => 'bananas',   'genero' => 'f', 'gn' => 'pakova'],
         ['emoji' => '🍊', 'es' => 'naranja',  'es_pl' => 'naranjas',  'genero' => 'f', 'gn' => 'naranja'],
         ['emoji' => '🍉', 'es' => 'sandía',   'es_pl' => 'sandías',   'genero' => 'f', 'gn' => 'sandía'],
-        ['emoji' => '🍇', 'es' => 'uva',      'es_pl' => 'uvas',      'genero' => 'f', 'gn' => 'yvapurũ'],
-        ['emoji' => '🍓', 'es' => 'frutilla', 'es_pl' => 'frutillas', 'genero' => 'f', 'gn' => 'frutilla'],
+        ['emoji' => '🥭', 'es' => 'mango',    'es_pl' => 'mangos',    'genero' => 'm', 'gn' => 'manga'],
+        ['emoji' => '🥥', 'es' => 'coco',     'es_pl' => 'cocos',     'genero' => 'm', 'gn' => 'koko'],
         ['emoji' => '🍍', 'es' => 'piña',     'es_pl' => 'piñas',     'genero' => 'f', 'gn' => 'piña'],
-        ['emoji' => '🍐', 'es' => 'pera',     'es_pl' => 'peras',     'genero' => 'f', 'gn' => 'pera'],
+        ['emoji' => '🍐', 'es' => 'guayaba',  'es_pl' => 'guayabas',  'genero' => 'f', 'gn' => 'arasa'],
         ['emoji' => '🍋', 'es' => 'limón',    'es_pl' => 'limones',   'genero' => 'm', 'gn' => 'limõ'],
-        ['emoji' => '🍑', 'es' => 'durazno',  'es_pl' => 'duraznos',  'genero' => 'm', 'gn' => 'durazno'],
+        ['emoji' => '🥑', 'es' => 'palta',    'es_pl' => 'paltas',    'genero' => 'f', 'gn' => 'palta'],
     ];
 
     /**

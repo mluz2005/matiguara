@@ -42,11 +42,11 @@ class FlujoSesionTest extends RepositorioTestCase
             $r = $sesiones->registrarRespuesta($sesion, $ejercicio, (string) $ejercicio->respuesta_correcta, 2000);
             $this->assertTrue($r['es_correcto']);
             $this->assertSame(1, $r['numero_intento']);
-            $this->assertSame(15, $r['puntos'], '10 base + 5 por responder en menos de 5 s.');
+            $this->assertSame(10, $r['puntos'], 'Suma de Frutas no da bonus por velocidad: 10 puntos fijos.');
         }
 
         $this->assertSame($total, (int) $sesion->aciertos);
-        $this->assertSame(15 * $total, (int) $sesion->puntaje_obtenido);
+        $this->assertSame(10 * $total, (int) $sesion->puntaje_obtenido);
         $this->assertTrue($sesiones->debeTerminar($sesion, $e['nivel1']));
 
         $cerrada = $sesiones->cerrar($sesion, false);
@@ -64,7 +64,7 @@ class FlujoSesionTest extends RepositorioTestCase
         $this->assertTrue((bool) $siguiente->nivel_desbloqueado);
     }
 
-    public function test_respuesta_incorrecta_suma_error_y_clasifica_el_tipo()
+    public function test_primer_error_en_suma_de_frutas_no_cuenta_todavia_y_clasifica_el_tipo()
     {
         $e        = $this->escenario();
         $sesiones = app(SesionService::class);
@@ -74,9 +74,82 @@ class FlujoSesionTest extends RepositorioTestCase
         $r = $sesiones->registrarRespuesta($sesion, $ejercicio, '999', 500);
 
         $this->assertFalse($r['es_correcto']);
+        $this->assertTrue($r['reintento_pendiente']);
         $this->assertSame(0, $r['puntos']);
         $this->assertSame('atencion', $r['movimiento']->tipo_error, 'Menos de 1 s = error de atención.');
-        $this->assertSame(1, (int) $sesion->errores);
+        $this->assertSame(0, (int) $sesion->errores, 'El primer error espera la segunda oportunidad.');
+        $this->assertSame(0, (int) $sesion->aciertos);
+    }
+
+    public function test_segunda_oportunidad_vuelve_el_mismo_ejercicio_y_si_acierta_da_5_puntos()
+    {
+        $e        = $this->escenario();
+        $sesiones = app(SesionService::class);
+        $sesion   = $sesiones->iniciar($e['estudiante']->id, $e['juego']->id, $e['nivel1']->id);
+        $ejercicio = $sesiones->obtenerProximoEjercicio($sesion);
+
+        $sesiones->registrarRespuesta($sesion, $ejercicio, '999', 3000);
+
+        $this->assertTrue($sesiones->esReintento($sesion, $ejercicio));
+        $mismo = $sesiones->obtenerProximoEjercicio($sesion);
+        $this->assertSame($ejercicio->id, $mismo->id, 'Tras fallar, se vuelve a mostrar el mismo ejercicio.');
+
+        $r = $sesiones->registrarRespuesta($sesion, $mismo, (string) $mismo->respuesta_correcta, 3000);
+
+        $this->assertTrue($r['es_correcto']);
+        $this->assertFalse($r['reintento_pendiente']);
+        $this->assertSame(2, $r['numero_intento']);
+        $this->assertSame(5, $r['puntos']);
+        $this->assertSame(5, (int) $sesion->puntaje_obtenido);
+        $this->assertSame(1, (int) $sesion->aciertos);
+        $this->assertSame(0, (int) $sesion->errores);
+
+        $this->assertFalse($sesiones->esReintento($sesion, $mismo));
+        $siguiente = $sesiones->obtenerProximoEjercicio($sesion);
+        $this->assertNotSame($ejercicio->id, $siguiente->id, 'Resuelto el reintento, avanza al ejercicio siguiente.');
+    }
+
+    public function test_si_falla_tambien_la_segunda_vez_cuenta_un_solo_error_y_sigue_adelante()
+    {
+        $e        = $this->escenario();
+        $sesiones = app(SesionService::class);
+        $sesion   = $sesiones->iniciar($e['estudiante']->id, $e['juego']->id, $e['nivel1']->id);
+        $ejercicio = $sesiones->obtenerProximoEjercicio($sesion);
+
+        $sesiones->registrarRespuesta($sesion, $ejercicio, '999', 3000);
+        $r = $sesiones->registrarRespuesta($sesion, $ejercicio, '998', 3000);
+
+        $this->assertFalse($r['es_correcto']);
+        $this->assertFalse($r['reintento_pendiente'], 'No hay tercera oportunidad.');
+        $this->assertSame(0, $r['puntos']);
+        $this->assertSame(1, (int) $sesion->errores, 'Un ejercicio fallado dos veces suma un solo error.');
+        $this->assertNotSame($ejercicio->id, $sesiones->obtenerProximoEjercicio($sesion)->id);
+    }
+
+    public function test_el_bonus_de_velocidad_solo_existe_en_flash_matematico()
+    {
+        $e        = $this->escenario();
+        $sesiones = app(SesionService::class);
+
+        $nivelFlash = \App\Models\Nivel::has('ejercicios')->whereNotNull('tiempo_mostrar_ms')
+            ->whereHas('juego', fn ($q) => $q->where('nombre_es', 'Flash Matemático'))
+            ->orderBy('grado')->orderBy('numero_nivel')->firstOrFail();
+        $ejFlash = \App\Models\ContenidoNivel::where('nivel_id', $nivelFlash->id)->orderBy('orden')->firstOrFail();
+
+        $sesionFlash = $sesiones->iniciar($e['estudiante']->id, $nivelFlash->juego_id, $nivelFlash->id);
+        $rapido = $sesiones->registrarRespuesta($sesionFlash, $ejFlash, (string) $ejFlash->respuesta_correcta, 2000);
+        $this->assertSame(15, $rapido['puntos'], 'Flash: 10 + 5 por responder en menos de 5 s.');
+
+        // Flash no tiene segunda oportunidad: un error cuenta de inmediato.
+        $otro = \App\Models\ContenidoNivel::where('nivel_id', $nivelFlash->id)->orderBy('orden')->skip(1)->firstOrFail();
+        $fallo = $sesiones->registrarRespuesta($sesionFlash, $otro, '999', 3000);
+        $this->assertFalse($fallo['reintento_pendiente']);
+        $this->assertSame(1, (int) $sesionFlash->errores);
+
+        $sesionSuma = $sesiones->iniciar($e['estudiante']->id, $e['juego']->id, $e['nivel1']->id);
+        $ej = $sesiones->obtenerProximoEjercicio($sesionSuma);
+        $r  = $sesiones->registrarRespuesta($sesionSuma, $ej, (string) $ej->respuesta_correcta, 1000);
+        $this->assertSame(10, $r['puntos'], 'Suma de Frutas: sin bonus aunque responda en 1 s.');
     }
 
     public function test_racha_de_aciertos_se_acumula_y_se_reinicia_con_un_error()
