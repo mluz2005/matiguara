@@ -93,7 +93,7 @@
         @else
             Consultá con la docente.
         @endif
-        <a href="{{ route('acerca') }}" class="ms-2">Acerca de MatiGuará</a>
+        <a href="{{ route('acerca') }}" class="ms-2">Acerca de MatiGuarã</a>
     </div>
 </div>
 @endsection

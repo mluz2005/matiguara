@@ -1,6 +1,6 @@
 @extends('layouts.estudiante')
 
-@section('titulo', 'Encuentra el par — MatiGuará')
+@section('titulo', 'Encuentra el par — MatiGuarã')
 
 {{-- Tiene su propia música (MP3): el layout no arranca la generada por código --}}
 @section('musica_propia', '1')
@@ -59,7 +59,7 @@
     {{-- ── HUD: mascota + globo · mundo/progreso/puntos · tiempo ───────── --}}
     <header class="mv2-hud">
         <div class="mv2-guara-wrap">
-            <div class="mv2-guara" id="guara" data-estado="idle" title="¡Guará te alienta!">
+            <div class="mv2-guara" id="guara" data-estado="idle" title="¡Guarã te alienta!">
                 @include('estudiante._mv2-guara')
             </div>
             <div class="mv2-burbuja" id="burbuja" role="status" aria-live="polite">

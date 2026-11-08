@@ -52,15 +52,7 @@ use Illuminate\Support\Facades\Log;
 class DiagnosticoIAService
 {
     /**
-     * URL base de la API de Anthropic.
-     * Configurada en .env: CLAUDE_API_KEY
-     */
-    private const API_URL    = 'https://api.anthropic.com/v1/messages';
-    private const API_VERSION = '2023-06-01';
 
-    /**
-     * Modelo a usar. claude-sonnet-4-6 es el modelo de producción actual.
-     * Configurable en .env: CLAUDE_MODEL
      */
     private string $modelo;
 
@@ -517,7 +509,7 @@ PROMPT;
         // Recomendación genérica
         $recomendacion = $pct >= 70
             ? "El estudiante está listo para avanzar al siguiente nivel. Se recomienda mantener la práctica diaria para consolidar lo aprendido. Reforzar en el aula con material concreto (fichas, bloques) para anclar los conceptos digitales en experiencias físicas."
-            : "Se recomienda consolidar el nivel actual antes de avanzar. Dedique tiempo en el aula a revisar los ejercicios donde el estudiante tuvo más dificultades, utilizando material concreto. La práctica constante en MatiGuará complementa el trabajo presencial.";
+            : "Se recomienda consolidar el nivel actual antes de avanzar. Dedique tiempo en el aula a revisar los ejercicios donde el estudiante tuvo más dificultades, utilizando material concreto. La práctica constante en MatiGuarã complementa el trabajo presencial.";
 
         // Nota aclaratoria sobre el origen del diagnóstico
         $nota = " (Nota: este análisis fue generado localmente por falta de conexión con el servicio de IA. Solicitá un nuevo diagnóstico cuando haya conectividad.)";

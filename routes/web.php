@@ -28,11 +28,9 @@ use Illuminate\Support\Facades\Route;
 // RUTAS PÚBLICAS
 // ==========================================================================
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('inicio');
+Route::view('/', 'welcome')->name('inicio');
 
-// ── Acerca de MatiGuará (pública: la ve cualquier perfil, con o sin sesión) ──
+// ── Acerca de MatiGuarã (pública: la ve cualquier perfil, con o sin sesión) ──
 Route::get('/acerca-de', [AyudaController::class, 'acerca'])->name('acerca');
 
 // ── Ayuda para adultos (docentes, familias, administración): muestra la guía según el perfil ──
@@ -94,6 +92,9 @@ Route::middleware(['auth', 'es.docente'])
     // Configuración de juegos (CU-13)
     Route::get('/juegos',          [DocenteController::class, 'configurarJuegos'])->name('juegos');
     Route::post('/juegos',         [DocenteController::class, 'guardarConfigJuegos'])->name('juegos.guardar');
+
+    // Límite de tiempo de juego y pausa entre sesiones (todos los juegos)
+    Route::post('/juegos/tiempo',  [DocenteController::class, 'guardarTiempoJuego'])->name('juegos.tiempo');
 });
 
 // ==========================================================================
@@ -108,14 +109,17 @@ Route::middleware(['auth:estudiante', \App\Http\Middleware\EstudianteActivo::cla
     Route::get('/progreso',          [EstudianteController::class, 'miProgreso'])->name('progreso');
     Route::get('/logros',            [EstudianteController::class, 'misLogros'])->name('logros');
 
+    // Descanso obligatorio al llegar al límite de juego (RN-L10, RN-L11)
+    Route::get('/descanso',          [\App\Http\Controllers\Dashboard\DescansoController::class, 'mostrar'])->name('descanso');
+
     // Ayuda para niños: "¿Cómo se juega?" (general o de un juego)
     Route::get('/ayuda/{juego?}',    [AyudaController::class, 'ninos'])->name('ayuda');
 
     // Flujo de sesión de juego
     Route::post('/juego/{juego}/nivel/{nivel}/iniciar',
-        [EstudianteController::class, 'iniciarSesion'])->name('sesion.iniciar');
+        [EstudianteController::class, 'iniciarSesion'])->middleware('limite.juego')->name('sesion.iniciar');
     Route::get('/sesion/{sesion}/ejercicio',
-        [EstudianteController::class, 'mostrarEjercicio'])->name('sesion.ejercicio');
+        [EstudianteController::class, 'mostrarEjercicio'])->middleware('limite.juego')->name('sesion.ejercicio');
     Route::post('/sesion/{sesion}/responder',
         [EstudianteController::class, 'procesarRespuesta'])->name('sesion.responder');
     Route::get('/sesion/{sesion}/resumen',
@@ -123,10 +127,12 @@ Route::middleware(['auth:estudiante', \App\Http\Middleware\EstudianteActivo::cla
         // Juego "Encuentra el par" — mecánica de memoria (Semana 8)
 Route::post('/memoria/{juego}/nivel/{nivel}/iniciar',
     [\App\Http\Controllers\Dashboard\MemoriaController::class, 'iniciarSesion'])
+    ->middleware('limite.juego')
     ->name('memoria.iniciar');
 
 Route::get('/memoria/sesion/{sesion}/tablero',
     [\App\Http\Controllers\Dashboard\MemoriaController::class, 'mostrarTablero'])
+    ->middleware('limite.juego')
     ->name('memoria.tablero');
 
 Route::post('/memoria/sesion/{sesion}/movimiento',
@@ -136,6 +142,25 @@ Route::post('/memoria/sesion/{sesion}/movimiento',
 Route::post('/memoria/sesion/{sesion}/cerrar',
     [\App\Http\Controllers\Dashboard\MemoriaController::class, 'cerrarSesion'])
     ->name('memoria.cerrar');
+
+// Juego "El camino a la escuela" — mecánica de laberinto
+Route::post('/laberinto/{juego}/nivel/{nivel}/iniciar',
+    [\App\Http\Controllers\Dashboard\LaberintoController::class, 'iniciarSesion'])
+    ->middleware('limite.juego')
+    ->name('laberinto.iniciar');
+
+Route::get('/laberinto/sesion/{sesion}/tablero',
+    [\App\Http\Controllers\Dashboard\LaberintoController::class, 'mostrarTablero'])
+    ->middleware('limite.juego')
+    ->name('laberinto.tablero');
+
+Route::post('/laberinto/sesion/{sesion}/movimiento',
+    [\App\Http\Controllers\Dashboard\LaberintoController::class, 'registrarMovimiento'])
+    ->name('laberinto.movimiento');
+
+Route::post('/laberinto/sesion/{sesion}/cerrar',
+    [\App\Http\Controllers\Dashboard\LaberintoController::class, 'cerrarSesion'])
+    ->name('laberinto.cerrar');
 });
 
 // ==========================================================================

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha de acceso — MatiGuará</title>
+    <title>Ficha de acceso — MatiGuarã</title>
     {{--
         FICHA DE ACCESO IMPRIMIBLE (para llevar a casa)
         - Una por niño/a, dos por hoja A4. Cada ficha se recorta por la línea punteada.
@@ -79,7 +79,7 @@
     @foreach($fichas as $f)
         <section class="ficha">
             <div class="cab">
-                <div class="marca">🦜 MatiGuará · Ficha de acceso</div>
+                <div class="marca">🦜 MatiGuarã · Ficha de acceso</div>
                 <div class="datos">
                     {{ date('Y') }}@if($f['grado']) · {{ $f['grado'] }}.º grado @endif
                     @if($f['escuela'])<br>{{ $f['escuela'] }}@endif
@@ -104,7 +104,7 @@
                         <div class="pin"><i></i><i></i><i></i><i></i></div>
                     @endif
                     <ol>
-                        <li><b>1</b> Abro MatiGuará</li>
+                        <li><b>1</b> Abro MatiGuarã</li>
                         <li><b>2</b> Toco <strong>¡Quiero jugar!</strong></li>
                         <li><b>3</b> Escribo mi código</li>
                         <li><b>4</b> Toco mi PIN y <strong>¡Entrar a jugar!</strong></li>
@@ -123,7 +123,7 @@
                     <div class="etq">Código de su hijo/a</div>
                     <span class="codigo" style="font-size:1.15rem">{{ $f['codigo'] }}</span>
                     <ol>
-                        <li><b>1</b> Abra MatiGuará</li>
+                        <li><b>1</b> Abra MatiGuarã</li>
                         <li><b>2</b> Toque <strong>Soy padre/madre</strong></li>
                         <li><b>3</b> Escriba su correo y el código</li>
                         <li><b>4</b> Toque <strong>Ingresar</strong></li>

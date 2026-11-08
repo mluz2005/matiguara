@@ -117,6 +117,17 @@ class DocenteRepository
         );
     }
 
+    // ── Límite de tiempo de juego y pausa (para todos los juegos) ───────
+
+    /** Guarda el límite de juego por sesión y la pausa entre sesiones del docente (minutos; 0 = sin límite / sin pausa). */
+    public function guardarLimiteDeJuego(int $docenteId, int $limiteMin, int $pausaMin): void
+    {
+        Docente::where('id', $docenteId)->update([
+            'limite_sesion_min'        => $limiteMin,
+            'pausa_entre_sesiones_min' => $pausaMin,
+        ]);
+    }
+
     // ── Administración de docentes ───────────────────────────────────────
 
     /** Cantidad de docentes activos. */

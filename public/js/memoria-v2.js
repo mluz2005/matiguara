@@ -6,7 +6,7 @@
  * cierre de sesión con reintento y respaldo, cambio de nivel 3/2). No cambia
  * ni un endpoint ni un dato que se envía al servidor.
  *
- * Lo NUEVO es solo presentación: MatiGuará reacciona, confeti, racha (combo),
+ * Lo NUEVO es solo presentación: MatiGuarã reacciona, confeti, racha (combo),
  * palabra en guaraní al acertar, barra de tiempo y estrellas del cartel final.
  *
  * Se configura con window.MV2_CFG (lo define la vista Blade):
@@ -78,7 +78,7 @@
         el.play().catch(function () {});
     }
 
-    // ── MatiGuará: expresiones y globo de diálogo ────────────────────────
+    // ── MatiGuarã: expresiones y globo de diálogo ────────────────────────
     const guara = $('guara');
     let guaraTimer = null;
     function guaraEstado(estado, ms) {

@@ -29,7 +29,7 @@ class LogrosSeeder extends Seeder
                 'codigo'      => 'primer_paso',
                 'nombre_es'   => 'Primer Paso',
                 'nombre_gn'   => 'Peteĩ Mba\'apopy',
-                'descripcion' => 'Completaste tu primera sesión de juego. ¡Bienvenido a MatiGuará!',
+                'descripcion' => 'Completaste tu primera sesión de juego. ¡Bienvenido a MatiGuarã!',
                 'rareza'      => 'comun',
                 'emoji'       => '👣',
                 'activo'      => true,

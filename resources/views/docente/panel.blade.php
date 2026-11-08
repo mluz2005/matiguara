@@ -77,6 +77,11 @@
     </div>
     @endif
 
+    {{-- Gráficos del grupo --}}
+    @if(!empty($grupo) && $grupo['total'] > 0)
+      @include('docente.graficos._grupo')
+    @endif
+
     {{-- Accesos rápidos --}}
     <div class="row g-3">
       @foreach([

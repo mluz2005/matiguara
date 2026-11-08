@@ -19,17 +19,31 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/memoria-v2.css') }}?v=1">
 <link rel="stylesheet" href="{{ asset('css/juegos-v2.css') }}?v=1">
+<link rel="stylesheet" href="{{ asset('css/laberinto-v2.css') }}?v=1">
 @endpush
 
 @section('contenido')
 
 @php
-    $esMemoria = $sesion->juego->tipoMecanica?->tipo === 'memoria';
+    $tipoMecRes  = $sesion->juego->tipoMecanica?->tipo;
+    $esMemoria   = $tipoMecRes === 'memoria';
+    $esLaberinto = $tipoMecRes === 'laberinto';
+    $detalleLab  = $detalleLaberinto ?? null;
+
+    // Ruta para empezar un nivel, según el juego
+    $rutaIniciarRes = fn ($nivelId) => $esMemoria
+        ? route('estudiante.memoria.iniciar', ['juego' => $sesion->juego_id, 'nivel' => $nivelId])
+        : ($esLaberinto
+            ? route('estudiante.laberinto.iniciar', ['juego' => $sesion->juego_id, 'nivel' => $nivelId])
+            : route('estudiante.sesion.iniciar', ['juego' => $sesion->juego_id, 'nivel' => $nivelId]));
 
     // Mundo (colores y escena) según el juego
     if ($esMemoria) {
         $mundoRes = (string) min(5, max(1, (int) ceil($sesion->nivel->numero_nivel / 2)));
         $escenaRes = ['🌴','🌊','🌻','🌈','🌸','⭐'];
+    } elseif ($esLaberinto) {
+        $mundoRes = 'L';
+        $escenaRes = ['🏫','🥯','🌿','🧒','⭐','🏠'];
     } elseif ($sesion->nivel->tiempo_mostrar_ms) {
         $mundoRes = 'F';
         $escenaRes = ['⚡','⭐','✨','💡','🚀','⚡'];
@@ -41,6 +55,15 @@
     if ($pctOk >= 80)      { $estrellasRes = 3; $estadoRes = 'feliz'; $tituloEs = '¡Fantástico!'; $tituloGn = '¡Iporãiterei!'; $subRes = 'Sos un crack de las matemáticas.'; }
     elseif ($pctOk >= 50)  { $estrellasRes = 2; $estadoRes = 'feliz'; $tituloEs = '¡Muy bien!';    $tituloGn = '¡Iporã!';        $subRes = 'Cada vez lo hacés mejor.'; }
     else                   { $estrellasRes = 1; $estadoRes = 'idle';  $tituloEs = '¡Buen intento!'; $tituloGn = "¡Eñeha'ã jey!"; $subRes = 'La práctica te hace más fuerte.'; }
+
+    // «El camino a la escuela»: las estrellas son las del camino (no el porcentaje de aciertos)
+    if ($esLaberinto && $detalleLab && $detalleLab->llego) {
+        $estrellasRes = max(1, (int) $detalleLab->estrellas);
+        $estadoRes    = $estrellasRes >= 2 ? 'feliz' : 'idle';
+        if ($estrellasRes === 3)     { $tituloEs = '¡Camino perfecto!';        $tituloGn = '¡Iporãiterei!';   $subRes = 'Llegaste a la escuela sin ayuda.'; }
+        elseif ($estrellasRes === 2) { $tituloEs = '¡Llegaste a la escuela!';  $tituloGn = '¡Iporã!';         $subRes = 'Usaste ayudas y llegaste igual.'; }
+        else                         { $tituloEs = '¡Llegaste a la escuela!';  $tituloGn = '¡Ereguahẽ!';      $subRes = 'Cada camino te enseña algo nuevo.'; }
+    }
 @endphp
 
 <div class="mv2 mv2-res mv2-w{{ $mundoRes }}" id="mv2Res">
@@ -67,6 +90,21 @@
         {{-- Badge de nivel superado --}}
         @if($sesion->nivel_superado)
             <div class="mv2-res-superado">🎉 ¡Nivel {{ $sesion->nivel->numero_nivel }} superado!</div>
+        @endif
+
+        {{-- «El camino a la escuela»: ayudas y chipas del camino --}}
+        @if($esLaberinto && $detalleLab && $detalleLab->llego)
+            <div class="mv2-res-extra">
+                @if($detalleLab->chipas_total > 0)
+                    <span class="mv2-res-ficha">🥯 {{ $detalleLab->chipas_recogidas }}/{{ $detalleLab->chipas_total }} chipas</span>
+                @endif
+                @if($detalleLab->pistas_usadas > 0)
+                    <span class="mv2-res-ficha">💡 {{ $detalleLab->pistas_usadas }} {{ (int) $detalleLab->pistas_usadas === 1 ? 'pista' : 'pistas' }}</span>
+                @endif
+                @if($detalleLab->soluciones_mostradas > 0)
+                    <span class="mv2-res-ficha">👀 {{ $detalleLab->soluciones_mostradas }} {{ (int) $detalleLab->soluciones_mostradas === 1 ? 'solución vista' : 'soluciones vistas' }}</span>
+                @endif
+            </div>
         @endif
 
         {{-- Estadísticas de la sesión --}}
@@ -116,9 +154,7 @@
         @if(!empty($siguienteNivel))
             <div class="ancho">
                 <form method="POST"
-                      action="{{ $esMemoria
-                            ? route('estudiante.memoria.iniciar', ['juego' => $sesion->juego_id, 'nivel' => $siguienteNivel->id])
-                            : route('estudiante.sesion.iniciar', ['juego' => $sesion->juego_id, 'nivel' => $siguienteNivel->id]) }}">
+                      action="{{ $rutaIniciarRes($siguienteNivel->id) }}">
                     @csrf
                     <button type="submit" class="mv2-btn amarillo">
                         <i class="bi bi-skip-forward-fill me-1"></i>
@@ -133,9 +169,7 @@
              se cumplió, repite el mismo nivel. --}}
         <div>
             <form method="POST"
-                  action="{{ $esMemoria
-                        ? route('estudiante.memoria.iniciar', ['juego' => $sesion->juego_id, 'nivel' => $nivelParaJugarDeNuevo ?? $sesion->nivel_id])
-                        : route('estudiante.sesion.iniciar', ['juego' => $sesion->juego_id, 'nivel' => $sesion->nivel_id]) }}">
+                  action="{{ $rutaIniciarRes(($esMemoria || $esLaberinto) ? ($nivelParaJugarDeNuevo ?? $sesion->nivel_id) : $sesion->nivel_id) }}">
                 @csrf
                 <button type="submit" class="mv2-btn verde">
                     @if(($cambioNivel ?? null) === 'sube')

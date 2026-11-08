@@ -1,6 +1,6 @@
 @extends('layouts.estudiante')
 
-@section('titulo', 'MatiGuará — Ejercicio')
+@section('titulo', 'MatiGuarã — Ejercicio')
 
 {{-- Cada juego de esta pantalla tiene su propia música (MP3): el layout no arranca la generada por código.
      Para cambiar una música basta con reemplazar el archivo (mismo nombre) en public/audio/musica/. --}}
@@ -70,10 +70,10 @@
         @foreach($escenaEj as $i => $adorno)<span class="e{{ $i + 1 }}">{{ $adorno }}</span>@endforeach
     </div>
 
-    {{-- ── MatiGuará: reacciona a la respuesta anterior ──────────────────── --}}
+    {{-- ── MatiGuarã: reacciona a la respuesta anterior ──────────────────── --}}
     <header class="mv2-ej-hud">
         <div class="mv2-guara-wrap">
-            <div class="mv2-guara" id="guara" data-estado="{{ $ult ? ($ult['es_correcto'] ? 'feliz' : 'uy') : 'idle' }}" title="¡Guará te alienta!">
+            <div class="mv2-guara" id="guara" data-estado="{{ $ult ? ($ult['es_correcto'] ? 'feliz' : 'uy') : 'idle' }}" title="¡Guarã te alienta!">
                 @include('estudiante._mv2-guara')
             </div>
             @if($ult)

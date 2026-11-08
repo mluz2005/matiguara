@@ -1,4 +1,4 @@
-# MatiGuará — Aplicación educativa gamificada con módulo bilingüe (español–guaraní)
+# MatiGuarã — Aplicación educativa gamificada con módulo bilingüe (español–guaraní)
 
 **Pesallaccia Cardozo, María Luz — FACAT-UNAE Encarnación, 2026**
 *Proyecto de Grado — Licenciatura en Análisis de Sistemas Informáticos*
@@ -85,7 +85,7 @@ de estudiantes de Laravel), que es el adaptador del framework hacia la base de d
    ```
 5. Editar `.env`:
    ```env
-   APP_NAME="MatiGuará"
+   APP_NAME="MatiGuarã"
    APP_ENV=local
    APP_DEBUG=true
    APP_URL=http://localhost/app-educativa/public
@@ -99,6 +99,7 @@ de estudiantes de Laravel), que es el adaptador del framework hacia la base de d
 
    QUEUE_CONNECTION=sync
    SESSION_DRIVER=file
+   SESSION_LIFETIME=30   # minutos de inactividad antes de cerrar la sesión (tablets compartidas)
 
    # Diagnóstico con IA (RF-10). Sin clave, el diagnóstico se genera con datos locales.
    CLAUDE_API_KEY=

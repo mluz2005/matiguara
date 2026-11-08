@@ -5,7 +5,7 @@ namespace App\Support;
 /**
  * DATOS DE LA PÁGINA "ACERCA DE"
  * =========================================================================
- * Todo lo que muestra la pantalla "Acerca de MatiGuará" está acá, en un solo
+ * Todo lo que muestra la pantalla "Acerca de MatiGuarã" está acá, en un solo
  * lugar. Para cambiar la versión, el correo de contacto o los créditos, se
  * edita este archivo y no hace falta tocar nada más.
  * =========================================================================

@@ -1,9 +1,9 @@
 @extends(\Illuminate\Support\Facades\Auth::guard('estudiante')->check() ? 'layouts.estudiante' : 'layouts.app')
 
-@section('titulo', 'Acerca de MatiGuará')
+@section('titulo', 'Acerca de MatiGuarã')
 
 {{--
-    VISTA: acerca-de.blade.php — "Acerca de MatiGuará"
+    VISTA: acerca-de.blade.php — "Acerca de MatiGuarã"
     =========================================================================
     Pública: la ven estudiantes, docentes, familias, administración y quien
     todavía no inició sesión. Usa el diseño infantil si quien mira es un
@@ -25,7 +25,7 @@
 
     <div class="text-center mb-4">
         <div style="font-size:3.5rem" aria-hidden="true">🦜</div>
-        <h1 class="fw-bold mb-1" style="color:#1B3361">MatiGuará</h1>
+        <h1 class="fw-bold mb-1" style="color:#1B3361">MatiGuarã</h1>
         <p class="fs-5 mb-2" style="color:#44546F">
             Aplicación educativa con juegos de matemática, en castellano y guaraní,
             para niños y niñas de 6 a 9 años (primer ciclo de la Educación Escolar Básica).
@@ -42,7 +42,7 @@
         <div class="card-body">
             <h2 class="h5 fw-bold" style="color:#1B3361">¿Qué es?</h2>
             <p class="mb-0" style="color:#1F2937">
-                MatiGuará convierte la práctica de la matemática en un juego. Tiene tres juegos
+                MatiGuarã convierte la práctica de la matemática en un juego. Tiene tres juegos
                 (Suma de Frutas, Flash Matemático y Encuentra el par), niveles que se adaptan
                 a cada niño, medallas y un panel para docentes y familias que muestra el avance.
             </p>
@@ -94,7 +94,7 @@
         <div class="card-body">
             <h2 class="h5 fw-bold" style="color:#1B3361">Datos de niños y niñas</h2>
             <p style="color:#1F2937">
-                MatiGuará guarda solo lo necesario para jugar y para que la docente pueda ver el avance:
+                MatiGuarã guarda solo lo necesario para jugar y para que la docente pueda ver el avance:
                 el nombre, el grado, el PIN (guardado de forma cifrada), las partidas, los puntajes y las medallas.
                 Además, la docente puede cargar el <strong>correo electrónico del padre, madre o tutor</strong>, que se usa
                 únicamente para que la familia pueda ingresar a ver el avance de su hijo o hija.

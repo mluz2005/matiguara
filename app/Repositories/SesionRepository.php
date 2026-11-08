@@ -95,6 +95,7 @@ class SesionRepository
         return $sesion->movimientos()
             ->pluck('contenido_id')
             ->unique()
+            ->values()
             ->toArray();
     }
 
@@ -268,7 +269,7 @@ class SesionRepository
             ->pluck('nivel_superado');
     }
 
-    // ── Resumen de rendimiento (panel del docente y de la familia) ───────
+    // ── Resumen de rendimiento (panel del docente y de la familia) ─────
 
     /**
      * Resumen de las sesiones COMPLETADAS de uno o varios estudiantes:
@@ -328,5 +329,58 @@ class SesionRepository
     public function contarCompletadasGlobal(): int
     {
         return SesionJuego::where('estado', 'completada')->count();
+    }
+
+    // ── Consultas para los gráficos del docente ──────────────────────────
+
+    /**
+     * Cuántos estudiantes distintos (entre los indicados) jugaron cada día,
+     * desde la fecha dada. Cuenta cualquier sesión iniciada, aunque no se haya completado.
+     *
+     * @param  iterable  $estudianteIds
+     * @param  \DateTimeInterface|string  $desde
+     * @return array<string,int>  ['2026-10-24' => 3, ...] (solo los días con actividad)
+     */
+    public function estudiantesActivosPorDia($estudianteIds, $desde): array
+    {
+        return SesionJuego::whereIn('estudiante_id', $estudianteIds)
+            ->where('fecha_inicio', '>=', $desde)
+            ->selectRaw('DATE(fecha_inicio) as dia, COUNT(DISTINCT estudiante_id) as n')
+            ->groupBy('dia')
+            ->pluck('n', 'dia')
+            ->map(fn ($n) => (int) $n)
+            ->all();
+    }
+    // ── Tiempo de juego (límite por sesión y pausa) ──────────────────────
+
+    /**
+     * Sesiones del estudiante iniciadas desde la fecha dada, de la más vieja a la
+     * más nueva, con lo mínimo para calcular el tiempo jugado.
+     *
+     * @return Collection  Filas con fecha_inicio, fecha_fin (puede ser null)
+     */
+    public function sesionesParaTiempo(int $estudianteId, $desde): Collection
+    {
+        return SesionJuego::where('estudiante_id', $estudianteId)
+            ->where('fecha_inicio', '>=', $desde)
+            ->orderBy('fecha_inicio')
+            ->orderBy('id')
+            ->get(['id', 'fecha_inicio', 'fecha_fin']);
+    }
+
+    /**
+     * Cierra como 'abandonada' toda sesión 'en_curso' del estudiante, de CUALQUIER
+     * juego (se usa al mandarlo a descansar).
+     *
+     * @return int Cantidad de sesiones cerradas
+     */
+    public function abandonarTodasEnCurso(int $estudianteId): int
+    {
+        return SesionJuego::where('estudiante_id', $estudianteId)
+            ->where('estado', 'en_curso')
+            ->update([
+                'estado'    => 'abandonada',
+                'fecha_fin' => now(),
+            ]);
     }
 }

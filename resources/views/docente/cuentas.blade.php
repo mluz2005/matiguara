@@ -82,18 +82,27 @@
               @error('grado')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
             <div class="mb-3">
-              <label class="form-label fw-semibold small">
-                PIN (4 dígitos — elegir junto al estudiante)
-              </label>
-              <input type="text" name="pin" class="form-control rounded-3 fw-bold"
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label fw-semibold small mb-0">
+                  PIN (4 dígitos — elegir junto al estudiante)
+                </label>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-3 py-0"
+                        onclick="pinAzar('crPin','crPin2')" title="Genera un PIN de 4 números fácil de recordar y difícil de adivinar">
+                  🎲 PIN al azar
+                </button>
+              </div>
+              <input type="text" name="pin" id="crPin" oninput="pinRevisar('crPin','crPinAviso')" class="form-control rounded-3 fw-bold"
                      maxlength="4" inputmode="numeric" pattern="\d{4}"
                      placeholder="0000" required style="letter-spacing:8px;font-size:1.2rem">
             </div>
             <div class="mb-3">
               <label class="form-label fw-semibold small">Confirmar PIN</label>
-              <input type="text" name="pin_confirmation" class="form-control rounded-3 fw-bold"
+              <input type="text" name="pin_confirmation" id="crPin2" class="form-control rounded-3 fw-bold"
                      maxlength="4" inputmode="numeric" pattern="\d{4}"
                      placeholder="0000" required style="letter-spacing:8px;font-size:1.2rem">
+              <div id="crPinAviso" class="small mt-1" style="display:none;color:#8A5A00" role="status">
+                ⚠️ Ese PIN es fácil de adivinar. Te sugerimos «PIN al azar»; si preferís mantenerlo, podés guardarlo igual.
+              </div>
             </div>
             <div class="mb-3">
               <label class="form-label fw-semibold small">
@@ -152,13 +161,22 @@
               </div>
             </div>
             <div class="mb-3">
-              <label class="form-label fw-semibold small">
-                Nuevo PIN <span class="text-muted fw-normal">(solo si querés cambiarlo)</span>
-              </label>
-              <input type="text" name="nuevo_pin" id="edPin" class="form-control rounded-3 fw-bold"
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label fw-semibold small mb-0">
+                  Nuevo PIN <span class="text-muted fw-normal">(solo si querés cambiarlo)</span>
+                </label>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-3 py-0"
+                        onclick="pinAzar('edPin')" title="Genera un PIN de 4 números fácil de recordar y difícil de adivinar">
+                  🎲 PIN al azar
+                </button>
+              </div>
+              <input type="text" name="nuevo_pin" id="edPin" oninput="pinRevisar('edPin','edPinAviso')" class="form-control rounded-3 fw-bold"
                      maxlength="4" inputmode="numeric" pattern="\d{4}" autocomplete="off"
                      placeholder="0000" style="letter-spacing:8px;font-size:1.2rem">
               <div class="form-text">Dejalo vacío para no cambiar el PIN actual.</div>
+              <div id="edPinAviso" class="small mt-1" style="display:none;color:#8A5A00" role="status">
+                ⚠️ Ese PIN es fácil de adivinar. Te sugerimos «PIN al azar»; si preferís mantenerlo, podés guardarlo igual.
+              </div>
             </div>
             <div class="d-grid gap-2">
               <button type="submit" class="btn fw-bold rounded-3" style="background:#1B3361;color:white">
@@ -321,6 +339,7 @@ function cuentaSeleccionar(fila) {
     document.getElementById('edApellido').value = d.apellido;
     document.getElementById('edCorreo').value   = d.correo;
     document.getElementById('edPin').value      = '';
+    document.getElementById('edPinAviso').style.display = 'none';
     document.getElementById('edCodigo').textContent = d.codigo;
     document.getElementById('edFicha').href = d.urlFicha;
 
@@ -354,6 +373,35 @@ function cuentaSeleccionar(fila) {
     if (window.innerWidth < 768) {
         document.getElementById('panelEditar').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+}
+
+// Genera un PIN de 4 números al azar y lo escribe en los campos indicados (el de crear
+// repite el valor en "Confirmar PIN"). Evita los PIN fáciles de adivinar: 0000, 7777,
+// 1234, 4321, 2345... Usa el generador criptográfico del navegador.
+function pinAzar() {
+    var pin = '';
+    do {
+        var n = new Uint32Array(1);
+        window.crypto.getRandomValues(n);
+        pin = String(n[0] % 10000).padStart(4, '0');
+    } while (pinTrivial(pin));
+    for (var i = 0; i < arguments.length; i++) {
+        document.getElementById(arguments[i]).value = pin;
+    }
+    ['crPinAviso', 'edPinAviso'].forEach(function (id) { document.getElementById(id).style.display = 'none'; });
+}
+function pinTrivial(pin) {
+    var d = pin.split('').map(Number);
+    if (d.every(function (x) { return x === d[0]; })) return true;                       // 0000, 7777
+    var sube = d.every(function (x, i) { return i === 0 || x === d[i - 1] + 1; });       // 1234
+    var baja = d.every(function (x, i) { return i === 0 || x === d[i - 1] - 1; });       // 4321
+    var alterna = d[0] === d[2] && d[1] === d[3];                                        // 1212
+    return sube || baja || alterna;
+}
+// Aviso suave (no bloquea): se muestra mientras el PIN escrito sea fácil de adivinar.
+function pinRevisar(idCampo, idAviso) {
+    var v = document.getElementById(idCampo).value;
+    document.getElementById(idAviso).style.display = (/^\d{4}$/.test(v) && pinTrivial(v)) ? 'block' : 'none';
 }
 
 // Vuelve al formulario de "Nuevo alumno".

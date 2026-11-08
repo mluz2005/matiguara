@@ -25,5 +25,5 @@
             </li>
         @endforeach
     </ul>
-    <p class="lg2-pie"><a href="{{ route('acerca') }}">ℹ️ Acerca de MatiGuará</a></p>
+    <p class="lg2-pie"><a href="{{ route('acerca') }}">ℹ️ Acerca de MatiGuarã</a></p>
 </nav>

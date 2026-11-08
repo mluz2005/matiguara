@@ -26,6 +26,9 @@
     <div class="alert alert-warning rounded-3 py-2 mb-3">{{ $errors->first() }}</div>
   @endif
 
+  {{-- Gráficos del alumno: contexto para decidir si pedir el análisis --}}
+  @include('docente.graficos._alumno', ['uid' => 'diag'])
+
   <div class="row g-3">
 
     {{-- ══ PANEL IZQUIERDO: Solicitar diagnóstico ══ --}}

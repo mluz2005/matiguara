@@ -322,7 +322,7 @@ class SesionService
             $racha->racha_actual_dias++;
         } else {
             // Pasaron más de 1 día
-            $diasDesdeUltima = $hoy->diffInDays($racha->ultima_sesion_fecha);
+           $diasDesdeUltima = (int) $hoy->diffInDays($racha->ultima_sesion_fecha, true);
             if ($diasDesdeUltima > $diasReinicio) {
                 // Se rompió la racha de días
                 $racha->racha_actual_dias = 1;
@@ -365,7 +365,7 @@ class SesionService
      * @param  int|null       $tiempoMs
      * @return string
      */
-    private function clasificarError(
+    public function clasificarError(
         ContenidoNivel $ejercicio,
         string $respuesta,
         ?int $tiempoMs

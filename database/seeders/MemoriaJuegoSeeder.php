@@ -11,7 +11,7 @@ use Illuminate\Database\Seeder;
 /**
  * SEEDER: MemoriaJuegoSeeder — "Encuentra el par / Jaheka pe par ojoajúva"
  * =========================================================================
- * Crea el tercer juego de MatiGuará: memoria visual de pares.
+ * Crea el tercer juego de MatiGuarã: memoria visual de pares.
  *
  * SIMPLIFICACIÓN DE DISEÑO (documentada, revisable):
  * Los 10 niveles se crean todos con grado=1, como una progresión ÚNICA

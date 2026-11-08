@@ -44,6 +44,9 @@
     </div>
   </div>
 
+  {{-- Gráficos del alumno --}}
+  @include('docente.graficos._alumno', ['uid' => 'prog'])
+
   <div class="row g-3">
 
     {{-- Progreso por nivel --}}
@@ -116,6 +119,42 @@
           @endforelse
         </div>
       </div>
+
+      {{-- «El camino a la escuela»: cómo llegó el niño (RF-L22) --}}
+      @if(($laberintoPartidas ?? collect())->isNotEmpty())
+        <div class="card border-0 shadow-sm rounded-4 mb-3">
+          <div class="card-header bg-white rounded-top-4 border-0 pt-3 px-3">
+            <h6 class="fw-bold mb-0" style="color:#A83A22">
+              <i class="bi bi-signpost-split me-1"></i>El camino a la escuela
+            </h6>
+          </div>
+          <div class="card-body p-3">
+            @foreach($laberintoPartidas as $lp)
+              <div class="py-1 border-bottom">
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="fw-bold">
+                    {{ $lp->sesion->nivel->grado }}.° · Nivel {{ $lp->sesion->nivel->numero_nivel }}
+                    <span class="text-muted fw-normal">{{ $lp->sesion->fecha_inicio?->format('d/m H:i') }}</span>
+                  </small>
+                  @if($lp->llego)
+                    <span style="letter-spacing:1px">{{ str_repeat('⭐', max(1, (int) $lp->estrellas)) }}</span>
+                  @else
+                    <span class="badge bg-light text-dark">no llegó</span>
+                  @endif
+                </div>
+                <small class="text-muted">
+                  🥯 {{ $lp->chipas_recogidas }}/{{ $lp->chipas_total }}
+                  · 💡 {{ $lp->pistas_usadas }} {{ (int) $lp->pistas_usadas === 1 ? 'pista' : 'pistas' }}
+                  @if($lp->uso_flecha) · 🧭 flecha @endif
+                  · 👀 {{ $lp->soluciones_mostradas }} {{ (int) $lp->soluciones_mostradas === 1 ? 'solución' : 'soluciones' }}
+                  @if($lp->duracion_s) · ⏱ {{ intdiv($lp->duracion_s, 60) }}:{{ str_pad($lp->duracion_s % 60, 2, '0', STR_PAD_LEFT) }} @endif
+                </small>
+              </div>
+            @endforeach
+            <p class="text-muted small mb-0 mt-2">Las ⭐ bajan con las pistas y la flecha (2) o con las soluciones mostradas (1).</p>
+          </div>
+        </div>
+      @endif
 
       {{-- Logros --}}
       <div class="card border-0 shadow-sm rounded-4">

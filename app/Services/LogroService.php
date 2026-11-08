@@ -6,6 +6,7 @@ use App\Models\CatalogoLogro;
 use App\Models\Racha;
 use App\Models\SesionJuego;
 use App\Models\Estudiante;
+use App\Repositories\LaberintoRepository;
 use App\Repositories\LogroRepository;
 use App\Repositories\SesionRepository;
 use Illuminate\Support\Collection;
@@ -33,7 +34,8 @@ class LogroService
 {
     public function __construct(
         private LogroRepository $logros,
-        private SesionRepository $sesiones
+        private SesionRepository $sesiones,
+        private LaberintoRepository $laberinto
     ) {
     }
 
@@ -62,6 +64,12 @@ class LogroService
         }
 
         return $logrosNuevos;
+    }
+
+    /** Detalle de la partida si es de «El camino a la escuela» (null en los otros juegos). */
+    private function detalleLaberinto(SesionJuego $sesion): ?\App\Models\DetalleLaberinto
+    {
+        return $this->laberinto->detalleDe($sesion->id);
     }
 
     /**
@@ -98,6 +106,16 @@ class LogroService
 
             // Días consecutivos jugando
             'dias_consecutivos' => $racha->racha_actual_dias >= $valor,
+
+            // «El camino a la escuela» (2026-11-08): se evalúan con el detalle de la partida.
+            'laberinto_llegada'      => $this->detalleLaberinto($sesion)?->llego === true,
+            'laberinto_perfecto'     => $this->detalleLaberinto($sesion)?->estrellas === 3,
+            'laberinto_chipas'       => ($d = $this->detalleLaberinto($sesion)) !== null
+                                        && $d->chipas_total > 0 && $d->chipas_recogidas >= $d->chipas_total,
+            'laberinto_ultimo_nivel' => $this->detalleLaberinto($sesion)?->llego === true
+                                        && (bool) $sesion->nivel_superado
+                                        && $sesion->nivel !== null
+                                        && $sesion->nivel->nivelSiguiente() === null,
 
             default => false,
         };

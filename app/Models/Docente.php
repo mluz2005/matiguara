@@ -25,11 +25,19 @@ class Docente extends Model
     protected $fillable = [
         'usuario_id',
         'activo',
+        'limite_sesion_min',          // minutos de juego por sesión (0 = sin límite)
+        'pausa_entre_sesiones_min',   // minutos de descanso obligatorio (0 = sin pausa)
     ];
 
     protected $casts = [
         'activo' => 'boolean',
+        'limite_sesion_min'        => 'integer',
+        'pausa_entre_sesiones_min' => 'integer',
     ];
+
+    /** Valores por defecto del límite de juego (también usados si el docente no tiene valor). */
+    public const LIMITE_SESION_DEFECTO_MIN = 8;
+    public const PAUSA_DEFECTO_MIN         = 30;
 
     // ── RELACIONES ────────────────────────────────────────────────────
 

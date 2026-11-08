@@ -21,6 +21,7 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/memoria-v2.css') }}?v=1">
 <link rel="stylesheet" href="{{ asset('css/juegos-v2.css') }}?v=1">
+<link rel="stylesheet" href="{{ asset('css/laberinto-v2.css') }}?v=1">
 @endpush
 
 @section('contenido')
@@ -65,9 +66,10 @@
                 $tipoMec     = $juego->tipoMecanica?->tipo ?? '';
                 $esMemoria   = $tipoMec === 'memoria';
                 $esFlashMenu = $juego->nombre_es === 'Flash Matemático';
+                $esLaberinto = $tipoMec === 'laberinto';
 
                 // Cada juego tiene su propio mundo de color
-                $claseMundo = $esMemoria ? 'mv2-w5' : ($esFlashMenu ? 'mv2-wF' : 'mv2-wS');
+                $claseMundo = $esMemoria ? 'mv2-w5' : ($esLaberinto ? 'mv2-wL' : ($esFlashMenu ? 'mv2-wF' : 'mv2-wS'));
 
                 $iconoJuego = $esFlashMenu ? '⚡' : match($tipoMec) {
                     'suma'           => '🍎',
@@ -75,6 +77,7 @@
                     'multiplicacion' => '✖️',
                     'division'       => '➗',
                     'memoria'        => '🃏',
+                    'laberinto'      => '🏫',
                     'mixto'          => '🔢',
                     default          => '🎯',
                 };
@@ -158,7 +161,9 @@
                                     : (bool) $nivel->desbloqueado_por_defecto;
                             @endphp
                             <form method="POST"
-                                  action="{{ route('estudiante.sesion.iniciar', ['juego' => $juego->id, 'nivel' => $nivel->id]) }}">
+                                  action="{{ $esLaberinto
+                                        ? route('estudiante.laberinto.iniciar', ['juego' => $juego->id, 'nivel' => $nivel->id])
+                                        : route('estudiante.sesion.iniciar', ['juego' => $juego->id, 'nivel' => $nivel->id]) }}">
                                 @csrf
                                 <button type="{{ $abierto ? 'submit' : 'button' }}"
                                         class="{{ $abierto ? '' : 'cerrado' }}"
@@ -172,6 +177,8 @@
                                     <small>
                                         @if($nivel->tiempo_mostrar_ms)
                                             ⏱ {{ intval($nivel->tiempo_mostrar_ms / 1000) }} s
+                                        @elseif($esLaberinto)
+                                            {{ ['🌱','💧','🐄','🏘️'][max(0, min(3, (int) ceil($nivel->numero_nivel / 2) - 1))] }}
                                         @else
                                             {{ str_repeat('★', $nivel->dificultad) }}{{ str_repeat('☆', 5 - $nivel->dificultad) }}
                                         @endif

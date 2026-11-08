@@ -58,6 +58,26 @@ class AyudaJuegos
                  'es' => 'Encontrá todos los pares antes de que se acabe el tiempo.',
                  'gn' => 'Ejuhu opa pe par tiempo opama mboyve.'],
             ],
+            'El camino a la escuela' => [
+                ['clave' => 'camino_1', 'dibujo' => ['🏠', '➡️', '🏫'],
+                 'es' => 'Llevá a tu personaje de la casa a la escuela.',
+                 'gn' => 'Eraha nde personaje óga-gui mbo\'ehaópe.'],
+                ['clave' => 'camino_2', 'dibujo' => ['👆', '🧒'],
+                 'es' => 'Tocá un lugar del camino y tu personaje camina hasta allí.',
+                 'gn' => 'Eikutu tape rehe ha nde personaje oguata upépe.'],
+                ['clave' => 'camino_3', 'dibujo' => ['🪵', '❓', '[5*]'],
+                 'es' => 'Si algo cierra el paso, resolvé el problema para abrirlo.',
+                 'gn' => 'Oĩ ramo mba\'e ojokóva, ejapo pe problema ojepe\'a hag̃ua.'],
+                ['clave' => 'camino_4', 'dibujo' => ['❌', '💡', '🔁'],
+                 'es' => 'Si te equivocás, MatiGuará te da una pista y probás de nuevo.',
+                 'gn' => 'Ejavy ramo, MatiGuará ome\'ẽ ndéve peteĩ pista ha eha\'ã jey.'],
+                ['clave' => 'camino_5', 'dibujo' => ['🥯', '🥯', '🧑‍🏫'],
+                 'es' => 'En los callejones hay chipas para la maestra.',
+                 'gn' => 'Callejón-pe oĩ chipa mbo\'ehárape guarã.'],
+                ['clave' => 'camino_6', 'dibujo' => ['🧭', '⭐'],
+                 'es' => 'El botón 🧭 te muestra el rumbo, pero así no llegás con 3 estrellas.',
+                 'gn' => 'Pe 🧭 ohechauka ndéve pe tape, ha ndereguahẽvéi mbohapy estrella ndive.'],
+            ],
             default => self::generales(),
         };
     }
@@ -97,7 +117,7 @@ class AyudaJuegos
     public static function todos(): array
     {
         $todos = [];
-        foreach (['Suma de Frutas', 'Flash Matemático', 'Encuentra el par'] as $j) {
+        foreach (['Suma de Frutas', 'Flash Matemático', 'Encuentra el par', 'El camino a la escuela'] as $j) {
             foreach (self::pasosDe($j) as $p) $todos[] = $p + ['juego' => $j];
         }
         foreach (self::generales() as $p) $todos[] = $p + ['juego' => 'Ayuda general'];

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡A Jugar! — MatiGuará</title>
+    <title>¡A Jugar! — MatiGuarã</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
@@ -24,11 +24,11 @@
 
 <main class="lg2-tablero">
 
-    {{-- ═ Columna 1: MatiGuará da la bienvenida ═══════════════════════════ --}}
+    {{-- ═ Columna 1: MatiGuarã da la bienvenida ═══════════════════════════ --}}
     <section class="lg2-izq" aria-label="Bienvenida">
         <div class="lg2-bienvenida">
             <div class="lg2-mascota">
-                <img id="guaraImg" src="{{ asset('img/guara/guara-guino.webp') }}" alt="MatiGuará, el guacamayo mascota, te saluda" width="230" height="260">
+                <img id="guaraImg" src="{{ asset('img/guara/guara-guino.webp') }}" alt="MatiGuarã, el guacamayo mascota, te saluda" width="230" height="260">
             </div>
             <div class="lg2-saludo">
                 <h1>¡A jugar!</h1>
@@ -72,8 +72,10 @@
                        placeholder="SAN-1A-007"
                        autocomplete="off"
                        autocapitalize="characters"
+                       autocorrect="off"
+                       spellcheck="false"
+                       enterkeyhint="next"
                        maxlength="20"
-                       autofocus
                        required>
                 <p class="lg2-ayuda">📋 Tu maestra o maestro te dio este código</p>
             </div>
@@ -114,7 +116,7 @@
         crossorigin="anonymous"></script>
 <script>
 /**
- * Lógica del teclado de PIN (la misma de siempre) + reacciones de MatiGuará.
+ * Lógica del teclado de PIN (la misma de siempre) + reacciones de MatiGuarã.
  *
  * Mantiene un array de hasta 4 dígitos y lo muestra visualmente.
  * Cuando tiene 4 dígitos, copia el valor al input oculto y habilita el botón.
@@ -124,7 +126,7 @@
  */
 let digitos = [];  // Array con los dígitos ingresados (máx 4)
 
-// ── MatiGuará: cambia de pose según lo que hace el niño ──────────────────
+// ── MatiGuarã: cambia de pose según lo que hace el niño ──────────────────
 const POSES = {
     guino:   @js(asset('img/guara/guara-guino.webp')),
     mira:    @js(asset('img/guara/guara-mira.webp')),
@@ -188,15 +190,44 @@ document.getElementById('formAcceso').addEventListener('submit', function (e) {
 
 document.getElementById('codigo_acceso').addEventListener('input', actualizarDisplay);
 
-// Soporte para teclado físico (tablets con teclado externo)
+// ── Teclado físico (computadora, o tablet con teclado) ─────────────────────
+// Es un complemento del teclado en pantalla, que sigue funcionando igual:
+//   · En el campo del código: Enter pasa al PIN (si el código no está vacío).
+//   · Fuera de ese campo: los números 0-9 (fila superior o teclado numérico)
+//     entran directo al PIN; Retroceso borra el último; Supr o Esc borran todo;
+//     Enter equivale a tocar «Entrar a jugar» (si falta algo, muestra el aviso).
+// No hay ningún campo de texto para el PIN: así en celulares y tabletas no se
+// abre el teclado del sistema y el teclado de la pantalla no queda tapado.
+const campoCodigo = document.getElementById('codigo_acceso');
+// El cursor arranca en el código solo con mouse o touchpad. En pantallas táctiles no:
+// abriría el teclado del sistema y taparía el teclado de números y la mascota.
+if (window.matchMedia && window.matchMedia('(pointer: fine)').matches) campoCodigo.focus();
+campoCodigo.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();                       // no enviar el formulario con el PIN vacío
+    if (campoCodigo.value.trim() === '') return;
+    campoCodigo.blur();                       // el foco sale del campo: los números van al PIN
+    pose('guino', 'Ahora tu PIN secreto.');
+});
 document.addEventListener('keydown', function (e) {
-    if (document.activeElement.id === 'codigo_acceso') return; // No interferir
-    if (e.key >= '0' && e.key <= '9') agregarDigito(parseInt(e.key));
-    if (e.key === 'Backspace') borrarDigito();
-    if (e.key === 'Escape') borrarTodo();
+    if (e.target === campoCodigo) return;     // escribiendo el código: no interferir
+    if (e.ctrlKey || e.metaKey || e.altKey) return;   // respetar atajos del navegador
+    if (/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+        if (!e.repeat) agregarDigito(parseInt(e.key, 10));   // mantener apretada no repite
+    } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        if (!e.repeat) borrarDigito();
+    } else if (e.key === 'Escape' || e.key === 'Delete') {
+        borrarTodo();
+    } else if (e.key === 'Enter') {
+        e.preventDefault();                   // evita que Enter «toque» el botón con foco
+        const f = document.getElementById('formAcceso');
+        if (f.requestSubmit) f.requestSubmit(); else if (!document.getElementById('btnJugar').disabled) f.submit();
+    }
 });
 
-// Si el servidor devolvió un error, MatiGuará se muestra pensativa
+// Si el servidor devolvió un error, MatiGuarã se muestra pensativa
 @if($errors->any())
 pose('piensa', '¡Uy! Probemos de nuevo.', 'uy');
 @endif

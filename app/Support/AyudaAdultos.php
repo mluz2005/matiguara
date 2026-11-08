@@ -152,8 +152,10 @@ class AyudaAdultos
              'notas' => [
                  '**Suma de Frutas y Flash Matemático:** cada partida tiene 5 ejercicios. Con **3 respuestas correctas seguidas** el niño sube un nivel; con **2 errores seguidos** baja uno. Un nivel se considera **superado** cuando se aciertan al menos 3 de los 5 ejercicios, y entonces se abre el siguiente.',
                  '**Encuentra el par:** el nivel se supera encontrando todos los pares antes de que se acabe el tiempo. Con **3 partidas ganadas seguidas** sube de nivel; con **2 partidas perdidas seguidas** baja.',
+                 '**El camino a la escuela:** el niño lleva a su personaje de la casa a la escuela y arregla con números los obstáculos del camino (cada uno es un problema con su historia). Mientras camina puede juntar chipas en los callejones. Las estrellas dependen de la ayuda: **3** si llega sin ayuda, **2** si usó pistas o la flecha, **1** si tuvo que ver la solución. Un camino se **supera** si el niño vio la solución en **un obstáculo como máximo**; con **3 caminos superados seguidos** sube de nivel y con **2 no superados seguidos** baja. Si se equivoca, el juego le da una pista; si se equivoca de nuevo, le muestra cómo se resuelve y le da después un problema parecido.',
                  '**Flash Matemático:** los números se ven unos segundos y desaparecen; el niño tiene que recordarlos. En los niveles más altos hay tres números y restas.',
                  'Al superar un nivel, la pantalla final ofrece el botón **¡Siguiente nivel!**. En **Encuentra el par**, cuando el niño cambia de nivel (sube o baja), el juego **pasa solo al nivel nuevo**, sin pantalla final, y le muestra un aviso con las medallas que ganó.',
+                 '**Tiempo de juego y descanso (todos los juegos):** para cuidar la vista y la atención, cada sesión tiene un tiempo máximo (8 minutos por defecto) y, después, una pausa antes de volver a jugar (30 minutos por defecto). El niño siempre termina el ejercicio que está resolviendo. Ambos valores se cambian en **Configurar juegos → Tiempo de juego** (0 = sin límite).',
                  'Las **medallas** se ganan solas, según cómo juega cada niño.',
              ]],
 
@@ -246,7 +248,7 @@ class AyudaAdultos
                  '**El código o el correo no funcionan.** Revisá que estén escritos igual que en el papel de la docente. Si sigue sin funcionar, pedile que confirme el correo que cargó.',
                  '**No veo a uno de mis hijos.** Hablá con la docente: tiene que cargar tu correo en la cuenta de ese hijo o hija.',
                  '**Quiero usar otro correo.** Hablá con la docente: ella lo cambia y, desde ese momento, entrás con el correo nuevo.',
-                 '**¿Qué datos de mi hijo o hija se guardan?** Mirá la nota en la pantalla «Acerca de MatiGuará».',
+                 '**¿Qué datos de mi hijo o hija se guardan?** Mirá la nota en la pantalla «Acerca de MatiGuarã».',
              ]],
         ];
     }

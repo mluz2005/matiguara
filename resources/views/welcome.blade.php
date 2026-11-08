@@ -88,7 +88,7 @@
     <div class="row justify-content-center text-center">
         <div class="col-12 mb-4">
             <h1 class="titulo-inicio fw-bold display-6 mb-3">
-                <span class="mascota" aria-hidden="true">🦜</span> MatiGuará
+                <span class="mascota" aria-hidden="true">🦜</span> MatiGuarã
             </h1>
             <p class="subtitulo-inicio fs-5 mb-1">Matemáticas en castellano y guaraní — Primer Ciclo EEB</p>
             <p class="subtitulo-inicio mb-0" style="font-size:.95rem">FACAT — Universidad Autónoma de Encarnación 2026</p>
@@ -148,7 +148,7 @@
     </div>
 </div>
 <p class="text-center mb-4">
-    <a href="{{ route('acerca') }}" style="color:#1B3361;font-weight:700;font-size:1.05rem">ℹ️ Acerca de MatiGuará</a>
+    <a href="{{ route('acerca') }}" style="color:#1B3361;font-weight:700;font-size:1.05rem">ℹ️ Acerca de MatiGuarã</a>
 </p>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         crossorigin="anonymous"></script>

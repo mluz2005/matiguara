@@ -14,7 +14,7 @@ use Illuminate\View\View;
  * -------------------------------------------------------------------------
  *  - ninos():  pantalla "¿Cómo se juega?" para los estudiantes (por juego o general)
  *  - adultos(): pantalla "Ayuda" de docentes, familias y administración (según el perfil)
- *  - acerca(): pantalla "Acerca de MatiGuará" (pública, la ve cualquier perfil)
+ *  - acerca(): pantalla "Acerca de MatiGuarã" (pública, la ve cualquier perfil)
  * No usa la base de datos más que para leer el nombre del juego.
  * -------------------------------------------------------------------------
  */

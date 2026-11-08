@@ -1,6 +1,6 @@
 @extends('layouts.estudiante')
 
-@section('titulo', '¿Cómo se juega? — MatiGuará')
+@section('titulo', '¿Cómo se juega? — MatiGuarã')
 
 {{-- Esta pantalla suena con la misma música del menú (MP3); el layout no arranca la generada por código. --}}
 @section('musica_propia', '1')
@@ -37,7 +37,7 @@
 </noscript>
 
 <div class="text-center mt-4">
-    <a href="{{ route('acerca') }}" style="color:#1B3361;font-size:1rem">ℹ️ Acerca de MatiGuará</a>
+    <a href="{{ route('acerca') }}" style="color:#1B3361;font-size:1rem">ℹ️ Acerca de MatiGuarã</a>
 </div>
 
 <audio id="musicaAyuda" loop preload="none">

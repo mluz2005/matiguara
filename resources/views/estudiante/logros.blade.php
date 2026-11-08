@@ -1,5 +1,5 @@
 @extends('layouts.estudiante')
-@section('titulo', 'Mis Logros — MatiGuará')
+@section('titulo', 'Mis Logros — MatiGuarã')
 
 @section('contenido')
 

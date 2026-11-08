@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('titulo', 'MatiGuará — ¡A Jugar!')</title>
+    <title>@yield('titulo', 'MatiGuarã — ¡A Jugar!')</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet"
@@ -144,9 +144,9 @@
         <div class="header-estudiante d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-2">
                 {{-- Mascota Guacamayo --}}
-                <span class="guacamayo" style="font-size:1.8rem" title="¡Guará te alienta!">🦜</span>
+                <span class="guacamayo" style="font-size:1.8rem" title="¡Guarã te alienta!">🦜</span>
                 <div>
-                    <div style="font-size:1rem;font-weight:500;color:#fff">MatiGuará</div>
+                    <div style="font-size:1rem;font-weight:500;color:#fff">MatiGuarã</div>
                     <div style="font-size:.875rem;color:rgba(255,255,255,.92)">
                         ¡Hola, {{ $est->nombre }}!
                     </div>
@@ -252,6 +252,13 @@
             </div>
         </nav>
     @endauth
+
+    {{-- Límite de tiempo de juego (RN-L10): barra suave, solo en pantallas de juego --}}
+    @isset($tiempoJuego)
+        @if(($tiempoJuego['limite_seg'] ?? 0) > 0)
+            @include('estudiante._limite-tiempo')
+        @endif
+    @endisset
 
     {{-- Bootstrap JS --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

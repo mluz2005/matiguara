@@ -305,7 +305,8 @@ class EstudianteController extends Controller
         $nivelParaJugarDeNuevo = $sesion->nivel_id;
         $cambioNivel           = null;
         $nivelDestino          = $sesion->nivel;
-        if ($sesion->juego->tipoMecanica?->tipo === 'memoria' && $sesion->estado === 'completada') {
+        $tipoMecanica = $sesion->juego->tipoMecanica?->tipo;
+        if (in_array($tipoMecanica, ['memoria', 'laberinto'], true) && $sesion->estado === 'completada') {
             $memoria    = app(MemoriaService::class);
             $evaluacion = $memoria->evaluarRachaPorPartida($sesion, (bool) $sesion->nivel_superado);
             if ($evaluacion['direccion'] !== null) {
@@ -343,6 +344,10 @@ class EstudianteController extends Controller
             'cambioNivel'           => $cambioNivel,
             'nivelDestino'          => $nivelDestino,
             'siguienteNivel'        => $siguienteNivel,
+            // «El camino a la escuela»: estrellas y ayudas reales de la partida (null en los otros juegos)
+            'detalleLaberinto'      => $tipoMecanica === 'laberinto'
+                ? app(\App\Repositories\LaberintoRepository::class)->detalleDe($sesion->id)
+                : null,
         ]);
     }
 

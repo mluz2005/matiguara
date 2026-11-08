@@ -1,5 +1,5 @@
 /**
- * SERVICIO DE AUDIO — MatiGuará
+ * SERVICIO DE AUDIO — MatiGuarã
  * =============================================================================
  * Gestiona todo el audio del sistema:
  *

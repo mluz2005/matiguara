@@ -1,5 +1,5 @@
 /**
- * SERVICIO DE MÚSICA — MatiGuará
+ * SERVICIO DE MÚSICA — MatiGuarã
  * =============================================================================
  * Genera música de fondo procedural con Tone.js.
  * No usa archivos MP3 — la música se genera en tiempo real con JavaScript.

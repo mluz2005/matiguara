@@ -218,7 +218,7 @@ class SistemaAdaptativoService
         }
 
         // Días desde la última sesión
-        $diasSinJugar = now()->diffInDays($racha->ultima_sesion_fecha);
+        $diasSinJugar = (int) now()->diffInDays($racha->ultima_sesion_fecha, true);
 
         // Si no hay configuración explícita, usar el default del sistema (3 días)
         $umbral = $diasConfig ?? 3;

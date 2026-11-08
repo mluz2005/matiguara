@@ -14,6 +14,7 @@ use App\Repositories\PadreRepository;
 use App\Repositories\SesionRepository;
 use App\Repositories\UsuarioRepository;
 use App\Services\DiagnosticoIAService;
+use App\Services\GraficosService;
 use App\Services\MatriculaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -47,7 +48,8 @@ class DocenteController extends Controller
         private LogroRepository $logros,
         private UsuarioRepository $usuarios,
         private PadreRepository $padres,
-        private MatriculaService $matriculas
+        private MatriculaService $matriculas,
+        private GraficosService $graficos
     ) {
     }
 
@@ -84,6 +86,7 @@ class DocenteController extends Controller
             'totalSesiones' => $totalSesiones,
             'ultimaSesion'  => $ultimaSesion,
             'docente'       => $docente,
+            'grafico'       => $this->graficos->delAlumno($id),
         ]);
     }
 
@@ -149,6 +152,13 @@ class DocenteController extends Controller
 {
     $docente     = Auth::user()->docente;
     $estudiante  = $this->estudiantes->buscarOFallar($id);
+
+    // Solo el docente del alumno puede ver sus diagnósticos.
+    if (!$this->esEstudianteDelDocente($id, $docente?->id)) {
+        return redirect()->route('docente.estudiantes')
+            ->withErrors(['error' => 'No tenés acceso a este estudiante.']);
+    }
+
     $diagnostico = $this->diagnosticos->buscar((int) $diagnostico);
 
     if ($diagnostico->estudiante_id !== $id) {
@@ -168,9 +178,16 @@ class DocenteController extends Controller
     /**
      * Historial completo de diagnósticos de un estudiante.
      */
-    public function historialDiagnosticos(int $id): View
+    public function historialDiagnosticos(int $id): View|RedirectResponse
     {
         $estudiante   = $this->estudiantes->buscarOFallar($id);
+
+        // Solo el docente del alumno puede ver su historial.
+        if (!$this->esEstudianteDelDocente($id, Auth::user()->docente?->id)) {
+            return redirect()->route('docente.estudiantes')
+                ->withErrors(['error' => 'No tenés acceso a este estudiante.']);
+        }
+
         $diagnosticos = $this->diagnosticos->delEstudiantePaginado($id, 10);
 
         return view('docente.diagnostico-ia', [
@@ -180,6 +197,7 @@ class DocenteController extends Controller
             'totalSesiones' => $this->sesiones->contarCompletadas($id),
             'ultimaSesion'  => null,
             'docente'       => Auth::user()->docente,
+            'grafico'       => $this->graficos->delAlumno($id),
         ]);
     }
 
@@ -193,8 +211,9 @@ class DocenteController extends Controller
         $docente    = $usuario->docente;
         $asignacion = $docente?->asignacionActiva;
         $metricas   = $this->calcularMetricas($docente?->id, $asignacion?->grado);
+        $grupo      = $this->graficos->delGrupo($docente?->id);
 
-        return view('docente.panel', compact('usuario','docente','asignacion','metricas'));
+        return view('docente.panel', compact('usuario','docente','asignacion','metricas','grupo'));
     }
 
     public function estudiantes(): View
@@ -245,9 +264,12 @@ class DocenteController extends Controller
         $sesiones     = $this->sesiones->recientesCompletadas($id, 10);
         $logros       = $this->logros->recientesDe($id, 5);
         $diagnosticos = $this->diagnosticos->exitososDelEstudiante($id, 3);
+        $grafico      = $this->graficos->delAlumno($id);
+        // «El camino a la escuela»: estrellas, ayudas y chipas de las últimas partidas (RF-L22)
+        $laberintoPartidas = app(\App\Repositories\LaberintoRepository::class)->recientesDelAlumno($id, 5);
 
         return view('docente.progreso-estudiante',
-            compact('estudiante','progresos','sesiones','logros','diagnosticos','grado','gradoActual','grados','asignacion'));
+            compact('estudiante','progresos','sesiones','logros','diagnosticos','grado','gradoActual','grados','asignacion','grafico','laberintoPartidas'));
     }
 
     public function cuentas(): View
@@ -582,7 +604,10 @@ class DocenteController extends Controller
         $juegos     = $this->juegos->activosConMecanica();
         $configuraciones = $this->docentes->habilitacionDeJuegos($docente?->id, $grado);
 
-        return view('docente.juegos-config', compact('juegos','configuraciones','grado','asignacion'));
+        $limiteMin = $docente?->limite_sesion_min ?? \App\Models\Docente::LIMITE_SESION_DEFECTO_MIN;
+        $pausaMin  = $docente?->pausa_entre_sesiones_min ?? \App\Models\Docente::PAUSA_DEFECTO_MIN;
+
+        return view('docente.juegos-config', compact('juegos','configuraciones','grado','asignacion','limiteMin','pausaMin'));
     }
 
     public function guardarConfigJuegos(Request $request): RedirectResponse
@@ -602,6 +627,35 @@ class DocenteController extends Controller
         });
 
         return back()->with('mensaje', '✅ Configuración guardada.');
+    }
+
+    /**
+     * Límite de tiempo de juego por sesión y pausa entre sesiones (RN-L10, RN-L11).
+     * Rige para TODOS los juegos y para los alumnos con matrícula activa de la docente.
+     * 0 = sin límite / sin pausa.
+     */
+    public function guardarTiempoJuego(Request $request): RedirectResponse
+    {
+        $docente = Auth::user()->docente;
+        if (!$docente) {
+            return back()->withErrors(['limite_sesion_min' => 'Tu usuario no tiene perfil de docente.']);
+        }
+
+        $datos = $request->validate([
+            'limite_sesion_min'        => ['required', 'integer', 'min:0', 'max:60'],
+            'pausa_entre_sesiones_min' => ['required', 'integer', 'min:0', 'max:240'],
+        ], [
+            'limite_sesion_min.*'        => 'El tiempo de juego debe ser un número de minutos entre 0 y 60.',
+            'pausa_entre_sesiones_min.*' => 'La pausa debe ser un número de minutos entre 0 y 240.',
+        ]);
+
+        $this->docentes->guardarLimiteDeJuego(
+            $docente->id,
+            (int) $datos['limite_sesion_min'],
+            (int) $datos['pausa_entre_sesiones_min']
+        );
+
+        return back()->with('mensaje', '✅ Tiempo de juego guardado.');
     }
 
     // ─────────────────────────────────────────────────────────────────────

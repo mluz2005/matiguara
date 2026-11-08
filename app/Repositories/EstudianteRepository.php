@@ -301,4 +301,18 @@ class EstudianteRepository
             ->whereRaw('LOWER(email_tutor) = ?', [$correo])
             ->get();
     }
+
+    /**
+     * Niveles con actividad (desbloqueados o ya jugados) de los estudiantes indicados,
+     * con su juego, grado y número de nivel. Insumo del gráfico «en qué nivel está el grupo».
+     *
+     * @param  iterable  $estudianteIds
+     */
+    public function progresosConActividad($estudianteIds): Collection
+    {
+        return ProgresoEstudiante::whereIn('estudiante_id', $estudianteIds)
+            ->where(fn ($q) => $q->where('nivel_desbloqueado', true)->orWhere('total_partidas', '>', 0))
+            ->with('nivel:id,juego_id,grado,numero_nivel')
+            ->get(['id', 'estudiante_id', 'juego_id', 'nivel_id', 'grado']);
+    }
 }
