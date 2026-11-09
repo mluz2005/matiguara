@@ -4,7 +4,7 @@
 *Proyecto de Grado — Licenciatura en Análisis de Sistemas Informáticos*
 
 Aplicación web para el aprendizaje de matemática en el primer ciclo de la Educación Escolar
-Básica (6 a 9 años): tres juegos con retroalimentación bilingüe simultánea, ajuste adaptativo
+Básica (6 a 9 años): cuatro juegos con retroalimentación bilingüe simultánea, ajuste adaptativo
 de nivel, logros y rachas, paneles para docentes, familias y administración, y diagnóstico
 pedagógico con IA bajo demanda del docente.
 
@@ -14,16 +14,15 @@ pedagógico con IA bajo demanda del docente.
 
 | Componente | Versión / detalle |
 |---|---|
-| Backend | Laravel **9.52** (PHP **8.0**, `composer.json`: `^8.0.2`) |
-| Base de datos | MariaDB **10.4** (XAMPP; compatible con MySQL 5.7+). Base: `matiguara_db` |
+| Backend | Laravel **13** (PHP **8.5.12**, `composer.json`: `^8.3`) |
+| Base de datos | MariaDB / MySQL (XAMPP, administrada con phpMyAdmin). Base: `matiguara_db` |
 | Frontend | Blade + Bootstrap 5.3 y Bootstrap Icons por CDN (no se compilan assets) |
 | Entorno de desarrollo | XAMPP en Windows (Apache + MariaDB), `C:\xampp\htdocs\app-educativa` |
-| Pruebas | PHPUnit 9 sobre una base separada `matiguara_test` |
+| Pruebas | PHPUnit 12 sobre una base separada `matiguara_test` |
 | IA | API Claude (Anthropic), solo bajo demanda explícita del docente (RN-05) |
 | Cola de tareas | `QUEUE_CONNECTION=sync` por defecto |
 
-> Importante: el código debe seguir siendo compatible con **PHP 8.0**. No usar `readonly`,
-> `enum`, `new` en valores por defecto ni la sintaxis `funcion(...)` de PHP 8.1.
+> Importante: el código se escribe para **Laravel 13 y PHP 8.5.12**; evitar funciones obsoletas de PHP 8.4/8.5.
 
 ---
 
@@ -70,7 +69,7 @@ de estudiantes de Laravel), que es el adaptador del framework hacia la base de d
 
 ## Instalación en XAMPP (Windows)
 
-1. Instalar XAMPP con PHP 8.0 y MariaDB 10.4, y Composer 2.
+1. Instalar XAMPP con PHP 8.5 (mínimo 8.3) y MariaDB/MySQL, y Composer 2.
 2. Copiar el proyecto en `C:\xampp\htdocs\app-educativa` y, dentro de esa carpeta:
    ```bash
    composer install
@@ -209,7 +208,7 @@ app-educativa/
 ---
 
 ## Estado y trabajo pendiente
-- Prototipo funcional con tres juegos (Suma de Frutas, Flash Matemático, Encuentra el par).
+- Prototipo funcional con cuatro juegos (Suma de Frutas, Flash Matemático, Encuentra el par y El camino a la escuela).
 - Pendiente: validación lingüística del guaraní por una persona hablante, pruebas con usuarios
   (SUS), prueba piloto y consolidación del contenido de los juegos en los sembradores.
 

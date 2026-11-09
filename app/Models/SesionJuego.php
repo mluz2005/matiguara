@@ -59,7 +59,7 @@ class SesionJuego extends Model
     public function duracionSegundos(): ?int
     {
         if (!$this->fecha_fin) return null;
-       return (int) $this->fecha_inicio->diffInSeconds($this->fecha_fin, true);
+        return $this->fecha_inicio->diffInSeconds($this->fecha_fin);
     }
 
     /** ¿La sesión está actualmente en curso? */
