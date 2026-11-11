@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @include('partials.pwa-head')
     <title>Tu sesión se cerró — MatiGuarã</title>
     <style>
         body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
