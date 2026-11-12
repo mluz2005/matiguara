@@ -25,7 +25,7 @@ body::before {
     body::before {
         background:
             linear-gradient(rgba(255,255,255,.26), rgba(255,255,255,.26)),
-            url("../img/fondo/selva-vertical.webp") 30% 50% / cover no-repeat;
+            url("../img/fondo/selva-vertical.webp") 25% 50% / cover no-repeat;
     }
 }
 
@@ -39,19 +39,6 @@ body::before {
 @media (min-aspect-ratio: 4/3) and (min-width: 900px) {
     .mv2-menu { max-width: 740px !important; margin-left: auto !important; margin-right: 0 !important; }
     .mv2-menu .jgrid { gap: 12px; }
-}
-/* Inicio e ingresos ya tienen su propia mascota en pantalla: ahí se muestra
-   solo el paisaje (sin el loro del fondo) para no ver dos loros. */
-body.lg2::before, body.fondo-sin-mascota::before {
-    background:
-        linear-gradient(rgba(255,255,255,.26), rgba(255,255,255,.26)),
-        url("../img/fondo/selva.webp") 100% 50% / cover no-repeat;
-}
-@media (min-aspect-ratio: 4/3) {
-    body.lg2::before, body.fondo-sin-mascota::before {
-        background-size: auto, auto 155%;
-        background-position: 0 0, 100% 60%;
-    }
 }
 /* Los emojis sueltos ya no hacen falta: la imagen ya trae los adornos. */
 .decoracion, .lg2-deco, .decoracion-lateral { display: none !important; }
