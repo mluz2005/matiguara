@@ -16,11 +16,19 @@
       · cada juego con su mundo de color; "Encuentra el par" con mapa de mundos
       · los tres lado a lado en pantallas anchas
     =========================================================================
+    MENÚ v3 (12/11/2026): la pantalla ya no muestra todos los niveles juntos.
+      · Al entrar: solo una tarjeta grande por juego (ícono, nombre en castellano
+        y guaraní, racha) → pantalla despejada.
+      · Al tocar un juego se abre SU vista (misma página, sin recargar) con la
+        ayuda '¿Cómo se juega?' y los niveles; botón grande '← Volver'.
+      · El botón Atrás del celular cierra la vista (history.pushState).
+      · Al volver de jugar un nivel se reabre la vista de ese mismo juego.
+    =========================================================================
 --}}
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/memoria-v2.css') }}?v=1">
-<link rel="stylesheet" href="{{ asset('css/juegos-v2.css') }}?v=1">
+<link rel="stylesheet" href="{{ asset('css/juegos-v2.css') }}?v=2">
 <link rel="stylesheet" href="{{ asset('css/laberinto-v2.css') }}?v=1">
 @endpush
 
@@ -46,8 +54,6 @@
     </div>
 @else
 
-    <h4 class="titulo-juegos">🎮 ¿A qué querés jugar hoy?</h4>
-
     @php
         $mundosMenu = [
             1 => ['ico' => '🌴', 'gn' => "Ka'aguy", 'es' => 'Selva'],
@@ -58,40 +64,77 @@
         ];
     @endphp
 
-    <div class="mv2-juegos">
-        @foreach($juegos as $juego)
-            @php
-                $racha       = $rachas[$juego->id] ?? null;
-                $rachaActual = $racha?->racha_actual_dias ?? 0;
-                $tipoMec     = $juego->tipoMecanica?->tipo ?? '';
-                $esMemoria   = $tipoMec === 'memoria';
-                $esFlashMenu = $juego->nombre_es === 'Flash Matemático';
-                $esLaberinto = $tipoMec === 'laberinto';
-
+    {{-- Datos de cada juego (se calculan una vez y se usan en la tarjeta y en su vista) --}}
+    @php
+        $grado = $matricula?->grado ?? 1;
+        $datosJuegos = $juegos->map(function ($juego) use ($rachas, $grado) {
+            $tipoMec     = $juego->tipoMecanica?->tipo ?? '';
+            $esMemoria   = $tipoMec === 'memoria';
+            $esFlashMenu = $juego->nombre_es === 'Flash Matemático';
+            $esLaberinto = $tipoMec === 'laberinto';
+            return (object) [
+                'juego'       => $juego,
+                'racha'       => ($rachas[$juego->id] ?? null)?->racha_actual_dias ?? 0,
+                'esMemoria'   => $esMemoria,
+                'esFlash'     => $esFlashMenu,
+                'esLaberinto' => $esLaberinto,
                 // Cada juego tiene su propio mundo de color
-                $claseMundo = $esMemoria ? 'mv2-w5' : ($esLaberinto ? 'mv2-wL' : ($esFlashMenu ? 'mv2-wF' : 'mv2-wS'));
+                'mundo'       => $esMemoria ? 'mv2-w5' : ($esLaberinto ? 'mv2-wL' : ($esFlashMenu ? 'mv2-wF' : 'mv2-wS')),
+                'icono'       => $esFlashMenu ? '⚡' : match($tipoMec) {
+                    'suma' => '🍎', 'resta' => '➖', 'multiplicacion' => '✖️', 'division' => '➗',
+                    'memoria' => '🃏', 'laberinto' => '🏫', 'mixto' => '🔢', default => '🎯',
+                },
+                'niveles'     => $juego->nivelesPorGrado($grado)->orderBy('numero_nivel')->get(),
+            ];
+        });
+    @endphp
 
-                $iconoJuego = $esFlashMenu ? '⚡' : match($tipoMec) {
-                    'suma'           => '🍎',
-                    'resta'          => '➖',
-                    'multiplicacion' => '✖️',
-                    'division'       => '➗',
-                    'memoria'        => '🃏',
-                    'laberinto'      => '🏫',
-                    'mixto'          => '🔢',
-                    default          => '🎯',
-                };
+    {{-- ══ VISTA 1: una tarjeta grande por juego ══════════════════════════ --}}
+    <div id="vistaInicio">
+        <h4 class="titulo-juegos">🎮 ¿A qué querés jugar hoy?</h4>
 
-                $grado = $matricula?->grado ?? 1;
-                $niveles = $juego->nivelesPorGrado($grado)->orderBy('numero_nivel')->get();
-                // Con muchos niveles (Flash, 10) los botones se muestran en cinco columnas
-                $compacto = $niveles->count() > 6;
-            @endphp
+        <div class="jgrid">
+            @foreach($datosJuegos as $d)
+                <button type="button"
+                        class="jcard {{ $d->mundo }}"
+                        data-abrir="juego-{{ $d->juego->id }}"
+                        aria-controls="juego-{{ $d->juego->id }}"
+                        aria-expanded="false">
+                    <span class="jcard-ico" aria-hidden="true">{{ $d->icono }}</span>
+                    <span class="jcard-es">{{ $d->juego->nombre_es }}</span>
+                    <span class="jcard-gn">{{ $d->juego->nombre_gn }}</span>
+                    @if($d->racha > 0)
+                        <span class="jcard-racha">🔥 {{ $d->racha }} día{{ $d->racha > 1 ? 's' : '' }}</span>
+                    @endif
+                    <span class="jcard-jugar" aria-hidden="true">▶ ¡Jugar!</span>
+                </button>
+            @endforeach
+        </div>
+    </div>
 
-            <article class="mv2-juego {{ $claseMundo }}{{ $esMemoria ? ' memoria' : '' }}">
+    {{-- ══ VISTA 2: los niveles de cada juego (una a la vez) ══════════════ --}}
+    @foreach($datosJuegos as $d)
+        @php
+            $juego    = $d->juego;
+            $niveles  = $d->niveles;
+            $compacto = $niveles->count() > 6;   // Flash (10 niveles): cinco columnas
+        @endphp
+
+        <section id="juego-{{ $juego->id }}" class="jvista" data-vista hidden
+                 aria-labelledby="jt-{{ $juego->id }}" tabindex="-1">
+
+            <div class="jvista-barra">
+                {{-- Guaraní: borrador ('Ejevy' = volvé), validar con una persona hablante (RN-07) --}}
+                <button type="button" class="jvolver" data-volver>
+                    <span aria-hidden="true">⬅️</span>
+                    <span>Volver <small>Ejevy</small></span>
+                </button>
+            </div>
+
+            <article class="mv2-juego {{ $d->mundo }}{{ $d->esMemoria ? ' memoria' : '' }}">
                 <div class="mv2-juego-cab">
-                    <div class="mv2-juego-ico" aria-hidden="true">{{ $iconoJuego }}</div>
-                    <h3>{{ $juego->nombre_es }}</h3>
+                    <div class="mv2-juego-ico" aria-hidden="true">{{ $d->icono }}</div>
+                    <h3 id="jt-{{ $juego->id }}">{{ $juego->nombre_es }}</h3>
                     <h3 class="gn">{{ $juego->nombre_gn }}</h3>
 
                     {{-- Ayuda del juego (late hasta que el niño la abre por primera vez) --}}
@@ -102,15 +145,15 @@
                         <small>¿Mba'éichapa ñembosarái?</small>
                     </a>
 
-                    @if($rachaActual > 0)
+                    @if($d->racha > 0)
                         <div class="mv2-juego-racha">
-                            <span>🔥 {{ $rachaActual }} día{{ $rachaActual > 1 ? 's' : '' }} seguido{{ $rachaActual > 1 ? 's' : '' }}</span>
+                            <span>🔥 {{ $d->racha }} día{{ $d->racha > 1 ? 's' : '' }} seguido{{ $d->racha > 1 ? 's' : '' }}</span>
                         </div>
                     @endif
                 </div>
 
                 <div class="mv2-juego-cuerpo">
-                @if($esMemoria)
+                @if($d->esMemoria)
                     {{-- ── MAPA DE MUNDOS (solo "Encuentra el par") ─────────────────── --}}
                     <div class="mapa">
                         @forelse($niveles->chunk(2) as $par)
@@ -148,7 +191,7 @@
                         @endforelse
                     </div>
                 @else
-                    {{-- ── NIVELES (Suma de Frutas / Flash Matemático) ──────────────── --}}
+                    {{-- ── NIVELES (Suma de Frutas / Flash Matemático / El camino a la escuela) ── --}}
                     @if($niveles->isEmpty())
                         <p class="text-muted small text-center mb-0">Sin niveles</p>
                     @else
@@ -161,7 +204,7 @@
                                     : (bool) $nivel->desbloqueado_por_defecto;
                             @endphp
                             <form method="POST"
-                                  action="{{ $esLaberinto
+                                  action="{{ $d->esLaberinto
                                         ? route('estudiante.laberinto.iniciar', ['juego' => $juego->id, 'nivel' => $nivel->id])
                                         : route('estudiante.sesion.iniciar', ['juego' => $juego->id, 'nivel' => $nivel->id]) }}">
                                 @csrf
@@ -177,7 +220,7 @@
                                     <small>
                                         @if($nivel->tiempo_mostrar_ms)
                                             ⏱ {{ intval($nivel->tiempo_mostrar_ms / 1000) }} s
-                                        @elseif($esLaberinto)
+                                        @elseif($d->esLaberinto)
                                             {{ ['🌱','💧','🐄','🏘️'][max(0, min(3, (int) ceil($nivel->numero_nivel / 2) - 1))] }}
                                         @else
                                             {{ str_repeat('★', $nivel->dificultad) }}{{ str_repeat('☆', 5 - $nivel->dificultad) }}
@@ -191,8 +234,8 @@
                 @endif
                 </div>
             </article>
-        @endforeach
-    </div>
+        </section>
+    @endforeach
 @endif
 </div>{{-- /.mv2-menu --}}
 
@@ -234,6 +277,13 @@
 @push('scripts')
 <script>
 (function () {
+    /* ════════════════════════════════════════════════════════════════
+       1) MÚSICA DEL MENÚ — activa por defecto
+          El navegador solo deja sonar después de un toque del niño, así que
+          arranca en el primer toque (cualquiera). Si el navegador la rechaza,
+          se reintenta en el siguiente toque. Solo queda silenciada si el niño
+          la apagó con el botón 🎵 en ESTA sesión (al ingresar se reactiva).
+       ════════════════════════════════════════════════════════════════ */
     const musica = document.getElementById('musicaDashboard');
     musica.volume = 0.3;
 
@@ -241,36 +291,115 @@
         try { return localStorage.getItem('matiguara_musica') !== '0'; } catch (e) { return true; }
     };
     let activa = quiereMusica();
+    let sonando = false;
 
-    // El navegador solo permite sonido después de un toque del niño:
-    // arrancamos en el primer toque/clic, si no la silenció antes.
     function arrancar() {
-        if (activa && musica.paused) {
-            musica.play().catch(() => {});
-        }
+        if (!activa || sonando || !musica.paused) return;
+        const p = musica.play();
+        if (p && p.then) {
+            p.then(() => { sonando = true; }).catch(() => { sonando = false; });   // se reintenta en el próximo toque
+        } else { sonando = true; }
     }
-    document.addEventListener('click', arrancar);
-    document.addEventListener('touchstart', arrancar);
+    // pointerup/touchend/click: gestos completos (Chrome del celular no acepta pointerdown/touchstart)
+    ['pointerup', 'touchend', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, arrancar, true));
 
     // Botón 🎵 del encabezado
     window.MusicaPropia = {
         alternar() {
             activa = !activa;
-            if (activa) musica.play().catch(() => {}); else musica.pause();
+            if (activa) { sonando = false; arrancar(); } else { musica.pause(); sonando = false; }
             return activa;
         }
     };
 
     // Si la pestaña queda en segundo plano, pausar; al volver, retomar.
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden) musica.pause(); else if (activa && musica.currentTime > 0) musica.play().catch(() => {});
+        if (document.hidden) { musica.pause(); sonando = false; }
+        else if (activa && musica.currentTime > 0) { arrancar(); }
     });
     // Al salir de la pantalla (entrar a un juego) se corta.
     window.addEventListener('pagehide', () => musica.pause());
 
     if (typeof actualizarBotonMusica === 'function') actualizarBotonMusica(activa);
 
-    // ── Ayuda de cada juego: late hasta que el niño la abre por primera vez ──
+    /* ════════════════════════════════════════════════════════════════
+       2) VISTAS: tarjetas de juegos  ⇄  niveles de un juego
+       ════════════════════════════════════════════════════════════════ */
+    const inicio  = document.getElementById('vistaInicio');
+    const vistas  = Array.from(document.querySelectorAll('[data-vista]'));
+    const tarjetas = Array.from(document.querySelectorAll('[data-abrir]'));
+    let abiertaId = null;
+    let empujamos = false;     // ¿esta vista se abrió con un toque (hay entrada en el historial)?
+
+    function mostrar(id) {
+        const v = document.getElementById(id);
+        if (!v) return false;
+        vistas.forEach(x => { x.hidden = (x !== v); });
+        inicio.hidden = true;
+        abiertaId = id;
+        tarjetas.forEach(t => t.setAttribute('aria-expanded', t.dataset.abrir === id ? 'true' : 'false'));
+        window.scrollTo(0, 0);
+        try { v.focus({ preventScroll: true }); } catch (e) {}
+        return true;
+    }
+    function mostrarInicio() {
+        vistas.forEach(x => { x.hidden = true; });
+        inicio.hidden = false;
+        const previa = tarjetas.find(t => t.dataset.abrir === abiertaId);
+        abiertaId = null;
+        tarjetas.forEach(t => t.setAttribute('aria-expanded', 'false'));
+        window.scrollTo(0, 0);
+        if (previa) { try { previa.focus({ preventScroll: true }); } catch (e) {} }
+    }
+
+    tarjetas.forEach(t => t.addEventListener('click', () => {
+        const id = t.dataset.abrir;
+        if (mostrar(id)) {
+            try { history.pushState({ panel: id }, '', '#' + id); empujamos = true; } catch (e) { empujamos = false; }
+        }
+    }));
+
+    document.querySelectorAll('[data-volver]').forEach(b => b.addEventListener('click', () => {
+        if (empujamos) { history.back(); }                // el popstate muestra el inicio
+        else {
+            mostrarInicio();
+            try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+        }
+    }));
+
+    // Botón Atrás del celular / del navegador
+    window.addEventListener('popstate', e => {
+        empujamos = false;
+        if (e.state && e.state.panel && mostrar(e.state.panel)) { empujamos = true; }
+        else { mostrarInicio(); }
+    });
+
+    // Al empezar un nivel recordamos el juego: al volver del juego se reabre su vista
+    document.addEventListener('submit', e => {
+        const v = e.target.closest && e.target.closest('[data-vista]');
+        if (v) { try { sessionStorage.setItem('matiguara_reabrir', v.id); } catch (err) {} }
+    });
+
+    // Entrada: si la dirección trae #juego-N, o venimos de jugar, se abre esa vista
+    (function () {
+        let id = null;
+        const h = location.hash.match(/^#(juego-\d+)$/);
+        if (h) { id = h[1]; }
+        else {
+            try {
+                const r = sessionStorage.getItem('matiguara_reabrir');
+                if (r) { id = r; sessionStorage.removeItem('matiguara_reabrir'); }
+            } catch (e) {}
+        }
+        if (id && mostrar(id)) {
+            try { history.replaceState({ panel: id }, '', '#' + id); } catch (e) {}
+        }
+    })();
+
+    /* ════════════════════════════════════════════════════════════════
+       3) AYUDA Y NIVELES CON CANDADO (igual que antes)
+       ════════════════════════════════════════════════════════════════ */
+    // Ayuda de cada juego: late hasta que el niño la abre por primera vez
     document.querySelectorAll('a[data-juego-ayuda]').forEach(a => {
         const clave = 'matiguaraAyudaVista_' + a.dataset.juegoAyuda;
         let vista = false;
@@ -279,7 +408,7 @@
         a.addEventListener('click', () => { try { localStorage.setItem(clave, '1'); } catch (e) {} });
     });
 
-    // ── Niveles con candado: al tocarlos, tiemblan y explican qué hacer ──
+    // Niveles con candado: al tocarlos, tiemblan y explican qué hacer
     // Guaraní: borrador, validar con una persona hablante.
     const aviso = document.getElementById('avisoBloqueo');
     let ocultar = null;

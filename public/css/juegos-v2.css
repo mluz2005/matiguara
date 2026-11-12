@@ -283,3 +283,84 @@
 @media (min-width: 820px) and (max-height: 820px) {
     .mv2-pregunta { display: none; }
 }
+
+/* =========================================================================
+   MENÚ v3 (12/11/2026) — una tarjeta por juego; sus niveles en una vista aparte
+   La pantalla de entrada queda despejada: solo las tarjetas.
+   ========================================================================= */
+.mv2-menu [hidden] { display: none !important; }
+
+/* ── Vista 1: tarjetas ─────────────────────────────────────────────────── */
+.mv2-menu .jgrid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;
+    max-width: 1000px; margin: 0 auto; padding: 4px 2px 18px;
+}
+@media (min-width: 820px) { .mv2-menu .jgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; } }
+@media (min-width: 560px) and (max-width: 819px) { .mv2-menu .jgrid { gap: 18px; } }
+
+.mv2-menu .jcard {
+    -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+    min-height: 212px; padding: 14px 8px 12px; cursor: pointer;
+    background: linear-gradient(180deg, var(--cielo-a), var(--cielo-b));
+    border: 4px solid var(--navy); border-radius: 28px; box-shadow: 0 7px 0 var(--navy);
+    color: var(--navy); font-family: var(--fuente-texto);
+    transition: transform .12s, box-shadow .12s;
+}
+.mv2-menu .jcard:hover  { transform: translateY(-3px); box-shadow: 0 10px 0 var(--navy); }
+.mv2-menu .jcard:active { transform: translateY(6px);  box-shadow: 0 1px 0 var(--navy); }
+.mv2-menu .jcard:focus-visible { outline: 4px solid var(--oro); outline-offset: 4px; }
+
+.mv2-menu .jcard-ico {
+    display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; font-size: 2.8rem; line-height: 1;
+    background: #fff; border: 4px solid var(--navy); box-shadow: 0 4px 0 var(--navy);
+    animation: jflota 3.4s ease-in-out infinite;
+}
+.mv2-menu .jcard:nth-child(2) .jcard-ico { animation-delay: .5s; }
+.mv2-menu .jcard:nth-child(3) .jcard-ico { animation-delay: 1s; }
+.mv2-menu .jcard:nth-child(4) .jcard-ico { animation-delay: 1.5s; }
+@keyframes jflota { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+.mv2-menu .jcard-es { margin-top: 6px; font: 800 1.12rem/1.1 var(--fuente-titulo); }
+.mv2-menu .jcard-gn { font: 800 .98rem/1.1 var(--fuente-titulo); color: var(--teal); }
+.mv2-menu .jcard-racha {
+    margin-top: 2px; padding: 0 10px; border-radius: 12px; background: #FFF1C2; border: 3px solid var(--navy);
+    font: 800 .85rem var(--fuente-texto);
+}
+.mv2-menu .jcard-jugar {
+    margin-top: auto; padding: 3px 16px; border-radius: 16px; background: var(--navy); color: #fff;
+    font: 800 1rem var(--fuente-texto);
+}
+
+/* ── Vista 2: niveles de UN juego ──────────────────────────────────────── */
+.mv2-menu .jvista { max-width: 720px; margin: 0 auto; padding-bottom: 14px; animation: jentra .28s ease-out; }
+.mv2-menu .jvista:focus { outline: none; }
+@keyframes jentra { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+
+.mv2-menu .jvista-barra { display: flex; margin: 2px 0 12px; }
+.mv2-menu .jvolver {
+    -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent;
+    display: inline-flex; align-items: center; gap: 8px; min-height: 52px; padding: 6px 20px 6px 14px;
+    background: #fff; color: var(--navy); border: 4px solid var(--navy); border-radius: 26px; box-shadow: 0 4px 0 var(--navy);
+    font: 800 1.2rem/1.05 var(--fuente-titulo); cursor: pointer;
+}
+.mv2-menu .jvolver small { display: block; font: 700 .85rem var(--fuente-texto); color: var(--teal); }
+.mv2-menu .jvolver:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--navy); }
+.mv2-menu .jvolver:focus-visible { outline: 4px solid var(--oro); outline-offset: 3px; }
+
+/* Aquí hay lugar: niveles más grandes y ordenados en cuatro columnas (Flash, cinco) */
+.mv2-menu .jvista .mv2-niveles { --c: 4; gap: 12px; }
+.mv2-menu .jvista .mv2-niveles.flash { --c: 5; gap: 10px; }
+.mv2-menu .jvista .mv2-niveles button { min-height: 78px; font-size: 1.6rem; }
+@media (max-width: 480px) {
+    .mv2-menu .jvista .mv2-niveles { gap: 9px; }
+    .mv2-menu .jvista .mv2-niveles button { min-height: 72px; font-size: 1.45rem; }
+    .mv2-menu .jvista .mv2-niveles.flash button { font-size: 1.15rem; min-height: 64px; }
+}
+/* "Encuentra el par": los mundos van en columna, como en el celular */
+.mv2-menu .jvista .mv2-juego.memoria .mapa { display: flex; flex-direction: column; gap: 10px; }
+.mv2-menu .jvista .mapa .paso button { min-height: 72px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .mv2-menu .jcard-ico, .mv2-menu .jvista { animation: none; }
+}

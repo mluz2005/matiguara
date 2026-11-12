@@ -1,0 +1,77 @@
+/* Fondo de selva (2026-11-12): reemplaza el papel tapiz de emojis
+   (arco iris, manzana, etc.) en inicio, ingresos y menú del estudiante.
+   - Va en body::before (position:fixed) y no en background-attachment:fixed,
+     porque iOS/Android lo ignoran o lo hacen lento.
+   - El velo claro mantiene el contraste de los textos azul marino.
+   - En vertical (celular) se muestra la zona de las casas del árbol; en
+     horizontal se ve la escena completa. */
+html body {
+    background: #8ED0E8 !important;
+    background-image: none !important;
+}
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        linear-gradient(rgba(255,255,255,.26), rgba(255,255,255,.26)),
+        url("../img/fondo/selva.webp") 30% 50% / cover no-repeat;
+}
+/* Vertical (celular): imagen propia 9:16 con la mascota (sombrero y mochila).
+   Se ancla arriba-izquierda para que la mascota quede a la vista. */
+@media (max-aspect-ratio: 4/5) {
+    body::before {
+        background:
+            linear-gradient(rgba(255,255,255,.26), rgba(255,255,255,.26)),
+            url("../img/fondo/selva-vertical.webp") 30% 50% / cover no-repeat;
+    }
+}
+
+/* Horizontal (PC/tablet): imagen 16:9 con la misma mascota que la vertical
+   (loro con sombrero y mochila) a la izquierda y el centro despejado. */
+@media (min-aspect-ratio: 4/3) {
+    body::before { background-position: 0 0, 40% 50%; }
+}
+/* En pantallas anchas el menú del estudiante se corre a la derecha para
+   que la mascota (a la izquierda de la imagen) quede a la vista. */
+@media (min-aspect-ratio: 4/3) and (min-width: 900px) {
+    .mv2-menu { max-width: 740px !important; margin-left: auto !important; margin-right: 0 !important; }
+    .mv2-menu .jgrid { gap: 12px; }
+}
+/* Inicio e ingresos ya tienen su propia mascota en pantalla: ahí se muestra
+   solo el paisaje (sin el loro del fondo) para no ver dos loros. */
+body.lg2::before, body.fondo-sin-mascota::before {
+    background:
+        linear-gradient(rgba(255,255,255,.26), rgba(255,255,255,.26)),
+        url("../img/fondo/selva.webp") 100% 50% / cover no-repeat;
+}
+@media (min-aspect-ratio: 4/3) {
+    body.lg2::before, body.fondo-sin-mascota::before {
+        background-size: auto, auto 155%;
+        background-position: 0 0, 100% 60%;
+    }
+}
+/* Los emojis sueltos ya no hacen falta: la imagen ya trae los adornos. */
+.decoracion, .lg2-deco, .decoracion-lateral { display: none !important; }
+
+/* Textos que van directo sobre la imagen: se les da una "etiqueta" blanca
+   para conservar el contraste (azul marino sobre blanco > 7:1). */
+.subtitulo-inicio, .mv2-menu .titulo-juegos {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding: .25rem 1rem;
+    background: rgba(255,255,255,.88);
+    border-radius: 999px;
+    box-shadow: 0 3px 0 rgba(27,51,97,.18);
+}
+.mv2-menu .grado small {
+    background: rgba(255,255,255,.88);
+    color: #1B3361;
+    padding: 2px 12px;
+    border-radius: 999px;
+}

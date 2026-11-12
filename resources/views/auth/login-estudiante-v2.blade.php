@@ -160,6 +160,7 @@
         @media (max-width: 899px) and (orientation: landscape) and (max-height: 520px) { body.lg2 { place-items: start center; } }
         @media (prefers-reduced-motion: reduce) { .lg2-deco span, .lg2-mascota img { animation: none !important; } }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/fondo-selva.css') }}?v=1">
 </head>
 <body class="lg2">
 
@@ -284,6 +285,17 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+<script>
+/* Cada vez que un niño llega a ingresar, los sonidos arrancan ACTIVADOS: así un
+   dispositivo compartido no queda mudo porque el niño anterior lo silenció.
+   (Si el niño lo silencia durante su sesión, se respeta hasta que salga.)
+   También se olvida el juego que dejó abierto el niño anterior. */
+try {
+    localStorage.setItem('matiguara_musica', '1');
+    localStorage.setItem('matiguara_audio', '1');
+    sessionStorage.removeItem('matiguara_reabrir');
+} catch (e) {}
+</script>
 <script>
 /**
  * Lógica del teclado de PIN (la misma de siempre) + reacciones de MatiGuarã.

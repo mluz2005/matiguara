@@ -150,8 +150,9 @@
             border-width: 3px; border-radius: 14px; font-weight: 700;
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/fondo-selva.css') }}?v=1">
 </head>
-<body>
+<body class="fondo-sin-mascota">
 
 {{-- Adornos de fondo (solo adorno) --}}
 <div class="decoracion" aria-hidden="true">

@@ -130,6 +130,7 @@
     </style>
 
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/fondo-selva.css') }}?v=1">
 </head>
 <body>
 
@@ -169,7 +170,7 @@
                 <button type="button"
                         class="btn-audio-ctrl"
                         id="btnMusica"
-                        title="Activar música"
+                        title="Silenciar música"
                         onclick="toggleMusica(this)">
                     🎵
                 </button>
@@ -178,7 +179,7 @@
                 <button type="button"
                         class="btn-audio-ctrl"
                         id="btnAudio"
-                        title="Activar audio"
+                        title="Silenciar audio"
                         onclick="toggleAudio(this)">
                     🔊
                 </button>

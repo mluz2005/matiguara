@@ -14,6 +14,7 @@
     {{-- Fuentes Baloo 2 y Nunito (ya incluidas en el proyecto) y estilos del login --}}
     <link rel="stylesheet" href="{{ asset('css/memoria-v2.css') }}?v=1">
     <link rel="stylesheet" href="{{ asset('css/login-v2.css') }}?v=1">
+    <link rel="stylesheet" href="{{ asset('css/fondo-selva.css') }}?v=1">
 </head>
 <body class="lg2 lg2-adulto">
 
