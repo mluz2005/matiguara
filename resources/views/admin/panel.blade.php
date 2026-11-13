@@ -42,6 +42,8 @@
        'Registrar, editar y configurar instituciones educativas','#1B3361','#DAE8FC'],
       ['admin.docentes','person-badge-fill','Docentes',
        'Crear cuentas, asignar a instituciones y gestionar bajas','#0E6B7D','#D9F0F5'],
+      ['admin.alumnos','people-fill','Alumnos',
+       'Ver todos los alumnos y eliminar cuentas repetidas sin actividad','#7A2E8E','#EBDDF3'],
       ['admin.mensajes','chat-quote-fill','Mensajes bilingüe',
        'Catálogo de retroalimentación en castellano y guaraní','#177040','#D5E8D4'],
       ['admin.juegos','controller','Juegos',

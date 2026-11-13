@@ -20,6 +20,7 @@ use App\Services\SistemaAdaptativoService;
 use App\Support\DesbloqueoNiveles;
 use App\Support\FrutasJuego;
 use App\Support\PistasSumaFrutas;
+use App\Support\TiempoFlash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -97,7 +98,10 @@ class EstudianteController extends Controller
         // Niveles que el niño ya tiene abiertos (los demás se ven con candado)
         $nivelesAbiertos = DesbloqueoNiveles::idsAbiertos($estudiante->id);
 
-        return view('estudiante.juegos', compact('estudiante','matricula','juegos','rachas','nivelesAbiertos'));
+        // Flash Matemático: segundos que la administración suma al tiempo de cada nivel
+        $segundosExtraFlash = TiempoFlash::extraDe($estudiante);
+
+        return view('estudiante.juegos', compact('estudiante','matricula','juegos','rachas','nivelesAbiertos','segundosExtraFlash'));
     }
 
     // =========================================================================
@@ -175,10 +179,13 @@ class EstudianteController extends Controller
             ? FrutasJuego::escena($ejercicio, $sesion, $respondidos)
             : null;
 
+        // Flash Matemático: tiempo base del nivel + ajuste de la administración
+        $tiempoFlashMs = TiempoFlash::ms($nivel->tiempo_mostrar_ms, TiempoFlash::extraDe($estudiante));
+
         return view('estudiante.ejercicio', compact(
             'sesion','ejercicio','nivel','opciones',
             'respondidos','totalEjercicios','porcentaje',
-            'puntaje','aciertos','escena','esReintento','pista'
+            'puntaje','aciertos','escena','esReintento','pista','tiempoFlashMs'
         ));
     }
 

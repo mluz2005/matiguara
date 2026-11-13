@@ -89,5 +89,12 @@
       <i class="bi bi-check2-circle me-1"></i>Guardar tiempo de juego
     </button>
   </form>
+  {{-- ── Segundos extra de Flash Matemático (solo lectura: lo define la administración) ── --}}
+  <div class="alert alert-light border rounded-3 py-2 mt-4 mb-0 small">
+    ⚡ <b>Flash Matemático:</b> la administración suma
+    <b>{{ ($segundosExtraFlash ?? 0) > 0 ? '+' : '' }}{{ $segundosExtraFlash ?? 0 }} s</b>
+    al tiempo que se ven los números en todos los niveles. Si los niños necesitan más o menos tiempo,
+    avisá a la administración para ajustarlo.
+  </div>
 </div>
 @endsection

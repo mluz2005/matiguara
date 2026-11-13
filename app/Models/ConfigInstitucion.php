@@ -29,10 +29,12 @@ class ConfigInstitucion extends Model
         'dias_reinicio_racha_default',
         'permitir_acceso_grados_ant',
         'meses_conservacion_egresados',
+        'segundos_extra_flash',   // Flash Matemático: segundos que se suman al tiempo de cada nivel
     ];
 
     protected $casts = [
         'permitir_acceso_grados_ant' => 'boolean',
+        'segundos_extra_flash'       => 'integer',
     ];
 
     /**
@@ -43,6 +45,7 @@ class ConfigInstitucion extends Model
         'dias_reinicio_racha_default'    => 3,
         'permitir_acceso_grados_ant'     => false,
         'meses_conservacion_egresados'   => 4,
+        'segundos_extra_flash'           => 0,
     ];
 
     public function institucion(): BelongsTo

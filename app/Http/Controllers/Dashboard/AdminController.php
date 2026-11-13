@@ -11,6 +11,8 @@ use App\Repositories\JuegoRepository;
 use App\Repositories\MensajeRetroRepository;
 use App\Repositories\SesionRepository;
 use App\Repositories\UsuarioRepository;
+use App\Support\NombrePropio;
+use App\Support\TiempoFlash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -180,9 +182,13 @@ class AdminController extends Controller
             'dias_reinicio_racha_default'  => ['required', 'integer', 'between:1,30'],
             'permitir_acceso_grados_ant'   => ['boolean'],
             'meses_conservacion_egresados' => ['required', 'integer', 'between:1,12'],
+            // Si no viene en el formulario, no se modifica el valor guardado.
+            'segundos_extra_flash'         => ['sometimes', 'integer', 'between:' . TiempoFlash::EXTRA_MIN . ',' . TiempoFlash::EXTRA_MAX],
         ], [
             'dias_reinicio_racha_default.between'  => 'Los días de racha deben estar entre 1 y 30.',
             'meses_conservacion_egresados.between' => 'Los meses deben estar entre 1 y 12.',
+            'segundos_extra_flash.between'         => 'Los segundos extra de Flash Matemático deben estar entre -5 y 20.',
+            'segundos_extra_flash.integer'         => 'Los segundos extra de Flash Matemático deben ser un número entero.',
         ]);
 
         // Asegurar que el booleano se maneje correctamente
@@ -232,6 +238,10 @@ class AdminController extends Controller
             'password.confirmed' => 'Las contraseñas no coinciden.',
         ]);
 
+        // Formato único de nombre y apellido («Laura Vega»)
+        $datos['nombre']   = NombrePropio::formatear($datos['nombre']);
+        $datos['apellido'] = NombrePropio::formatear($datos['apellido']);
+
         // 1. Crear cuenta de usuario con perfil 'docente'
         $usuario = $this->usuarios->crear([
             'nombre'        => $datos['nombre'],
@@ -274,6 +284,46 @@ class AdminController extends Controller
         return redirect()
             ->route('admin.docentes')
             ->with('mensaje', 'Docente desactivado.');
+    }
+
+    // =========================================================================
+    // ALUMNOS: listado global y limpieza de duplicados
+    // =========================================================================
+
+    /**
+     * Lista todos los alumnos. Marca los que podrían estar repetidos y muestra el botón
+     * «Eliminar» solo en las cuentas que nunca jugaron.
+     */
+    public function alumnos(Request $request): View
+    {
+        $busqueda = trim((string) $request->query('q', ''));
+        $alumnos  = $this->estudiantes->listadoParaAdmin($busqueda);
+
+        // Mismo nombre y apellido (aunque cambien mayúsculas o tildes) = posible duplicado
+        $repetidos = $alumnos
+            ->groupBy(fn ($e) => NombrePropio::clave($e->nombre . ' ' . $e->apellido))
+            ->filter(fn ($grupo) => $grupo->count() > 1)
+            ->keys()->all();
+
+        return view('admin.alumnos', compact('alumnos', 'busqueda', 'repetidos'));
+    }
+
+    /**
+     * Elimina una cuenta SIN actividad (típico: duplicado creado por error).
+     * Si ya jugó o tiene diagnósticos, no se borra: solo se desactiva desde el panel docente.
+     */
+    public function eliminarAlumno(int $id): RedirectResponse
+    {
+        $estudiante = $this->estudiantes->buscarOFallar($id);
+        $nombre     = $estudiante->nombre_completo;
+
+        if (!$this->estudiantes->eliminarSinActividad($estudiante)) {
+            return redirect()->route('admin.alumnos')->withErrors([
+                'error' => "{$nombre} ya tiene partidas o diagnósticos: no se puede eliminar para no perder su historial. Pedile a la docente que lo desactive.",
+            ]);
+        }
+
+        return redirect()->route('admin.alumnos')->with('mensaje', "🗑️ Cuenta eliminada: {$nombre}.");
     }
 
     // =========================================================================

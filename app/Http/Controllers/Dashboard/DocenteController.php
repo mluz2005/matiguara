@@ -16,6 +16,7 @@ use App\Repositories\UsuarioRepository;
 use App\Services\DiagnosticoIAService;
 use App\Services\GraficosService;
 use App\Services\MatriculaService;
+use App\Support\NombrePropio;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -303,6 +304,29 @@ class DocenteController extends Controller
             'grado.between'     => 'El grado debe ser 1.°, 2.° o 3.°.',
         ]);
 
+        // Formato único («María Luz Pérez»): evita la mezcla de MAYÚSCULAS y minúsculas.
+        $datos['nombre']   = NombrePropio::formatear($datos['nombre']);
+        $datos['apellido'] = NombrePropio::formatear($datos['apellido']);
+        if ($datos['nombre'] === '' || $datos['apellido'] === '') {
+            return back()->withInput($request->except(['pin', 'pin_confirmation']))
+                ->withErrors(['nombre' => 'Escribí el nombre y el apellido del alumno.']);
+        }
+
+        // Aviso de posible duplicado: mismo nombre y apellido, activo, en la misma institución.
+        // No se bloquea (puede haber dos niños con el mismo nombre): la docente confirma.
+        if (!$request->boolean('confirmar_duplicado')) {
+            $repetidos = $this->estudiantes->posiblesDuplicados($datos['nombre'], $datos['apellido'], $asignacion->institucion_id);
+            if ($repetidos->isNotEmpty()) {
+                return back()
+                    ->withInput($request->except(['pin', 'pin_confirmation', 'confirmar_duplicado']))
+                    ->with('duplicados', $repetidos->map(fn (Estudiante $e) => [
+                        'nombre' => $e->nombre_completo,
+                        'grado'  => $e->matriculaActiva?->grado,
+                        'codigo' => $e->codigo_acceso,
+                    ])->all());
+            }
+        }
+
         $grado = (int) ($datos['grado'] ?? $asignacion->grado);
         if (!$this->juegos->hayNivelesDelGrado($grado)) {
             return back()->withInput()->withErrors([
@@ -387,7 +411,13 @@ class DocenteController extends Controller
                 return back()->withErrors(['error' => $this->avisoFaltaMigracion()]);
             }
 
-            $cambios = ['nombre' => trim($datos['nombre']), 'apellido' => trim($datos['apellido'])];
+            $cambios = [
+                'nombre'   => NombrePropio::formatear($datos['nombre']),
+                'apellido' => NombrePropio::formatear($datos['apellido']),
+            ];
+            if ($cambios['nombre'] === '' || $cambios['apellido'] === '') {
+                return back()->withErrors(['error' => 'El nombre y el apellido no pueden quedar vacíos.']);
+            }
             $conPin  = !empty($datos['nuevo_pin']);
             if ($conPin) {
                 $cambios['pin_hash'] = Estudiante::hashearPin($datos['nuevo_pin']);
@@ -607,7 +637,10 @@ class DocenteController extends Controller
         $limiteMin = $docente?->limite_sesion_min ?? \App\Models\Docente::LIMITE_SESION_DEFECTO_MIN;
         $pausaMin  = $docente?->pausa_entre_sesiones_min ?? \App\Models\Docente::PAUSA_DEFECTO_MIN;
 
-        return view('docente.juegos-config', compact('juegos','configuraciones','grado','asignacion','limiteMin','pausaMin'));
+        // Solo informativo: lo define la administración (Instituciones → Configuración)
+        $segundosExtraFlash = \App\Support\TiempoFlash::extraDeInstitucion($asignacion?->institucion_id);
+
+        return view('docente.juegos-config', compact('juegos','configuraciones','grado','asignacion','limiteMin','pausaMin','segundosExtraFlash'));
     }
 
     public function guardarConfigJuegos(Request $request): RedirectResponse

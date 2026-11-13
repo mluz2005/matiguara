@@ -8,7 +8,9 @@ use App\Models\Nivel;
 use App\Models\ProgresoEstudiante;
 use App\Models\Racha;
 use App\Models\SesionJuego;
+use App\Support\NombrePropio;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * REPOSITORIO: EstudianteRepository
@@ -252,6 +254,72 @@ class EstudianteRepository
     public function existeCodigo(string $codigoAcceso): bool
     {
         return Estudiante::where('codigo_acceso', $codigoAcceso)->exists();
+    }
+
+    // ── Duplicados y limpieza de cuentas ────────────────────────────────
+
+    /**
+     * Alumnos ACTIVOS con matrícula activa en la institución cuyo nombre y apellido
+     * coinciden (sin importar mayúsculas, tildes ni espacios) con los indicados.
+     * Sirve para avisar antes de crear una cuenta repetida.
+     */
+    public function posiblesDuplicados(string $nombre, string $apellido, int $institucionId): Collection
+    {
+        $clave = NombrePropio::clave($nombre . ' ' . $apellido);
+
+        return Estudiante::activos()
+            ->whereHas('matriculas', fn ($q) => $q->where('institucion_id', $institucionId)->where('activo', true))
+            ->with('matriculaActiva')
+            ->get()
+            ->filter(fn (Estudiante $e) => NombrePropio::clave($e->nombre . ' ' . $e->apellido) === $clave)
+            ->values();
+    }
+
+    /** Todos los alumnos para el listado del administrador (con la cantidad de partidas y diagnósticos). */
+    public function listadoParaAdmin(?string $busqueda = null, int $limite = 300): Collection
+    {
+        $busqueda = trim((string) $busqueda);
+
+        return Estudiante::with(['matriculaActiva.institucion'])
+            ->withCount(['sesiones', 'diagnosticos'])
+            ->when($busqueda !== '', function ($q) use ($busqueda) {
+                $q->where(function ($w) use ($busqueda) {
+                    $w->where('nombre', 'like', "%{$busqueda}%")
+                      ->orWhere('apellido', 'like', "%{$busqueda}%")
+                      ->orWhere('codigo_acceso', 'like', "%{$busqueda}%");
+                });
+            })
+            ->orderBy('apellido')->orderBy('nombre')
+            ->limit($limite)
+            ->get();
+    }
+
+    /** ¿La cuenta nunca jugó ni tiene diagnósticos? (solo esas se pueden eliminar). */
+    public function sinActividad(Estudiante $estudiante): bool
+    {
+        return !$estudiante->sesiones()->exists() && !$estudiante->diagnosticos()->exists();
+    }
+
+    /**
+     * Elimina una cuenta SIN actividad (p. ej. un duplicado creado por error), con sus
+     * matrículas y registros vacíos. Devuelve false, sin tocar nada, si la cuenta tiene
+     * partidas o diagnósticos (en ese caso solo se puede desactivar).
+     */
+    public function eliminarSinActividad(Estudiante $estudiante): bool
+    {
+        return DB::transaction(function () use ($estudiante) {
+            if (!$this->sinActividad($estudiante)) {
+                return false;
+            }
+
+            $estudiante->logros()->delete();
+            $estudiante->progresos()->delete();
+            $estudiante->rachas()->delete();
+            $estudiante->matriculas()->delete();
+            $estudiante->delete();
+
+            return true;
+        });
     }
 
     // ── Cuentas de estudiantes: consultas globales y acceso de familias ──

@@ -87,6 +87,36 @@
           </div>
         </div>
 
+        {{-- Parámetro 4: Segundos extra en Flash Matemático --}}
+        <div class="mb-4">
+          <label class="form-label fw-bold" for="segundos_extra_flash" style="color:#1B3361">
+            ⚡ Segundos extra en Flash Matemático
+          </label>
+          <div class="d-flex align-items-center gap-3">
+            <input type="range" id="segundos_extra_flash_rango"
+                   min="-5" max="20" step="1"
+                   value="{{ old('segundos_extra_flash', $config->segundos_extra_flash ?? 0) }}"
+                   class="form-range flex-grow-1"
+                   oninput="document.getElementById('segundos_extra_flash').value=this.value">
+            <input type="number" name="segundos_extra_flash" id="segundos_extra_flash"
+                   min="-5" max="20" step="1" required
+                   value="{{ old('segundos_extra_flash', $config->segundos_extra_flash ?? 0) }}"
+                   class="form-control text-center fw-bold" style="max-width:90px"
+                   oninput="document.getElementById('segundos_extra_flash_rango').value=this.value">
+            <span class="text-muted">s</span>
+          </div>
+          @error('segundos_extra_flash')
+            <div class="text-danger small mt-1">{{ $message }}</div>
+          @enderror
+          <div class="form-text">
+            Se <strong>suma</strong> al tiempo que se ven los números en <strong>todos los niveles</strong>
+            de Flash Matemático: cada unidad es 1 segundo. Con <strong>0</strong> quedan los tiempos
+            actuales; un valor negativo los acorta (nunca baja de 2 segundos). Se aplica a los alumnos de
+            esta institución en la próxima partida. <strong>Solo afecta a Flash Matemático</strong>.
+            Por defecto: 0.
+          </div>
+        </div>
+
         <div class="d-grid">
           <button type="submit" class="btn fw-bold rounded-3"
                   style="background:#7B1FA2;color:#fff">

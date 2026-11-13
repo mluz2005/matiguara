@@ -56,8 +56,26 @@
           <a href="{{ route('ayuda') }}#crear-cuenta" class="small" style="color:#1B3361">¿Necesitás ayuda?</a>
         </div>
         <div class="card-body p-3">
-          <form method="POST" action="{{ route('docente.cuentas.crear') }}">
+          <form method="POST" action="{{ route('docente.cuentas.crear') }}" id="formCrearCuenta">
             @csrf
+            {{-- Aviso de posible duplicado: mismo nombre y apellido ya cargado en la institución --}}
+            @if(session('duplicados'))
+              <div class="alert alert-warning rounded-3 py-2 small" role="alert">
+                <b>⚠️ Ya hay un alumno con ese nombre:</b>
+                <ul class="mb-2 ps-3">
+                  @foreach(session('duplicados') as $d)
+                    <li>{{ $d['nombre'] }} — {{ $d['grado'] ? $d['grado'] . '.° grado' : 'sin grado' }} — código {{ $d['codigo'] }}</li>
+                  @endforeach
+                </ul>
+                <div class="mb-2">Si es el <b>mismo niño</b>, no lo cargues otra vez: buscalo en la lista de la derecha.</div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="confirmar_duplicado" value="1" id="chkDup">
+                  <label class="form-check-label" for="chkDup">
+                    Es <b>otro niño</b> con el mismo nombre: crear igual (volvé a escribir el PIN)
+                  </label>
+                </div>
+              </div>
+            @endif
             <div class="mb-3">
               <label class="form-label fw-semibold small">Nombre</label>
               <input type="text" name="nombre" class="form-control rounded-3"
@@ -117,7 +135,7 @@
               </div>
             </div>
             <div class="d-grid">
-              <button type="submit" class="btn fw-bold rounded-3"
+              <button type="submit" class="btn fw-bold rounded-3" id="btnCrearCuenta"
                       style="background:#177040;color:white">
                 <i class="bi bi-person-check me-1"></i>Crear cuenta y matrícula
               </button>
@@ -326,6 +344,20 @@
 @endpush
 @push('scripts')
 <script>
+/* Anti doble envío: el primer clic bloquea el botón. Un doble clic (o tocar dos veces
+   en la tablet) creaba la cuenta repetida. Si el navegador vuelve a esta página con
+   «Atrás», se rehabilita. */
+(function () {
+    var f = document.getElementById('formCrearCuenta');
+    var b = document.getElementById('btnCrearCuenta');
+    if (!f || !b) return;
+    var etiqueta = b.innerHTML;
+    f.addEventListener('submit', function (e) {
+        if (b.disabled) { e.preventDefault(); return; }
+        setTimeout(function () { b.disabled = true; b.textContent = 'Guardando…'; }, 0);
+    });
+    window.addEventListener('pageshow', function () { b.disabled = false; b.innerHTML = etiqueta; });
+})();
 // Pasa la columna izquierda al modo "Editar alumno" con los datos del alumno tocado.
 // JavaScript simple: no depende de Bootstrap (funciona aunque sus scripts no carguen).
 function cuentaSeleccionar(fila) {

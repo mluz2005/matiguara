@@ -124,7 +124,7 @@
             <div class="mv2-cuenta" id="countdownRing">
                 <span class="et" id="countdownEtiqueta">⚡ ¡Memorizá!</span>
                 <div class="pista"><div id="countdownBarra"></div></div>
-                <b class="n" id="countdownNumero">{{ intval($nivel->tiempo_mostrar_ms / 1000) }}</b>
+                <b class="n" id="countdownNumero">{{ intdiv($tiempoFlashMs, 1000) }}</b>
             </div>
         @endif
 
@@ -368,7 +368,7 @@ window.textoEsActual = @js($textoEs);
 // ── COUNTDOWN para Flash Matemático ────────────────────────────────────
 @if($nivel->tiempo_mostrar_ms)
 (function() {
-    const totalMs   = {{ $nivel->tiempo_mostrar_ms }};
+    const totalMs   = {{ $tiempoFlashMs }};
     const barra     = document.getElementById('countdownBarra');
     const numero    = document.getElementById('countdownNumero');
     const etiqueta  = document.getElementById('countdownEtiqueta');

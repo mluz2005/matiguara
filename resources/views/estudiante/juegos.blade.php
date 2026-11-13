@@ -215,11 +215,11 @@
                                         data-bloqueado="1"
                                         data-requisito="{{ max(1, $nivel->numero_nivel - 1) }}"
                                         @endif
-                                        title="Nivel {{ $nivel->numero_nivel }} · Dificultad {{ $nivel->dificultad }} de 5{{ $nivel->tiempo_mostrar_ms ? ' · ' . intval($nivel->tiempo_mostrar_ms / 1000) . ' segundos para memorizar' : '' }}">
+                                        title="Nivel {{ $nivel->numero_nivel }} · Dificultad {{ $nivel->dificultad }} de 5{{ $nivel->tiempo_mostrar_ms ? ' · ' . \App\Support\TiempoFlash::segundos($nivel->tiempo_mostrar_ms, $segundosExtraFlash ?? 0) . ' segundos para memorizar' : '' }}">
                                     {{ $abierto ? '' : '🔒' }} {{ $nivel->numero_nivel }}
                                     <small>
                                         @if($nivel->tiempo_mostrar_ms)
-                                            ⏱ {{ intval($nivel->tiempo_mostrar_ms / 1000) }} s
+                                            ⏱ {{ \App\Support\TiempoFlash::segundos($nivel->tiempo_mostrar_ms, $segundosExtraFlash ?? 0) }} s
                                         @elseif($d->esLaberinto)
                                             {{ ['🌱','💧','🐄','🏘️'][max(0, min(3, (int) ceil($nivel->numero_nivel / 2) - 1))] }}
                                         @else

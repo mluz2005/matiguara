@@ -203,6 +203,10 @@ Route::middleware(['auth', 'es.admin'])
     Route::post('/docentes',           [AdminController::class, 'crearDocente'])->name('docentes.crear');
     Route::put('/docentes/{id}/desactivar', [AdminController::class, 'desactivarDocente'])->name('docentes.desactivar');
 
+    // Alumnos: listado global y eliminación de cuentas sin actividad (duplicados)
+    Route::get('/alumnos',             [AdminController::class, 'alumnos'])->name('alumnos');
+    Route::delete('/alumnos/{id}',     [AdminController::class, 'eliminarAlumno'])->name('alumnos.eliminar');
+
     // Mensajes retroalimentación (CU-22)
     Route::get('/mensajes',            [AdminController::class, 'mensajes'])->name('mensajes');
     Route::post('/mensajes',           [AdminController::class, 'guardarMensaje'])->name('mensajes.guardar');
