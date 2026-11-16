@@ -101,7 +101,7 @@ class DesbloqueoNiveles
 
         $resumen = [];
         foreach ($juegos as $juego) {
-            if ($juego->niveles->isEmpty()) continue;
+            if ($juego->niveles->isEmpty() || $juego->esTamizaje()) continue;   // el tamizaje no tiene candados ni medallas
             $filas = [];
             foreach ($juego->niveles as $nivel) {
                 $estado = isset($superados[$nivel->id]) ? 'superado'

@@ -101,7 +101,15 @@ class EstudianteController extends Controller
         // Flash Matemático: segundos que la administración suma al tiempo de cada nivel
         $segundosExtraFlash = TiempoFlash::extraDe($estudiante);
 
-        return view('estudiante.juegos', compact('estudiante','matricula','juegos','rachas','nivelesAbiertos','segundosExtraFlash'));
+        // «Mati y los números»: en qué viaje y ciclo está el niño (los tres viajes se ven como tres niveles)
+        $numerosEstado = [];
+        foreach ($juegos as $j) {
+            if ($j->esTamizaje()) {
+                $numerosEstado[$j->id] = app(\App\Services\NumerosService::class)->estadoDe($estudiante->id, $j->id);
+            }
+        }
+
+        return view('estudiante.juegos', compact('estudiante','matricula','juegos','rachas','nivelesAbiertos','segundosExtraFlash','numerosEstado'));
     }
 
     // =========================================================================

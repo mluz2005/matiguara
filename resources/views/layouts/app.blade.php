@@ -112,6 +112,11 @@
                                     <i class="bi bi-people"></i> Estudiantes
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('docente.tamizaje') }}">
+                                    <i class="bi bi-eye"></i> Atención numérica
+                                </a>
+                            </li>
                         @elseif(Auth::user()->esPadre())
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('padre.panel') }}">
@@ -134,6 +139,46 @@
                         </li>
                     @endauth
                 </ul>
+
+                {{-- Campanita de la docente: avisos de «Mati y los números» --}}
+                @auth
+                    @if(Auth::user()->esDocente())
+                        @php $tt = \App\Support\Numeros\TextosTamizaje::SEMAFORO; @endphp
+                        <div class="dropdown me-2">
+                            <button class="btn btn-outline-light btn-sm position-relative" type="button" data-bs-toggle="dropdown"
+                                    aria-label="Avisos{{ $avisosTamizajeTotal ? ' (' . $avisosTamizajeTotal . ' sin leer)' : '' }}" title="Avisos">
+                                <i class="bi bi-bell{{ $avisosTamizajeTotal ? '-fill' : '' }}"></i>
+                                @if($avisosTamizajeTotal)
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ $avisosTamizajeTotal }}</span>
+                                @endif
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" style="min-width:300px;max-width:92vw">
+                                <li><h6 class="dropdown-header">Avisos de «Mati y los números»</h6></li>
+                                @forelse($avisosTamizaje as $aviso)
+                                    <li>
+                                        <a class="dropdown-item small text-wrap" href="{{ route('docente.tamizaje.alumno', $aviso->estudiante_id) }}">
+                                            {{ $tt[$aviso->semaforo]['icono'] ?? '' }}
+                                            <strong>{{ $aviso->estudiante?->nombre }} {{ $aviso->estudiante?->apellido }}</strong><br>
+                                            <span class="text-muted">{{ $tt[$aviso->semaforo]['etiqueta'] ?? 'Mirar con más atención' }}</span>
+                                        </a>
+                                    </li>
+                                @empty
+                                    <li><span class="dropdown-item-text small text-muted">No hay avisos nuevos.</span></li>
+                                @endforelse
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item small" href="{{ route('docente.tamizaje') }}"><i class="bi bi-eye me-1"></i>Ver Atención numérica</a></li>
+                                @if($avisosTamizajeTotal)
+                                    <li>
+                                        <form method="POST" action="{{ route('docente.avisos.leer') }}">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item small"><i class="bi bi-check2-all me-1"></i>Marcar todo como leído</button>
+                                        </form>
+                                    </li>
+                                @endif
+                            </ul>
+                        </div>
+                    @endif
+                @endauth
 
                 {{-- Usuario autenticado --}}
                 @auth

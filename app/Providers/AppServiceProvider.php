@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\TamizajeAviso;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -46,6 +48,24 @@ class AppServiceProvider extends ServiceProvider
         //   5. EstudianteProvider::validateCredentials() verifica el PIN
         Auth::provider('estudiante-provider', function ($app, array $config) {
             return new EstudianteProvider();
+        });
+
+        // ── Campanita de la docente: avisos de «Mati y los números» sin leer ──
+        // Un solo conteo por página; si la tabla todavía no existe (falta migrar) no rompe nada.
+        View::composer('layouts.app', function ($view) {
+            $avisos = collect();
+            $total  = 0;
+            try {
+                $usuario = Auth::user();
+                if ($usuario && $usuario->esDocente() && $usuario->docente) {
+                    $sinLeer = TamizajeAviso::where('docente_id', $usuario->docente->id)->whereNull('leido_en');
+                    $total   = (clone $sinLeer)->count();
+                    $avisos  = $sinLeer->with('estudiante:id,nombre,apellido')->latest('id')->limit(6)->get();
+                }
+            } catch (\Throwable $e) {
+                // sin campanita: la página sigue funcionando
+            }
+            $view->with('avisosTamizaje', $avisos)->with('avisosTamizajeTotal', $total);
         });
     }
 }

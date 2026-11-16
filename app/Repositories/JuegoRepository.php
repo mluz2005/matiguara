@@ -41,7 +41,7 @@ class JuegoRepository
     public function activosConNivelesDelGrado($grado): Collection
     {
         return Juego::activos()
-            ->with(['niveles' => fn ($q) => $q->where('grado', $grado)->orderBy('numero_nivel')])
+            ->with(['tipoMecanica', 'niveles' => fn ($q) => $q->where('grado', $grado)->orderBy('numero_nivel')])
             ->get();
     }
 

@@ -7,6 +7,7 @@
     =========================================================================
     Se muestra cuando el niño llegó al límite de juego de la sesión. Es
     amable, no un castigo: sin puntos perdidos y con ideas para descansar.
+    Mati duerme en su nido (public/img/numeros/mati-durmiendo.webp).
     Guaraní: BORRADOR, validar con una persona hablante antes de usar con niños.
     =========================================================================
 --}}
@@ -14,7 +15,8 @@
 @section('contenido')
 <div class="tarjeta-infantil bg-white p-4 text-center mt-3" id="descanso"
      data-vuelve-en="{{ (int) $vuelveEnSeg }}">
-    <div style="font-size:4rem" aria-hidden="true">🦜😴</div>
+    <img src="{{ asset('img/numeros/mati-durmiendo.webp') }}" alt="Mati durmiendo en su nido, bien abrigado"
+         width="260" height="228" class="d-block mx-auto" style="max-width:70%;height:auto">
 
     <h2 class="fw-bold mt-2" style="color:#1B3361">¡Hora de descansar!</h2>
     <p class="fw-bold mb-3" style="color:#0E6B7D">Ñapytu'ũ ko'ágã!</p>

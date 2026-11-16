@@ -30,6 +30,7 @@
 <link rel="stylesheet" href="{{ asset('css/memoria-v2.css') }}?v=1">
 <link rel="stylesheet" href="{{ asset('css/juegos-v2.css') }}?v=2">
 <link rel="stylesheet" href="{{ asset('css/laberinto-v2.css') }}?v=1">
+<link rel="stylesheet" href="{{ asset('css/numeros.css') }}?v=1">
 @endpush
 
 @section('contenido')
@@ -72,17 +73,19 @@
             $esMemoria   = $tipoMec === 'memoria';
             $esFlashMenu = $juego->nombre_es === 'Flash Matemático';
             $esLaberinto = $tipoMec === 'laberinto';
+            $esNumeros   = $tipoMec === 'numeros';
             return (object) [
                 'juego'       => $juego,
                 'racha'       => ($rachas[$juego->id] ?? null)?->racha_actual_dias ?? 0,
                 'esMemoria'   => $esMemoria,
                 'esFlash'     => $esFlashMenu,
                 'esLaberinto' => $esLaberinto,
+                'esNumeros'   => $esNumeros,
                 // Cada juego tiene su propio mundo de color
-                'mundo'       => $esMemoria ? 'mv2-w5' : ($esLaberinto ? 'mv2-wL' : ($esFlashMenu ? 'mv2-wF' : 'mv2-wS')),
+                'mundo'       => $esMemoria ? 'mv2-w5' : ($esLaberinto ? 'mv2-wL' : ($esNumeros ? 'mv2-wN' : ($esFlashMenu ? 'mv2-wF' : 'mv2-wS'))),
                 'icono'       => $esFlashMenu ? '⚡' : match($tipoMec) {
                     'suma' => '🍎', 'resta' => '➖', 'multiplicacion' => '✖️', 'division' => '➗',
-                    'memoria' => '🃏', 'laberinto' => '🏫', 'mixto' => '🔢', default => '🎯',
+                    'memoria' => '🃏', 'laberinto' => '🏫', 'numeros' => '🦜', 'mixto' => '🔢', default => '🎯',
                 },
                 'niveles'     => $juego->nivelesPorGrado($grado)->orderBy('numero_nivel')->get(),
             ];
@@ -190,6 +193,39 @@
                             <p class="text-muted small text-center mb-0">Sin niveles</p>
                         @endforelse
                     </div>
+                @elseif($d->esNumeros)
+                    {{-- ── LOS TRES VIAJES (Mati y los números): se abren en orden y al terminar el tercero empieza otro ciclo ── --}}
+                    @php
+                        $ne = $numerosEstado[$juego->id] ?? ['ciclo' => 1, 'viaje' => 1, 'hechos_en_ciclo' => 0, 'viajes_hechos' => []];
+                        $nombresViaje = \App\Support\Numeros\TextosNumeros::VIAJES;
+                    @endphp
+                    @if($niveles->isEmpty())
+                        <p class="text-muted small text-center mb-0">Sin niveles</p>
+                    @else
+                    <div class="nm-menu">
+                        <p class="nm-ciclo">🦜 Ciclo {{ $ne['ciclo'] }} <small>· Hoy toca: <b>{{ $nombresViaje[$ne['viaje']]['es'] }}</b></small></p>
+                        <div class="mv2-niveles nm-viajes">
+                            @foreach($niveles as $nivel)
+                                @php
+                                    $n     = (int) $nivel->numero_nivel;
+                                    $hecho = in_array($n, $ne['viajes_hechos'] ?? [], true);
+                                    $toca  = $n === $ne['viaje'];
+                                    $nv    = $nombresViaje[$n] ?? ['es' => 'Viaje ' . $n, 'gn' => '', 'ico' => '🔢'];
+                                @endphp
+                                <form method="POST" action="{{ route('estudiante.numeros.iniciar', ['juego' => $juego->id, 'nivel' => $nivel->id]) }}">
+                                    @csrf
+                                    <button type="{{ $toca ? 'submit' : 'button' }}"
+                                            class="{{ $toca ? '' : ($hecho ? 'hecho' : 'cerrado') }}"
+                                            @if(!$toca) aria-disabled="true" @endif
+                                            title="Viaje {{ $n }} · {{ $nv['es'] }}">
+                                        {{ $hecho ? '✅' : ($toca ? $nv['ico'] : '🔒') }} {{ $n }}
+                                        <small>{{ $nv['es'] }}</small>
+                                    </button>
+                                </form>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
                 @else
                     {{-- ── NIVELES (Suma de Frutas / Flash Matemático / El camino a la escuela) ── --}}
                     @if($niveles->isEmpty())

@@ -30,11 +30,15 @@ class ConfigInstitucion extends Model
         'permitir_acceso_grados_ant',
         'meses_conservacion_egresados',
         'segundos_extra_flash',   // Flash Matemático: segundos que se suman al tiempo de cada nivel
+        'tamizaje_corte_verde',     // «Mati y los números»: desde este % de aciertos el color es verde
+        'tamizaje_corte_amarillo',  // y desde este % es amarillo (por debajo, rojo). Provisorios.
     ];
 
     protected $casts = [
         'permitir_acceso_grados_ant' => 'boolean',
         'segundos_extra_flash'       => 'integer',
+        'tamizaje_corte_verde'       => 'integer',
+        'tamizaje_corte_amarillo'    => 'integer',
     ];
 
     /**
@@ -46,6 +50,8 @@ class ConfigInstitucion extends Model
         'permitir_acceso_grados_ant'     => false,
         'meses_conservacion_egresados'   => 4,
         'segundos_extra_flash'           => 0,
+        'tamizaje_corte_verde'           => 75,
+        'tamizaje_corte_amarillo'        => 60,
     ];
 
     public function institucion(): BelongsTo

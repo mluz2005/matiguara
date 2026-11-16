@@ -158,7 +158,10 @@ class TiempoJuegoTest extends RepositorioTestCase
 
         // Jugó 9 min y terminó hace 5 min: en descanso.
         $this->partidaTerminada($e, 840, 540);
-        $this->get(route('estudiante.descanso'))->assertOk()->assertSee('Hora de descansar');
+        $this->get(route('estudiante.descanso'))->assertOk()->assertSee('Hora de descansar')
+            ->assertSee('mati-durmiendo.webp', false)
+            ->assertSee('Mati durmiendo en su nido');
+        $this->assertFileExists(public_path('img/numeros/mati-durmiendo.webp'));
 
         // Pausa de 0 minutos = sin pausa: ya no está bloqueado.
         $this->docenteDe($e['estudiante'])->update(['pausa_entre_sesiones_min' => 0]);

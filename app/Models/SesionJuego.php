@@ -77,4 +77,19 @@ class SesionJuego extends Model
     {
         return $query->where('estado', 'completada');
     }
+
+    /**
+     * Deja afuera las sesiones de «Mati y los números» (tamizaje, mecánica 'numeros').
+     * Ese juego no suma puntos ni entra en el progreso, los logros ni los resúmenes
+     * de rendimiento (RF-02); sus datos se leen aparte, con NumerosRepository.
+     * NO se usa para el límite de tiempo de juego, que sí debe contarlas.
+     */
+    public function scopeSinTamizaje($query)
+    {
+        return $query->whereNotIn('juego_id', function ($q) {
+            $q->select('juegos.id')->from('juegos')
+              ->join('tipos_mecanica', 'tipos_mecanica.id', '=', 'juegos.tipo_mecanica_id')
+              ->where('tipos_mecanica.tipo', 'numeros');
+        });
+    }
 }

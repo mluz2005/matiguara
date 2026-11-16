@@ -38,8 +38,12 @@ use RuntimeException;
  */
 class LaberintoController extends Controller
 {
-    /** Personajes del niño en el laberinto (se asigna uno fijo por alumno). */
-    private const AVATARES = ['👧🏽', '👦🏽', '🧒🏽', '👧🏻', '👦🏻', '👧🏿', '👦🏿', '🧒🏻'];
+    /**
+     * Personajes del niño en el laberinto (se asigna uno fijo por alumno).
+     * Todos son «niño/a» NEUTRO (🧒) en distintos tonos de piel: así el dibujo nunca contradice el nombre
+     * (una nena con un nene o al revés) y no hace falta pedir ni guardar el sexo del estudiante.
+     */
+    public const AVATARES = ['🧒🏻', '🧒🏼', '🧒🏽', '🧒🏾', '🧒🏿'];
 
     public function __construct(
         private LaberintoService $laberinto,

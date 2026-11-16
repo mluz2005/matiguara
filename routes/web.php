@@ -9,6 +9,7 @@ use App\Http\Controllers\Dashboard\DocenteNivelesController;
 use App\Http\Controllers\AyudaController;
 use App\Http\Controllers\Dashboard\EstudianteController;
 use App\Http\Controllers\Dashboard\PadreController;
+use App\Http\Controllers\Dashboard\TamizajeController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -95,6 +96,14 @@ Route::middleware(['auth', 'es.docente'])
 
     // Límite de tiempo de juego y pausa entre sesiones (todos los juegos)
     Route::post('/juegos/tiempo',  [DocenteController::class, 'guardarTiempoJuego'])->name('juegos.tiempo');
+
+    // «Mati y los números» — Atención numérica: semáforo, detalle, ficha y avisos (la campanita)
+    Route::get('/atencion',                     [TamizajeController::class, 'index'])->name('tamizaje');
+    Route::get('/atencion/{id}',                [TamizajeController::class, 'alumno'])->whereNumber('id')->name('tamizaje.alumno');
+    Route::post('/atencion/{id}/ficha',         [TamizajeController::class, 'guardarFicha'])->whereNumber('id')->name('tamizaje.ficha');
+    Route::post('/atencion/{id}/informe',       [TamizajeController::class, 'generarInforme'])->whereNumber('id')->name('tamizaje.informe');
+    Route::post('/atencion/viaje/{detalle}/validez', [TamizajeController::class, 'validez'])->whereNumber('detalle')->name('tamizaje.validez');
+    Route::post('/avisos/leer',                 [TamizajeController::class, 'leerAvisos'])->name('avisos.leer');
 });
 
 // ==========================================================================
@@ -161,6 +170,34 @@ Route::post('/laberinto/sesion/{sesion}/movimiento',
 Route::post('/laberinto/sesion/{sesion}/cerrar',
     [\App\Http\Controllers\Dashboard\LaberintoController::class, 'cerrarSesion'])
     ->name('laberinto.cerrar');
+
+// Juego "Mati y los números" — tamizaje (no suma puntos ni entra en el progreso)
+Route::post('/numeros/{juego}/nivel/{nivel}/iniciar',
+    [\App\Http\Controllers\Dashboard\NumerosController::class, 'iniciarSesion'])
+    ->middleware('limite.juego')
+    ->name('numeros.iniciar');
+
+Route::get('/numeros/{juego}/nivel/{nivel}/hoy',
+    [\App\Http\Controllers\Dashboard\NumerosController::class, 'invitacion'])
+    ->name('numeros.hoy');
+
+Route::get('/numeros/sesion/{sesion}/tablero',
+    [\App\Http\Controllers\Dashboard\NumerosController::class, 'mostrarTablero'])
+    ->middleware('limite.juego')
+    ->name('numeros.tablero');
+
+Route::get('/numeros/sesion/{sesion}/parte/{parte}',
+    [\App\Http\Controllers\Dashboard\NumerosController::class, 'parte'])
+    ->whereNumber('parte')
+    ->name('numeros.parte');
+
+Route::post('/numeros/sesion/{sesion}/respuesta',
+    [\App\Http\Controllers\Dashboard\NumerosController::class, 'responder'])
+    ->name('numeros.responder');
+
+Route::post('/numeros/sesion/{sesion}/cerrar',
+    [\App\Http\Controllers\Dashboard\NumerosController::class, 'cerrar'])
+    ->name('numeros.cerrar');
 });
 
 // ==========================================================================

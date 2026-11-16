@@ -134,6 +134,7 @@
                 Si hoy no lo tenés, lo cargás después: tocá al alumno en la lista.
               </div>
             </div>
+            @include('docente._fecha-nacimiento', ['pref' => 'cr'])
             <div class="d-grid">
               <button type="submit" class="btn fw-bold rounded-3" id="btnCrearCuenta"
                       style="background:#177040;color:white">
@@ -178,6 +179,7 @@
                 La familia entra con este correo y el código del alumno. Si lo dejás vacío, se quita.
               </div>
             </div>
+            @include('docente._fecha-nacimiento', ['pref' => 'ed'])
             <div class="mb-3">
               <div class="d-flex justify-content-between align-items-center mb-1">
                 <label class="form-label fw-semibold small mb-0">
@@ -275,6 +277,9 @@
                       data-apellido="{{ $mat->estudiante->apellido }}"
                       data-codigo="{{ $mat->estudiante->codigo_acceso }}"
                       data-correo="{{ $mat->estudiante->email_tutor }}"
+                      data-nac-dia="{{ $mat->estudiante->fecha_nacimiento?->day }}"
+                      data-nac-mes="{{ $mat->estudiante->fecha_nacimiento?->month }}"
+                      data-nac-anio="{{ $mat->estudiante->fecha_nacimiento?->year }}"
                       data-activo="{{ $mat->estudiante->activo ? 1 : 0 }}"
                       data-grado="{{ $mat->grado }}"
                       data-url-editar="{{ route('docente.cuentas.editar', $mat->estudiante_id) }}"
@@ -370,6 +375,9 @@ function cuentaSeleccionar(fila) {
     document.getElementById('edNombre').value   = d.nombre;
     document.getElementById('edApellido').value = d.apellido;
     document.getElementById('edCorreo').value   = d.correo;
+    document.getElementById('edNacDia').value   = d.nacDia  || '';
+    document.getElementById('edNacMes').value   = d.nacMes  || '';
+    document.getElementById('edNacAnio').value  = d.nacAnio || '';
     document.getElementById('edPin').value      = '';
     document.getElementById('edPinAviso').style.display = 'none';
     document.getElementById('edCodigo').textContent = d.codigo;

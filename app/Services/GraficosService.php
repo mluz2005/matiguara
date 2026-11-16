@@ -212,7 +212,10 @@ class GraficosService
 
         $grados = array_values(array_unique(array_values($gradoDe)));
         $salida = [];
-        foreach ($this->juegos->activos() as $juego) {
+        foreach ($this->juegos->activosConMecanica() as $juego) {
+            if ($juego->esTamizaje()) {
+                continue;   // el tamizaje no tiene niveles de progreso
+            }
             $cantNiveles = 0;
             foreach ($grados as $g) {
                 $cantNiveles = max($cantNiveles, (int) $this->juegos->nivelesDelGrado($juego, $g)->max('numero_nivel'));

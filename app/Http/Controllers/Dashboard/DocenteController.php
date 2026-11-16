@@ -16,6 +16,7 @@ use App\Repositories\UsuarioRepository;
 use App\Services\DiagnosticoIAService;
 use App\Services\GraficosService;
 use App\Services\MatriculaService;
+use App\Support\Cumpleanos;
 use App\Support\NombrePropio;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -74,7 +75,7 @@ class DocenteController extends Controller
         $diagnosticos = $this->diagnosticos->delEstudiante($id);
 
         // Juegos disponibles para filtrar el diagnóstico
-        $juegos = $this->juegos->activos();
+        $juegos = $this->juegos->activosConMecanica()->reject(fn ($j) => $j->esTamizaje())->values();
 
         // Métricas básicas para mostrar en el formulario
         $totalSesiones   = $this->sesiones->contarCompletadas($id);
@@ -194,7 +195,7 @@ class DocenteController extends Controller
         return view('docente.diagnostico-ia', [
             'estudiante'    => $estudiante,
             'diagnosticos'  => $diagnosticos,
-            'juegos'        => $this->juegos->activos(),
+            'juegos'        => $this->juegos->activosConMecanica()->reject(fn ($j) => $j->esTamizaje())->values(),
             'totalSesiones' => $this->sesiones->contarCompletadas($id),
             'ultimaSesion'  => null,
             'docente'       => Auth::user()->docente,
@@ -299,6 +300,10 @@ class DocenteController extends Controller
             // Grado en el que se matricula. Opcional: si no viene, el de la asignación de la docente.
             // Permite inscribir de entrada a un niño en 2.° o 3.° (sin tener que "pasarlo de grado").
             'grado'    => ['nullable','integer','between:1,' . MatriculaService::GRADO_FINAL],
+            // Fecha de nacimiento opcional (para el saludo de cumpleaños de Mati).
+            'nac_dia'  => ['nullable','integer','between:1,31'],
+            'nac_mes'  => ['nullable','integer','between:1,12'],
+            'nac_anio' => ['nullable','integer'],
         ], [
             'email_tutor.email' => 'El correo del padre, madre o tutor no es válido. Revisalo.',
             'grado.between'     => 'El grado debe ser 1.°, 2.° o 3.°.',
@@ -310,6 +315,12 @@ class DocenteController extends Controller
         if ($datos['nombre'] === '' || $datos['apellido'] === '') {
             return back()->withInput($request->except(['pin', 'pin_confirmation']))
                 ->withErrors(['nombre' => 'Escribí el nombre y el apellido del alumno.']);
+        }
+
+        [$nacimiento, $errorNacimiento] = Cumpleanos::desdeFormulario($datos['nac_dia'] ?? null, $datos['nac_mes'] ?? null, $datos['nac_anio'] ?? null);
+        if ($errorNacimiento) {
+            return back()->withInput($request->except(['pin', 'pin_confirmation']))
+                ->withErrors(['nac_dia' => $errorNacimiento]);
         }
 
         // Aviso de posible duplicado: mismo nombre y apellido, activo, en la misma institución.
@@ -351,6 +362,7 @@ class DocenteController extends Controller
             'pin_hash'       => Estudiante::hashearPin($datos['pin']),
             'id_anonimizado' => Estudiante::generarIdAnonimizado(),
             'activo'         => true,
+            'fecha_nacimiento' => $nacimiento?->toDateString(),
         ];
         // Solo si la columna existe (si falta ejecutar la migración, la cuenta se crea igual, sin correo).
         if ($this->existeColumnaCorreo()) {
@@ -396,6 +408,9 @@ class DocenteController extends Controller
             'apellido'     => ['required_if:accion,guardar','nullable','string','max:100'],
             'nuevo_pin'    => ['required_if:accion,reset_pin','nullable','regex:/^\d{4}$/'],
             'nuevo_correo' => ['required_if:accion,cambiar_correo','nullable','email:rfc','max:191', $this->reglaCorreoDeFamilia()],
+            'nac_dia'      => ['nullable','integer','between:1,31'],
+            'nac_mes'      => ['nullable','integer','between:1,12'],
+            'nac_anio'     => ['nullable','integer'],
         ], [
             'nuevo_correo.required_if' => 'Escribí el correo del padre, madre o tutor.',
             'nuevo_correo.email'       => 'El correo del padre, madre o tutor no es válido. Revisalo.',
@@ -417,6 +432,14 @@ class DocenteController extends Controller
             ];
             if ($cambios['nombre'] === '' || $cambios['apellido'] === '') {
                 return back()->withErrors(['error' => 'El nombre y el apellido no pueden quedar vacíos.']);
+            }
+            // Fecha de nacimiento: solo se toca si el formulario la trae (vacía = se quita).
+            if ($request->hasAny(['nac_dia', 'nac_mes', 'nac_anio'])) {
+                [$nacimiento, $errorNacimiento] = Cumpleanos::desdeFormulario($datos['nac_dia'] ?? null, $datos['nac_mes'] ?? null, $datos['nac_anio'] ?? null);
+                if ($errorNacimiento) {
+                    return back()->withErrors(['nac_dia' => $errorNacimiento])->with('seleccionado', $estudiante->id);
+                }
+                $cambios['fecha_nacimiento'] = $nacimiento?->toDateString();
             }
             $conPin  = !empty($datos['nuevo_pin']);
             if ($conPin) {

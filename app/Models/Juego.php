@@ -37,6 +37,12 @@ class Juego extends Model
         return $this->belongsTo(TipoMecanica::class, 'tipo_mecanica_id');
     }
 
+    /** ¿Es «Mati y los números» (tamizaje)? No suma puntos ni entra en progreso, logros ni diagnóstico. */
+    public function esTamizaje(): bool
+    {
+        return $this->tipoMecanica?->tipo === 'numeros';
+    }
+
     public function niveles(): HasMany
     {
         return $this->hasMany(Nivel::class, 'juego_id');

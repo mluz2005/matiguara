@@ -12,6 +12,7 @@
         @foreach([
           ['docente.panel','grid-1x2','Mi Panel'],
           ['docente.estudiantes','people','Mis Estudiantes'],
+          ['docente.tamizaje','eye','Atención numérica'],
           ['docente.juegos','controller','Configurar Juegos'],
           ['docente.cuentas','person-plus','Cuentas'],
         ] as [$ruta,$icon,$lbl])
@@ -86,10 +87,11 @@
     <div class="row g-3">
       @foreach([
         ['docente.estudiantes','people-fill','Ver mis estudiantes','Ver progreso y métricas de cada alumno','#1B3361','#DAE8FC'],
+        ['docente.tamizaje','eye','Atención numérica','Mati y los números: a quién mirar con más atención','#7A4F00','#FFF2CC'],
         ['docente.juegos','controller','Configurar juegos','Habilitar o deshabilitar juegos por grado','#0E6B7D','#D9F0F5'],
         ['docente.cuentas','person-plus','Gestionar cuentas','Crear y editar cuentas de estudiantes','#177040','#D5E8D4'],
       ] as [$ruta,$icon,$titulo,$desc,$color,$bg])
-      <div class="col-md-4">
+      <div class="col-md-6 col-lg-3">
         <a href="{{ route($ruta) }}"
            class="card border-0 shadow-sm rounded-4 h-100 text-decoration-none p-3 d-block"
            style="background:{{ $bg }}; transition:transform .2s"

@@ -117,6 +117,35 @@
           </div>
         </div>
 
+        {{-- Parámetro 5: Cortes del semáforo de «Mati y los números» --}}
+        <div class="mb-4">
+          <label class="form-label fw-bold" style="color:#1B3361">
+            🦜 Cortes del semáforo de «Mati y los números»
+          </label>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <label class="form-label small" for="tamizaje_corte_verde">Verde desde (% de aciertos)</label>
+              <input type="number" name="tamizaje_corte_verde" id="tamizaje_corte_verde" min="2" max="100" step="1" required
+                     value="{{ old('tamizaje_corte_verde', $config->tamizaje_corte_verde ?? 75) }}"
+                     class="form-control fw-bold" style="max-width:120px">
+              @error('tamizaje_corte_verde')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label small" for="tamizaje_corte_amarillo">Amarillo desde (% de aciertos)</label>
+              <input type="number" name="tamizaje_corte_amarillo" id="tamizaje_corte_amarillo" min="1" max="99" step="1" required
+                     value="{{ old('tamizaje_corte_amarillo', $config->tamizaje_corte_amarillo ?? 60) }}"
+                     class="form-control fw-bold" style="max-width:120px">
+              @error('tamizaje_corte_amarillo')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+            </div>
+          </div>
+          <div class="form-text">
+            Con el promedio de aciertos del área más baja del niño: desde el corte del verde es <strong>verde</strong>,
+            desde el del amarillo es <strong>amarillo</strong> y por debajo es <strong>rojo</strong>. El amarillo debe ser
+            menor que el verde. <strong>Son cortes provisorios</strong>: conviene revisarlos con los datos del piloto.
+            Se aplican a la próxima vez que se calcule el semáforo de cada niño. Por defecto: 75 y 60.
+          </div>
+        </div>
+
         <div class="d-grid">
           <button type="submit" class="btn fw-bold rounded-3"
                   style="background:#7B1FA2;color:#fff">

@@ -78,6 +78,7 @@ class SesionRepository
     public function completadasDe(int $estudianteId, ?int $juegoId = null): Collection
     {
         $consulta = SesionJuego::where('estudiante_id', $estudianteId)
+            ->sinTamizaje()
             ->where('estado', 'completada');
 
         if ($juegoId) {
@@ -215,6 +216,7 @@ class SesionRepository
     public function nivelesJugados(int $estudianteId): Collection
     {
         return SesionJuego::where('estudiante_id', $estudianteId)
+            ->sinTamizaje()
             ->get(['nivel_id', 'nivel_superado']);
     }
 
@@ -222,6 +224,7 @@ class SesionRepository
     public function idsNivelesSuperados(int $estudianteId): array
     {
         return SesionJuego::where('estudiante_id', $estudianteId)
+            ->sinTamizaje()
             ->where('nivel_superado', true)
             ->pluck('nivel_id')
             ->all();
@@ -231,6 +234,7 @@ class SesionRepository
     public function contarNivelesSuperados(int $estudianteId): int
     {
         return SesionJuego::where('estudiante_id', $estudianteId)
+            ->sinTamizaje()
             ->where('nivel_superado', true)
             ->distinct()
             ->count('nivel_id');
@@ -240,6 +244,7 @@ class SesionRepository
     public function contarCompletadas(int $estudianteId): int
     {
         return SesionJuego::where('estudiante_id', $estudianteId)
+            ->sinTamizaje()
             ->where('estado', 'completada')
             ->count();
     }
@@ -248,6 +253,7 @@ class SesionRepository
     public function puntajeTotalCompletadas(int $estudianteId)
     {
         return SesionJuego::where('estudiante_id', $estudianteId)
+            ->sinTamizaje()
             ->where('estado', 'completada')
             ->sum('puntaje_obtenido');
     }
@@ -285,6 +291,7 @@ class SesionRepository
             : [$estudianteIds];
 
         $fila = SesionJuego::whereIn('estudiante_id', $ids)
+            ->sinTamizaje()
             ->where('estado', 'completada')
             ->selectRaw('COUNT(*) as sesiones, COALESCE(SUM(aciertos), 0) as aciertos, COALESCE(SUM(aciertos + errores), 0) as respuestas')
             ->first();
@@ -300,6 +307,7 @@ class SesionRepository
     public function ultimaCompletada(int $estudianteId): ?SesionJuego
     {
         return SesionJuego::where('estudiante_id', $estudianteId)
+            ->sinTamizaje()
             ->where('estado', 'completada')
             ->latest('fecha_inicio')
             ->first();
@@ -309,6 +317,7 @@ class SesionRepository
     public function recientesCompletadas(int $estudianteId, int $limite): Collection
     {
         return SesionJuego::where('estudiante_id', $estudianteId)
+            ->sinTamizaje()
             ->where('estado', 'completada')
             ->with(['juego', 'nivel'])
             ->orderBy('fecha_inicio', 'desc')
@@ -328,7 +337,7 @@ class SesionRepository
     /** Cantidad de sesiones completadas en todo el sistema. */
     public function contarCompletadasGlobal(): int
     {
-        return SesionJuego::where('estado', 'completada')->count();
+        return SesionJuego::sinTamizaje()->where('estado', 'completada')->count();
     }
 
     // ── Consultas para los gráficos del docente ──────────────────────────

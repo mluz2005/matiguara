@@ -8,6 +8,7 @@
     Muestra la guía del perfil de quien inició sesión. Los textos están en
     App\Support\AyudaAdultos (se corrigen ahí, sin tocar esta vista).
     La primera sección se ve abierta; las demás se abren al tocarlas.
+    Una sección con 'grupo' muestra ese subtítulo encima (agrupa las que siguen).
     Al imprimir, se despliegan todas.
     Variables: $rol ('docente' | 'padre' | 'admin'), $titulo ['es','gn'], $secciones
     =========================================================================
@@ -40,6 +41,9 @@
 
     <div class="accordion" id="acordeonAyuda">
         @foreach($secciones as $i => $sec)
+            @if(!empty($sec['grupo']))
+                <h2 class="h6 fw-bold text-uppercase mt-4 mb-2 ayuda-grupo" style="color:#44546F;letter-spacing:.04em">{{ $sec['grupo'] }}</h2>
+            @endif
             <div class="accordion-item rounded-3 mb-2 overflow-hidden" id="{{ $sec['id'] }}" style="border:2px solid #1B3361">
                 <h2 class="accordion-header">
                     <button class="accordion-button {{ $i === 0 ? '' : 'collapsed' }} fw-bold"

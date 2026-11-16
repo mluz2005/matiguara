@@ -184,12 +184,31 @@ class AdminController extends Controller
             'meses_conservacion_egresados' => ['required', 'integer', 'between:1,12'],
             // Si no viene en el formulario, no se modifica el valor guardado.
             'segundos_extra_flash'         => ['sometimes', 'integer', 'between:' . TiempoFlash::EXTRA_MIN . ',' . TiempoFlash::EXTRA_MAX],
+            // «Mati y los números»: cortes del semáforo (% de aciertos). Si no vienen, no se modifican.
+            'tamizaje_corte_verde'         => ['sometimes', 'integer', 'between:2,100'],
+            'tamizaje_corte_amarillo'      => ['sometimes', 'integer', 'between:1,99'],
         ], [
             'dias_reinicio_racha_default.between'  => 'Los días de racha deben estar entre 1 y 30.',
             'meses_conservacion_egresados.between' => 'Los meses deben estar entre 1 y 12.',
             'segundos_extra_flash.between'         => 'Los segundos extra de Flash Matemático deben estar entre -5 y 20.',
             'segundos_extra_flash.integer'         => 'Los segundos extra de Flash Matemático deben ser un número entero.',
+            'tamizaje_corte_verde.between'         => 'El corte del verde debe estar entre 2 y 100.',
+            'tamizaje_corte_amarillo.between'      => 'El corte del amarillo debe estar entre 1 y 99.',
+            'tamizaje_corte_verde.integer'         => 'El corte del verde debe ser un número entero.',
+            'tamizaje_corte_amarillo.integer'      => 'El corte del amarillo debe ser un número entero.',
         ]);
+
+        // El amarillo tiene que quedar por debajo del verde (con lo guardado si solo llega uno).
+        if (isset($datos['tamizaje_corte_verde']) || isset($datos['tamizaje_corte_amarillo'])) {
+            $actual  = $this->instituciones->configOCrearPorDefecto($this->instituciones->buscar($id));
+            $verde    = (int) ($datos['tamizaje_corte_verde'] ?? $actual->tamizaje_corte_verde);
+            $amarillo = (int) ($datos['tamizaje_corte_amarillo'] ?? $actual->tamizaje_corte_amarillo);
+            if ($amarillo >= $verde) {
+                return back()->withInput()->withErrors([
+                    'tamizaje_corte_amarillo' => 'El corte del amarillo debe ser menor que el del verde.',
+                ]);
+            }
+        }
 
         // Asegurar que el booleano se maneje correctamente
         $datos['permitir_acceso_grados_ant'] = $request->boolean('permitir_acceso_grados_ant');

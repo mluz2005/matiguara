@@ -78,6 +78,20 @@ class AyudaJuegos
                  'es' => 'El botón 🧭 te muestra el rumbo, pero así no llegás con 3 estrellas.',
                  'gn' => 'Pe 🧭 ohechauka ndéve pe tape, ha ndereguahẽvéi mbohapy estrella ndive.'],
             ],
+            'Mati y los números' => [
+                ['clave' => 'numeros_1', 'dibujo' => ['🦜', '🌴', '🔢'],
+                 'es' => 'Viajá con Mati por la selva y mirá los números.',
+                 'gn' => 'Eho Mati ndive ka\'aguýpe ha ehecha umi papapy.'],
+                ['clave' => 'numeros_2', 'dibujo' => ['[7]', '🪵🪵🪵', '👆'],
+                 'es' => 'Tocá la respuesta que te parezca. No hay puntos.',
+                 'gn' => 'Epoko pe respuesta ndépe iporãva. Ndaipóri punto.'],
+                ['clave' => 'numeros_3', 'dibujo' => ['🙂', '💪'],
+                 'es' => 'Hacé lo que puedas. ¡Está bien si no sabés alguna!',
+                 'gn' => 'Ejapo ikatúva. ¡Iporã ndereikuaáiramo peteĩ!'],
+                ['clave' => 'numeros_4', 'dibujo' => ['🏁', '🐆', '🦜'],
+                 'es' => 'Al terminar el viaje te llevás una figurita de la selva.',
+                 'gn' => 'Pe viaje opa vove ereraha peteĩ figurita ka\'aguy-gui.'],
+            ],
             default => self::generales(),
         };
     }
@@ -117,7 +131,7 @@ class AyudaJuegos
     public static function todos(): array
     {
         $todos = [];
-        foreach (['Suma de Frutas', 'Flash Matemático', 'Encuentra el par', 'El camino a la escuela'] as $j) {
+        foreach (['Suma de Frutas', 'Flash Matemático', 'Encuentra el par', 'El camino a la escuela', 'Mati y los números'] as $j) {
             foreach (self::pasosDe($j) as $p) $todos[] = $p + ['juego' => $j];
         }
         foreach (self::generales() as $p) $todos[] = $p + ['juego' => 'Ayuda general'];

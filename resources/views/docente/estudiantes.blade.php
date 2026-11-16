@@ -9,6 +9,7 @@
         @foreach([
           ['docente.panel','grid-1x2','Mi Panel'],
           ['docente.estudiantes','people','Mis Estudiantes'],
+          ['docente.tamizaje','eye','Atención numérica'],
           ['docente.juegos','controller','Configurar Juegos'],
           ['docente.cuentas','person-plus','Cuentas'],
         ] as [$ruta,$icon,$lbl])

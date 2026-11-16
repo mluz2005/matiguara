@@ -200,6 +200,9 @@
 
         {{-- Franja de frutas (solo adorno) --}}
         <div class="franja-frutas" aria-hidden="true">🍎 🍌 🍊 🍉 🍇 🍓 🍍</div>
+
+        {{-- Saludo de cumpleaños de Mati (solo el día que cumple años) --}}
+        @include('estudiante._cumple', ['est' => $est])
     @endauth
 
     {{-- ── ALERTAS FLASH ───────────────────────────────────────────── --}}
