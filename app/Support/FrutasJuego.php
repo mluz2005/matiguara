@@ -42,7 +42,7 @@ class FrutasJuego
      * para que las 5 preguntas de una partida lleven frutas distintas.
      *   es / es_pl : nombre en castellano (singular / plural)
      *   genero     : 'f' o 'm' (para "cuántas" / "cuántos")
-     *   gn         : nombre en guaraní  ← A VALIDAR
+     *   gn         : nombre en guaraní (revisado por la persona hablante, SF-FRU-01..10)
      */
     private const FRUTAS = [
         ['emoji' => '🍎', 'es' => 'manzana',  'es_pl' => 'manzanas',  'genero' => 'f', 'gn' => 'manzana'],
@@ -58,7 +58,7 @@ class FrutasJuego
     ];
 
     /**
-     * Frases de las preguntas en guaraní  ← A VALIDAR
+     * Frases de las preguntas en guaraní (revisadas: SF-PRE-01; SF-PRE-02 se mantiene, ver DECISIONES)
      *   {fruta} = nombre de la fruta   {a} = cantidad inicial   {b} = cantidad que se saca
      */
     private const FRASES_GN = [

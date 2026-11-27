@@ -15,7 +15,7 @@
     en public/css/memoria-v2.css (ambos nuevos y aislados).
 
     Mundos por nivel (cada 2 niveles): 1-2 Ka'aguy · 3-4 Ysyry · 5-6 Ñu ·
-    7-8 Yvága · 9-10 Ñandutí. Los nombres en guaraní son borradores a validar.
+    7-8 Yvága · 9-10 Ñanduti. Nombres en guaraní revisados (EP-MUN-1..5).
     =========================================================================
 --}}
 
@@ -32,7 +32,7 @@
         2 => ['gn' => 'Ysyry',   'es' => 'Río',       'ico' => '🌊', 'esc' => ['🌊','🐟','🐢','🐠','☁️','🐊'], 'fruta' => '🍇'],
         3 => ['gn' => 'Ñu',      'es' => 'Campo',     'ico' => '🌻', 'esc' => ['🌻','🐄','🌾','☀️','🐴','🦋'], 'fruta' => '🍊'],
         4 => ['gn' => 'Yvága',   'es' => 'Cielo',     'ico' => '🌈', 'esc' => ['☁️','🌈','⭐','🪁','☁️','✨'], 'fruta' => '🍓'],
-        5 => ['gn' => 'Ñandutí', 'es' => 'Encaje',    'ico' => '🕸️', 'esc' => ['🌸','✨','🦋','💜','🌺','⭐'], 'fruta' => '🍎'],
+        5 => ['gn' => 'Ñanduti', 'es' => 'Encaje',    'ico' => '🕸️', 'esc' => ['🌸','✨','🦋','💜','🌺','⭐'], 'fruta' => '🍎'],
     ];
     $m = $mundos[$mundo];
 
@@ -64,7 +64,7 @@
             </div>
             <div class="mv2-burbuja" id="burbuja" role="status" aria-live="polite">
                 <b id="burbujaEs">¡Hola, {{ Auth::guard('estudiante')->user()->nombre ?? 'amigo' }}!</b>
-                <i id="burbujaGn">Mba'éichapa!</i>
+                <i id="burbujaGn">¡Mba'éichapa, {{ Auth::guard('estudiante')->user()->nombre ?? 'amigo' }}!</i>
             </div>
         </div>
 
@@ -84,7 +84,7 @@
         </div>
 
         <div class="mv2-tiempo mv2-pegatina" id="timerRing">
-            <div class="mv2-tiempo-fila"><span id="timerEtiqueta">⏱ Tiempo</span><b id="timerNumero">{{ gmdate('i:s', $tiempoLimiteSeg) }}</b></div>
+            <div class="mv2-tiempo-fila"><span id="timerEtiqueta">⏱ Tiempo · Aravo</span><b id="timerNumero">{{ gmdate('i:s', $tiempoLimiteSeg) }}</b></div>
             <div class="mv2-barra"><div id="timerBarra"></div></div>
         </div>
     </header>
@@ -131,7 +131,7 @@
         {{-- Ayuda corta (se oculta tras la primera jugada). El texto completo sigue en "¿Cómo se juega?" --}}
         <div class="mv2-ayuda mv2-pegatina" id="mv2Ayuda">
             👆 Volteá dos cartas y encontrá los pares iguales.
-            <small>Embojere mokõi kuatia ha ejuhu umi ojoguáva.</small>
+            <small>👆 Embojere mokõi kuatia'atã ha ejuhu umi ojoguáva.</small>
         </div>
     </section>
 
@@ -163,5 +163,5 @@ window.MV2_CFG = {
     csrf:            document.querySelector('meta[name="csrf-token"]').content
 };
 </script>
-<script src="{{ asset('js/memoria-v2.js') }}?v=1"></script>
+<script src="{{ asset('js/memoria-v2.js') }}?v=2"></script>
 @endpush

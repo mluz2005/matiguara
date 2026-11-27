@@ -20,8 +20,8 @@ use App\Models\ContenidoNivel;
  * del ejercicio, así que es estable si el niño actualiza la página.
  *
  * ┌──────────────────────────────────────────────────────────────────────┐
- * │ GUARANÍ A VALIDAR: las frases en guaraní (campo 'gn' de cada pista)  │
- * │ son un BORRADOR para que las revise una persona hablante nativa.     │
+ * │ GUARANÍ: las frases (campo 'gn' de cada pista) siguen la planilla    │
+ * │ revisada por la persona hablante (IDs SF-PIS-01 a SF-PIS-09).        │
  * │ Se corrigen SOLO en este archivo, en los métodos de abajo.           │
  * └──────────────────────────────────────────────────────────────────────┘
  * =========================================================================
@@ -30,6 +30,15 @@ class PistasSumaFrutas
 {
     private const LUGARES      = ['unidades', 'decenas', 'centenas'];
     private const LUGAR_SIGUIENTE = ['decena', 'centena', 'unidad de mil'];
+
+    /**
+     * Guaraní de «unidades / decenas / centenas» (plural) y de «decena / centena /
+     * unidad de mil» (singular). Formas elegidas del glosario revisado
+     * (GLO-T03 a GLO-T08): se tomó la primera opción de cada par por ser la más
+     * sencilla de entender (jopara aceptado). Se cambian SOLO acá.
+     */
+    private const LUGARES_GN         = ['peteĩnguéra', 'panguéra', 'sahanguéra'];
+    private const LUGAR_SIGUIENTE_GN = ['paha', 'saha', 'suha'];
 
     /**
      * @return array{tipo:string, es:string, gn:string}|null
@@ -77,13 +86,15 @@ class PistasSumaFrutas
             $db = self::digito($b, $columna);
             $lugar = self::LUGARES[$columna] ?? 'unidades';
             $sig   = self::LUGAR_SIGUIENTE[$columna] ?? 'decena';
+            $lugarGn = self::LUGARES_GN[$columna] ?? 'peteĩnguéra';
+            $sigGn   = self::LUGAR_SIGUIENTE_GN[$columna] ?? 'paha';
             $suma  = $da + $db;
             $resto = $suma - 10;
 
             return [
                 'tipo' => 'llevada',
                 'es'   => "Primero las {$lugar}: {$da} + {$db} = {$suma}. Son 1 {$sig} y {$resto} {$lugar}: ¡llevá la {$sig}!",
-                'gn'   => "{$lugar}: {$da} + {$db} = {$suma}. Peteĩ {$sig} ha {$resto} {$lugar}.",
+                'gn'   => "{$lugarGn}: {$da} + {$db} = {$suma}. Peteĩ {$sigGn} ha {$resto} {$lugarGn}.",
             ];
         }
 
@@ -92,13 +103,13 @@ class PistasSumaFrutas
             return [
                 'tipo' => 'partes',
                 'es'   => "Pensalo así: {$partes}. Mirá cuántas decenas o centenas son.",
-                'gn'   => "Embojuaju: {$partes}.",
+                'gn'   => 'Ehecha péicha: ' . self::partesGn($partes) . '.',
             ];
         }
         return [
             'tipo' => 'partes',
             'es'   => "Sumá por partes: {$partes}. Después juntá los resultados.",
-            'gn'   => "Embojuaju: {$partes}. Upéi embojuaju opaite.",
+            'gn'   => 'Embojuaju: ' . self::partesGn($partes) . '. Upéi embojuaju opaite.',
         ];
     }
 
@@ -120,6 +131,8 @@ class PistasSumaFrutas
             $db = self::digito($b, $columna);
             $lugar = self::LUGARES[$columna] ?? 'unidades';
             $sig   = self::LUGAR_SIGUIENTE[$columna] ?? 'decena';
+            $lugarGn = self::LUGARES_GN[$columna] ?? 'peteĩnguéra';
+            $sigGn   = self::LUGAR_SIGUIENTE_GN[$columna] ?? 'paha';
             $tengo = $da + 10;
 
             // Si la columna de la izquierda tiene un 0 (p. ej. 205 − 38) no hay nada que prestar ahí:
@@ -128,14 +141,14 @@ class PistasSumaFrutas
                 return [
                     'tipo' => 'prestamo',
                     'es'   => "En las {$lugar}, {$da} es menor que {$db}: hay que pedir prestado a la columna de la izquierda. Si ahí hay un 0, pedí a la que sigue.",
-                    'gn'   => "{$lugar}: {$da} ha {$db}. Eipe'a {$db} {$tengo}-gui.",
+                    'gn'   => "{$lugarGn}: {$da} ha {$db}. Eipe'a {$db} {$tengo}-gui.",
                 ];
             }
 
             return [
                 'tipo' => 'prestamo',
                 'es'   => "En las {$lugar}, {$da} es menor que {$db}: pedí prestada 1 {$sig}. Ahora tenés {$tengo} {$lugar} y restás {$db}.",
-                'gn'   => "{$lugar}: {$tengo} − {$db}. Peteĩ {$sig} oñemoĩ umi {$lugar}-pe.",
+                'gn'   => "{$lugarGn}: {$tengo} − {$db}. Peteĩ {$sigGn} oñemoĩ umi {$lugarGn}-pe.",
             ];
         }
 
@@ -144,13 +157,13 @@ class PistasSumaFrutas
             return [
                 'tipo' => 'partes',
                 'es'   => "Pensalo así: {$partes}. Mirá cuántas decenas o centenas quedan.",
-                'gn'   => "Eipe'a: {$partes}.",
+                'gn'   => 'Ehecha péicha: ' . self::partesGn($partes) . '.',
             ];
         }
         return [
             'tipo' => 'partes',
             'es'   => "Restá por partes: {$partes}. Después juntá los resultados.",
-            'gn'   => "Eipe'a: {$partes}. Upéi embojuaju opaite.",
+            'gn'   => "Eipe'a: " . self::partesGn($partes) . '. Upéi embojuaju opaite.',
         ];
     }
 
@@ -199,6 +212,12 @@ class PistasSumaFrutas
             }
         }
         return null;
+    }
+
+    /** En guaraní el «y» que une las cuentas parciales es «ha» (GLO-T09). */
+    private static function partesGn(string $partes): string
+    {
+        return str_replace(' y ', ' ha ', $partes);
     }
 
     /**

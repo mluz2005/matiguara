@@ -12,8 +12,8 @@ use Illuminate\Database\Seeder;
  * Todos los mensajes son positivos y motivadores (pedagogía infantil).
  * Máximo 160 caracteres en cada idioma.
  *
- * GUARANÍ: los textos en guaraní deben ser validados por un docente
- * bilingüe antes de ir a producción. Los de aquí son aproximaciones.
+ * GUARANÍ: textos revisados por la persona hablante (IDs CMP-RET-01..13,
+ * 2026-11). Deben coincidir con App\Support\TextosGuaraniCompartidos::MENSAJES.
  * -------------------------------------------------------------------------
  */
 class MensajesRetroSeeder extends Seeder
@@ -24,59 +24,59 @@ class MensajesRetroSeeder extends Seeder
             // ── ACIERTOS ──────────────────────────────────────────────
             ['tipo' => 'acierto', 'contexto' => 'general',
              'texto_es' => '¡Excelente! Lo lograste. Seguí así, vas muy bien.',
-             'texto_gn' => '¡Iporãve! Ejapo porã. Ejapyhy, nde mba\'e iporã.'],
+             'texto_gn' => '¡Iporãite! Rejapo porã. Eikove katu, iporãite.'],
 
             ['tipo' => 'acierto', 'contexto' => 'general',
              'texto_es' => '¡Muy bien! Esa respuesta es correcta. ¡Sos increíble!',
-             'texto_gn' => '¡Porãve! Ha\'eña oñeikotevê. ¡Nde iporã kakuaa!'],
+             'texto_gn' => '¡Iporãite! Upe mbohovái oĩporã. ¡Nde arandu!'],
 
             ['tipo' => 'acierto', 'contexto' => 'primer_intento',
              'texto_es' => '¡Perfecto en el primer intento! Sos un crack de las matemáticas.',
-             'texto_gn' => '¡Porã peteĩ joavy rupive! Nde arandukáva matemátikape.'],
+             'texto_gn' => '¡Iporãite ñepyrũme! Nde arandu matemátikape.'],
 
             ['tipo' => 'acierto', 'contexto' => 'reintento',
              'texto_es' => '¡Lo conseguiste! El esfuerzo siempre vale la pena. ¡Adelante!',
-             'texto_gn' => '¡Ejapo! Mba\'apopy oñeñemboyke reíva. ¡Eguata!'],
+             'texto_gn' => '¡Rejapo! Tembiapo porã aréma opyta. ¡Eho tenonde!'],
 
             // ── ERRORES (siempre positivos) ───────────────────────────
             ['tipo' => 'error', 'contexto' => 'general',
              'texto_es' => 'No importa, ¡intentalo de nuevo! Cada error te hace más fuerte.',
-             'texto_gn' => 'Nahániri mba\'e, ¡ejapo jevy! Oñembyayi añete oñemoinge-ta.'],
+             'texto_gn' => 'Nahániri, ¡erejere jevy! Opa jejavy omombareteve.'],
 
             ['tipo' => 'error', 'contexto' => 'general',
              'texto_es' => 'Casi lo tenés. ¡Revisá bien y volvé a intentarlo!',
-             'texto_gn' => 'Ichupe reiko. ¡Echa porã ha ejapo jevy!'],
+             'texto_gn' => 'Hasyete mbytépe. ¡Ehecha porã ha erejere jevy!'],
 
             ['tipo' => 'error', 'contexto' => 'primer_intento',
              'texto_es' => 'Buena pregunta difícil. Pensá despacio y podrás lograrlo.',
-             'texto_gn' => 'Porã potĩ hasy. Ekuaa porã ha rejapo-ta.'],
+             'texto_gn' => 'Porã porã. Emano mbegue ha rejapóta.'],
 
             ['tipo' => 'error', 'contexto' => 'reintento',
              'texto_es' => 'No te rindas, ¡vos podés! Mirá bien los números y probá.',
-             'texto_gn' => 'Ani remboyke, ¡nde ikatu! Ehecha porã papapy ha eprueba.'],
+             'texto_gn' => 'Ani remboyke, ¡nde ikatúva! Ehecha porã papapy ha eñeme\'ẽ.'],
 
             // ── RACHAS ────────────────────────────────────────────────
             ['tipo' => 'racha', 'contexto' => 'general',
              'texto_es' => '¡Racha activa! Llevás varios aciertos seguidos. ¡No pares!',
-             'texto_gn' => '¡Racha ipype! Rejapyhy hetave acierto. ¡Ani reky!'],
+             'texto_gn' => '¡Racha oĩva! Rejapyhy hetave acierto. ¡Ani rekyhyje!'],
 
             ['tipo' => 'racha', 'contexto' => 'maximo_racha',
              'texto_es' => '¡Nuevo récord! ¡Esta es tu mejor racha de aciertos! ¡Extraordinario!',
-             'texto_gn' => '¡Récord pyahu! ¡Ko ne racha porãvéva! ¡Iporã kakuaa!'],
+             'texto_gn' => '¡Récord pyahu! Ko ne racha iporãvéva. ¡Iporãite!'],
 
             // ── NIVEL SUPERADO ────────────────────────────────────────
             ['tipo' => 'nivel_superado', 'contexto' => 'general',
              'texto_es' => '¡Nivel superado! ¡Sos increíble! El siguiente nivel te espera.',
-             'texto_gn' => '¡Nivel oñemboja! ¡Nde iporã kakuaa! Oĩ nivel pyahu nderehe.'],
+             'texto_gn' => '¡Nivel oñembohasa! ¡Nde arandu! Nivel pyahu oha\'arõ ndéve.'],
 
             ['tipo' => 'nivel_superado', 'contexto' => 'general',
              'texto_es' => '¡Lo lograste! Pasaste al siguiente nivel. ¡Seguí brillando!',
-             'texto_gn' => '¡Ejapo! Nde oñeimo\'ã nivel pyahúpe. ¡Ejekuave-sapy\'a!'],
+             'texto_gn' => '¡Rejapo! Rehasa nivel pyahúpe. ¡Ehesape katu!'],
 
             // ── INICIO DE SESIÓN ──────────────────────────────────────
             ['tipo' => 'inicio_sesion', 'contexto' => 'general',
              'texto_es' => '¡Bienvenido de nuevo! Hoy vas a aprender cosas increíbles. ¡Empecemos!',
-             'texto_gn' => '¡Eraha jevy! Ko árape reñe\'ẽ-ta mba\'e ipyahuvéva. ¡Ñañepyrũ!'],
+             'texto_gn' => '¡Maitei jevy! Ko árape reñe\'ẽta mba\'e ipyahúva. ¡Ñañepyrũ!'],
         ];
 
         foreach ($mensajes as $m) {

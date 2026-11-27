@@ -15,12 +15,12 @@
     El tablero ocupa toda la pantalla: tapa el encabezado y la navegación del
     layout para que el niño tenga el mayor espacio posible para el laberinto.
     La barra de tiempo del layout (RN-L10) sigue visible arriba.
-    Guaraní: BORRADOR a validar con una persona hablante.
+    Guaraní: revisado por la persona hablante (planilla Guarani_ElCaminoALaEscuela).
     =========================================================================
 --}}
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/laberinto-v2.css') }}?v=5">
+<link rel="stylesheet" href="{{ asset('css/laberinto-v2.css') }}?v=6">
 <style>
     /* Solo en esta pantalla: el juego ocupa TODA la pantalla (celular, tablet y compu).
        El layout deja el contenido dentro de <main>, que crea su propia capa (z-index) y por eso
@@ -54,7 +54,7 @@
   <div class="hud2">
    <span class="stars" id="h-stars" role="img" aria-label="Estrellas posibles"></span>
    <span class="pill"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#lb-chipa"/></svg><b id="h-chipas">0/0</b></span>
-   <span class="pill">Puntos <b id="h-pts">0</b></span>
+   <span class="pill">Puntos · <span class="gn">Kyta</span> <b id="h-pts">0</b></span>
    <span class="route" id="h-route" aria-label="Obstáculos del camino"></span>
   </div>
   <div class="guara" aria-live="polite">
@@ -65,15 +65,15 @@
    <canvas id="cv" role="img" aria-label="Laberinto: llevá a tu personaje de la casa a la escuela"></canvas>
    <div class="modal" id="modal" hidden>
     <div class="card" role="alertdialog" aria-labelledby="m-t">
-     <h3 id="m-t">La flecha ayuda, pero…</h3>
+     <h3 id="m-t">La flecha ayuda, pero… <span class="gn">· Pe hu'y oipytyvõ, péro…</span></h3>
      <p>Si usás la flecha ya no podés llegar con 3 estrellas. Igual podés llegar con 2.</p>
-     <p class="gn">Peteĩ flecha ndive ndaikatuvéima ereguahẽ mbohapy estrella ndive.</p>
-     <div class="row"><button class="btn gold" id="m-yes" type="button">Sí, usar la flecha</button><button class="btn" id="m-no" type="button">No, sigo solo</button></div>
+     <p class="gn">Reiporúramo pe hu'y ndaikatuvéima reguahẽ mbohapy mbyja ndive. Upéicharõ jepe ikatu reguahẽ mokõi ndive.</p>
+     <div class="row"><button class="btn gold" id="m-yes" type="button"><span class="bl">Sí, usar la flecha<small class="gn">Héẽ, aiporúta pe hu'y</small></span></button><button class="btn" id="m-no" type="button"><span class="bl">No, sigo solo<small class="gn">Nahániri, aháta che año</small></span></button></div>
     </div>
    </div>
   </div>
   <div class="ctrl">
-   <button class="btn arrowbtn" id="b-arrow" type="button">🧭 ¿Por dónde?</button>
+   <button class="btn arrowbtn" id="b-arrow" type="button"><span class="bl">🧭 ¿Por dónde?<small class="gn">🧭 ¿Moõrupi?</small></span></button>
    <div class="dpad" id="dpad">
     <button class="u" type="button" data-d="u" aria-label="Arriba">▲</button>
     <button class="l" type="button" data-d="l" aria-label="Izquierda">◀</button>
@@ -87,10 +87,10 @@
    <div class="card" role="alertdialog" aria-labelledby="rest-h" style="text-align:center;align-items:center">
     <img id="rest-img" alt="" width="110" height="110" style="object-fit:contain">
     <h3 id="rest-h">¡Terminó el tiempo de hoy!</h3>
-    <p class="gn">Opa ko árape ñembosarái!</p>
+    <p class="gn">¡Opa ko ára pegua ñembosarái!</p>
     <p id="rest-t"></p>
-    <p>Guardamos tu camino. Descansá un ratito y mirá lejos. <span class="gn">Eñemomýi sapy'ami ha ehecha mombyry.</span></p>
-    <button class="btn gold big" id="rest-go" type="button">Ir a descansar</button>
+    <p>Guardamos tu camino. Descansá un ratito y mirá lejos. <span class="gn">Roñongatu nde rape. Epytu'u sapy'ami ha emaña mombyry.</span></p>
+    <button class="btn gold big" id="rest-go" type="button"><span class="bl">Ir a descansar<small class="gn">Jaha ñapytu'u</small></span></button>
    </div>
   </div>
 
@@ -100,10 +100,10 @@
     <span class="school" aria-hidden="true">🏫</span>
     <div class="stars-big" id="arr-stars" role="img"></div>
     <h3 id="arr-msg" aria-live="polite">Guardando tu camino…</h3>
-    <p class="gn">Ereguahẽ mbo'ehaópe!</p>
+    <p class="gn" id="arr-gn">Roñongatu hína nde rape…</p>
     <div id="arr-medals"></div>
-    <button class="btn gold" id="arr-go" type="button" hidden>Continuar ➜</button>
-    <button class="btn" id="arr-retry" type="button" hidden>Reintentar</button>
+    <button class="btn gold" id="arr-go" type="button" hidden><span class="bl">Continuar ➜<small class="gn">Eseguí ➜</small></span></button>
+    <button class="btn" id="arr-retry" type="button" hidden><span class="bl">Reintentar<small class="gn">Eha'ã jey</small></span></button>
    </div>
   </div>
 
@@ -118,10 +118,10 @@
    <div class="p-opts" id="p-opts"></div>
    <div class="p-fb" id="p-fb" aria-live="polite"></div>
    <div class="p-tools">
-    <button class="tool" id="t-hint" type="button">💡 Pista</button>
-    <button class="tool" id="t-aid" type="button">🔢 Dibujo</button>
-    <button class="tool" id="t-say" type="button">🔊 Escuchar</button>
-    <button class="tool go" id="t-next" type="button" hidden>Seguir ➜</button>
+    <button class="tool" id="t-hint" type="button"><span class="bl">💡 Pista<small class="gn">💡 Pytyvõrã</small></span></button>
+    <button class="tool" id="t-aid" type="button"><span class="bl">🔢 Dibujo<small class="gn">🔢 Ta'anga</small></span></button>
+    <button class="tool" id="t-say" type="button"><span class="bl">🔊 Escuchar<small class="gn">🔊 Ehendu</small></span></button>
+    <button class="tool go" id="t-next" type="button" hidden><span class="bl">Seguir ➜<small class="gn">Eseguí ➜</small></span></button>
    </div>
   </div>
  </section>
@@ -137,5 +137,5 @@
 
 @push('scripts')
 <script>window.LB_CFG = @json($config);</script>
-<script src="{{ asset('js/laberinto-v2.js') }}?v=3"></script>
+<script src="{{ asset('js/laberinto-v2.js') }}?v=4"></script>
 @endpush

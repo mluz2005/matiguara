@@ -220,5 +220,7 @@
 @media (prefers-reduced-motion: reduce){#lb-root *,#lb-root *::before,#lb-root *::after{animation-duration:.001s!important;animation-delay:0s!important;transition:none!important}
 
 }
-
-
+/* Botones de dos líneas: castellano + guaraní */
+#lb-root .bl{display:flex;flex-direction:column;align-items:center;line-height:1.15}
+#lb-root .bl small{font-size:.72em;font-weight:700;font-style:italic;opacity:.85}
+#lb-root .tool .bl small{font-size:.7em}

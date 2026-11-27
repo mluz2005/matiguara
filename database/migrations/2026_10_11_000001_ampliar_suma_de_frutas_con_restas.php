@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\EnunciadosGuarani;
 use App\Models\ContenidoNivel;
 use App\Models\Nivel;
 use Illuminate\Database\Migrations\Migration;
@@ -137,7 +138,7 @@ return new class extends Migration
             'nivel_id'           => $nivelId,
             'tipo_operacion'     => $tipoOper,
             'enunciado_es'       => "¿Cuánto es {$a} {$palabra} {$b}?",
-            'enunciado_gn'       => "¿Mboy'e pa {$a} {$palabra} {$b}?",
+            'enunciado_gn'       => EnunciadosGuarani::plantilla($a, $op, $b),
             'valor_a'            => $a,
             'operador'           => $op,
             'valor_b'            => $b,

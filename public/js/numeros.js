@@ -5,7 +5,8 @@
    preguntas van (GeneradorItems) y corrige; acá solo se dibuja y se mide el
    tiempo. La respuesta del juego es la MISMA para aciertos y errores: no hay
    puntos, sonidos ni colores que digan si estuvo bien.
-   Guaraní: BORRADOR a validar con una persona hablante.
+   Guaraní: versión REVISADA (planilla Guarani_MatiYLosNumeros_revisado). Los textos vienen de
+   App\Support\Numeros\TextosNumeros por NM_CFG.tx; acá no hay guaraní escrito a mano.
    ========================================================================= */
 (function () {
   'use strict';
@@ -28,6 +29,14 @@
   var terminado    = false;
   var audioActual  = null;
 
+  // Textos (es + gn) que manda el servidor: C.tx = { ui: {...}, pre: {...} }.
+  var TX = C.tx || { ui: {}, pre: {} };
+  function U(k) { return TX.ui[k] || { es: '', gn: '' }; }
+  function P(k) { return TX.pre[k] || { es: '', gn: '' }; }
+  function fill(t, vars) {
+    return String(t).replace(/\{(\w+)\}/g, function (m, k) { return vars && vars[k] !== undefined ? vars[k] : m; });
+  }
+
   var NOMBRES_P = {};
   C.partes.forEach(function (p) { NOMBRES_P[p.parte] = p; });
 
@@ -37,6 +46,16 @@
     var e = document.createElement(tag);
     if (cls) { e.className = cls; }
     if (txt !== undefined && txt !== null) { e.textContent = txt; }
+    return e;
+  }
+  /** Elemento con la línea en castellano y, debajo, la línea en guaraní (chica, en cursiva). */
+  function bi(tag, cls, t) {
+    var e = el(tag, cls, t.es);
+    if (t.gn) {
+      var g = el('span', 'nm-gn', t.gn);
+      g.lang = 'gn';
+      e.appendChild(g);
+    }
     return e;
   }
   function esperar(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
@@ -84,8 +103,11 @@
     return C.limiteSeg > 0 && (Date.now() - inicioPagina) / 1000 >= C.restanteSeg;
   }
 
-  function toast(txt) {
-    aviso.textContent = txt; aviso.hidden = false;
+  function toast(t) {
+    aviso.replaceChildren();
+    aviso.appendChild(el('span', '', t.es));
+    if (t.gn) { var g = el('span', 'nm-gn', t.gn); g.lang = 'gn'; aviso.appendChild(g); }
+    aviso.hidden = false;
     clearTimeout(toast.t); toast.t = setTimeout(function () { aviso.hidden = true; }, 2600);
   }
 
@@ -219,7 +241,7 @@
     return b;
   }
 
-  function enunciado(txt, chico) { return el('p', 'nm-enunciado' + (chico ? ' chico' : ''), txt); }
+  function enunciado(t, chico) { return bi('p', 'nm-enunciado' + (chico ? ' chico' : ''), t); }
 
   function marcarDemo(cont, valor) {
     var objetivo = cont.querySelector('[data-valor="' + String(valor) + '"]');
@@ -248,7 +270,7 @@
       });
     } else { b.tabIndex = -1; }
     return {
-      nodo: [enunciado(ctx.demo ? 'Tocá la luciérnaga' : '¡Tocá la luz!', ctx.demo), cielo],
+      nodo: [enunciado(ctx.demo ? P('luzDemo') : P('luz'), ctx.demo), cielo],
       listo: function () {
         if (ctx.demo) { b.hidden = false; b.classList.add('demo-ok'); return; }
         setTimeout(function () { b.hidden = false; ctx.activar(); }, 600 + Math.round(Math.random() * 800));
@@ -263,7 +285,7 @@
     });
     var num = el('div', 'nm-numerote', String(item.datos.numero));
     return {
-      nodo: [enunciado('Tocá las ramitas que son:', true), num, cont],
+      nodo: [enunciado(P('ramitas'), true), num, cont],
       listo: ctx.activar, demoOk: function () { marcarDemo(cont, item.datos.numero); }
     };
   };
@@ -274,7 +296,7 @@
     var rep = { c: item.datos.c, d: item.datos.d, u: item.datos.u };
     var g = grupo(rep, alturaPara(rep, true), 'nm-grupo-grande');
     return {
-      nodo: [enunciado('¿Qué número es?', true), g, cont],
+      nodo: [enunciado(P('numero'), true), g, cont],
       listo: ctx.activar, demoOk: function () { marcarDemo(cont, item.datos.numero); }
     };
   };
@@ -297,7 +319,7 @@
       paneles.appendChild(b);
     });
     return {
-      nodo: [enunciado('¿Dónde hay más puntos?'), paneles],
+      nodo: [enunciado(P('puntos')), paneles],
       listo: ctx.activar, demoOk: function () { marcarDemo(paneles, d.izq > d.der ? 'izq' : 'der'); }
     };
   };
@@ -308,7 +330,7 @@
       cont.appendChild(opcion(String(l[1]), l[0], ctx, cont));
     });
     return {
-      nodo: [enunciado('¿Cuál es más grande?'), cont],
+      nodo: [enunciado(P('grande')), cont],
       listo: ctx.activar, demoOk: function () { marcarDemo(cont, item.datos.izq > item.datos.der ? 'izq' : 'der'); }
     };
   };
@@ -329,7 +351,7 @@
       tarjeta.replaceChildren(document.createTextNode('?'));
     }
     return {
-      nodo: [enunciado(ctx.demo ? 'Mirá los puntos' : '¡Mirá bien!', ctx.demo), tarjeta, cont],
+      nodo: [enunciado(ctx.demo ? P('rapidoDemo') : P('rapido'), ctx.demo), tarjeta, cont],
       listo: function () {
         if (ctx.demo) { ponerPuntos(); cont.hidden = false; return; }
         taparPuntos();
@@ -359,7 +381,7 @@
     caja.appendChild(linea);
 
     var obj = el('p', 'nm-linea-obj', String(d.objetivo));
-    var listoBtn = el('button', 'nm-boton', 'Listo ✔');
+    var listoBtn = bi('button', 'nm-boton', U('listo'));
     listoBtn.type = 'button'; listoBtn.disabled = true;
     var valor = null;
 
@@ -383,7 +405,7 @@
       });
     }
     return {
-      nodo: [enunciado('¿Dónde va este número?', true), obj, caja, ctx.demo ? el('span') : listoBtn],
+      nodo: [enunciado(P('linea'), true), obj, caja, ctx.demo ? el('span') : listoBtn],
       listo: function () {
         if (ctx.demo) {
           marca.style.left = (100 * d.objetivo / d.max) + '%';
@@ -406,7 +428,7 @@
     var cont = el('div', 'nm-opciones dos nm-signos');
     item.opciones.forEach(function (o) { cont.appendChild(opcion(o === '+' ? '+' : '−', o, ctx, cont)); });
     return {
-      nodo: [enunciado('¿Qué signo falta?', true), ec, cont],
+      nodo: [enunciado(P('signo'), true), ec, cont],
       listo: ctx.activar, demoOk: function () { marcarDemo(cont, item.correcta); }
     };
   };
@@ -422,7 +444,7 @@
     var cont = el('div', 'nm-opciones c3');
     item.opciones.forEach(function (n) { cont.appendChild(opcion(String(n), n, ctx, cont)); });
     return {
-      nodo: [enunciado('Resolvé la cuenta', true), fila, cont],
+      nodo: [enunciado(P('cuenta'), true), fila, cont],
       listo: ctx.activar, demoOk: function () { marcarDemo(cont, item.correcta); }
     };
   };
@@ -435,7 +457,7 @@
     var cont = el('div', 'nm-opciones c3');
     item.opciones.forEach(function (n) { cont.appendChild(opcion(String(n), n, ctx, cont)); });
     return {
-      nodo: [enunciado('¿Qué número falta?', true), fila, cont],
+      nodo: [enunciado(P('falta'), true), fila, cont],
       listo: ctx.activar, demoOk: function () { marcarDemo(cont, item.correcta); }
     };
   };
@@ -466,7 +488,7 @@
     return conReintentos(function () {
       return api('POST', C.urls.responder, { parte: parte, orden: orden, respuesta: resp, tiempo_ms: ms });
     }, 3).then(function (r) {
-      if (r === null) { toast('Sin conexión. Seguimos igual.'); }
+      if (r === null) { toast(U('sinConexion')); }
       else if (r.descanso) { /* el cierre lo maneja agotado() */ }
       respondidas++;
       avance();
@@ -475,20 +497,21 @@
 
   // ── Pantallas ──────────────────────────────────────────────────────────
 
+  /** titulo puede ser texto o {es, gn}. */
   function matiGlobo(imagen, titulo, es, gn) {
     var cont = el('div', 'nm-mati');
     var i = new Image(); i.src = imagen; i.alt = 'Mati, la mascota'; i.decoding = 'async';
     cont.appendChild(i);
     var g = el('div', 'nm-globo');
-    if (titulo) { g.appendChild(el('h2', '', titulo)); }
+    if (titulo) { g.appendChild(typeof titulo === 'string' ? el('h2', '', titulo) : bi('h2', '', titulo)); }
     if (es) { g.appendChild(el('p', 'es', es)); }
     if (gn) { var p = el('p', 'gn', gn); p.lang = 'gn'; g.appendChild(p); }
     cont.appendChild(g);
     return cont;
   }
 
-  function botonGrande(txt, fn) {
-    var b = el('button', 'nm-boton', txt);
+  function botonGrande(t, fn) {
+    var b = typeof t === 'string' ? el('button', 'nm-boton', t) : bi('button', 'nm-boton', t);
     b.type = 'button';
     b.addEventListener('click', function () { b.disabled = true; fn(); });
     return b;
@@ -497,12 +520,13 @@
   function pantallaIntro() {
     return new Promise(function (resolve) {
       var v = C.viajeNombre;
+      var it = U('intro');
       mostrar(
         matiGlobo(C.mati.senala,
-          '¡Hola! Soy Mati',
-          'Hoy vamos de viaje por la selva: ' + v.es + '. Tocá lo que te parezca. ¡No hay puntos!',
-          "Maitei! Che Mati. Jaha ka'aguýpe. Epoko ndépe iporãva."),
-        botonGrande('▶ ¡Vamos!', resolve)
+          U('hola'),
+          fill(it.es, { viaje: v.es }),
+          fill(it.gn, { viaje: v.gn })),
+        botonGrande(U('vamos'), resolve)
       );
     });
   }
@@ -514,7 +538,7 @@
       bEs.addEventListener('click', function () { hablar(info.parte, 'es', true); });
       voces.appendChild(bEs);
       if (C.voces && C.voces[info.parte] && C.voces[info.parte].gn) {
-        var bGn = el('button', '', '🔊 Guaraní'); bGn.type = 'button';
+        var bGn = el('button', '', U('vozGn').gn || '🔊 Guaraní'); bGn.type = 'button';
         bGn.addEventListener('click', function () { hablar(info.parte, 'gn', true); });
         voces.appendChild(bGn);
       }
@@ -530,7 +554,7 @@
         matiGlobo(C.mati.senala, info.es + ' · ' + info.gn, info.ies, info.ign),
         voces,
         area,
-        botonGrande('¡Listo! Empezar', function () { pararVoz(); resolve(); })
+        botonGrande(U('empezar'), function () { pararVoz(); resolve(); })
       );
       if (d.listo) { d.listo(); }
       if (d.demoOk) { d.demoOk(); }
@@ -541,8 +565,8 @@
   function pantallaError(mensaje, reintentar) {
     return new Promise(function (resolve) {
       mostrar(
-        matiGlobo(C.mati.piensa, 'Uy, no hay conexión', mensaje, ''),
-        botonGrande('Probar otra vez', function () { resolve(); })
+        matiGlobo(C.mati.piensa, U('errTitulo'), mensaje, ''),
+        botonGrande(U('errBoton'), function () { resolve(); })
       );
     }).then(reintentar);
   }
@@ -575,18 +599,17 @@
       var f = new Image(); f.src = C.img + r.figurita.img + '.webp'; f.alt = r.figurita.es; f.className = 'nm-figu';
       marco.appendChild(f);
       mostrar(
-        matiGlobo(C.mati.despidiendo, '¡Terminaste el viaje!',
-          'Te llevás una figurita de la selva: ' + r.figurita.es + '.',
-          "Ereraha peteĩ figurita: " + r.figurita.gn + '.'),
+        matiGlobo(C.mati.despidiendo, U('finTitulo'),
+          fill(U('finTexto').es, { figurita: r.figurita.es }),
+          fill(U('finTexto').gn, { figurita: r.figurita.gn })),
         marco,
-        botonGrande('🎮 Volver a los juegos', function () { irA(C.urls.juegos); })
+        botonGrande(U('volverJuegos'), function () { irA(C.urls.juegos); })
       );
     } else {
       mostrar(
-        matiGlobo(C.mati.despidiendo, '¡Descansemos!',
-          'Guardamos lo que hiciste. ¡Gracias por jugar con Mati!',
-          "Aguyje! Ñamoĩ ñande py'a guapy."),
-        botonGrande('🎮 Volver a los juegos', function () { irA(C.urls.juegos); })
+        matiGlobo(C.mati.despidiendo, U('descTitulo'),
+          U('descTexto').es, U('descTexto').gn),
+        botonGrande(U('volverJuegos'), function () { irA(C.urls.juegos); })
       );
     }
   }
@@ -598,10 +621,9 @@
     return cerrarViaje().then(function (r) {
       if (porTiempo) {
         mostrar(
-          matiGlobo(C.mati.despidiendo, '¡Terminó el tiempo de hoy!',
-            'Guardamos lo que hiciste. Descansá un ratito y mirá lejos.',
-            "Opa ko árape ñembosarái. Eñemomýi sapy'ami."),
-          botonGrande('😌 Ir a descansar', function () { irA(C.urls.descanso); })
+          matiGlobo(C.mati.despidiendo, U('tiempoTitulo'),
+            U('tiempoTexto').es, U('tiempoTexto').gn),
+          botonGrande(U('irDescansar'), function () { irA(C.urls.descanso); })
         );
         return;
       }
@@ -612,15 +634,23 @@
   // ── Salir (dos toques, RF-22) ──────────────────────────────────────────
 
   var armado = null;
+  /** El texto del botón va en dos líneas: castellano y, debajo, guaraní. */
+  function textoSalir(t) {
+    var e = btnSalir.lastElementChild;
+    e.replaceChildren();
+    e.appendChild(document.createTextNode(t.es));
+    if (t.gn) { var g = el('small', 'nm-gn', t.gn); g.lang = 'gn'; e.appendChild(g); }
+  }
+  textoSalir(U('salir'));
   btnSalir.addEventListener('click', function () {
     if (cerrando) { return; }
     if (!armado) {
       btnSalir.classList.add('armado');
-      btnSalir.lastElementChild.textContent = '¿Salir? Tocá otra vez';
+      textoSalir(U('salirOtra'));
       armado = setTimeout(function () {
         armado = null;
         btnSalir.classList.remove('armado');
-        btnSalir.lastElementChild.textContent = 'Salir';
+        textoSalir(U('salir'));
       }, 3000);
       return;
     }
@@ -669,6 +699,6 @@
 
   jugar().catch(function (e) {
     if (window.console) { console.error(e); }
-    toast('Algo salió mal. Probá de nuevo.');
+    toast(U('salioMal'));
   });
 })();

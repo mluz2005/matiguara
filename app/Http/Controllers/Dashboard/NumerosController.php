@@ -121,6 +121,7 @@ class NumerosController extends Controller
             'viaje'       => $viaje,
             'ciclo'       => (int) $detalle->ciclo,
             'viajeNombre' => TextosNumeros::VIAJES[$viaje],
+            'tx'          => TextosNumeros::paraJs(),
             'partes'      => $partes,
             'total'       => (int) $detalle->total_preguntas,
             'limiteSeg'   => (int) $estado['limite_seg'],

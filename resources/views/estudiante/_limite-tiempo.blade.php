@@ -7,10 +7,11 @@
     aviso: "terminá este ejercicio y descansamos". El corte real lo hace el
     servidor (middleware LimiteTiempoJuego) en la pantalla siguiente.
     Se incluye desde layouts/estudiante.blade.php solo si hay `$tiempoJuego`.
-    Guaraní: BORRADOR a validar.
+    Guaraní REVISADO 2026-11-19 (App\Support\TextosComunes::TIEMPO).
     =========================================================================
 --}}
-<div id="barraTiempo" role="progressbar" aria-label="Tiempo de juego que queda"
+@php $tt = \App\Support\TextosComunes::TIEMPO; @endphp
+<div id="barraTiempo" role="progressbar" aria-label="{{ \App\Support\TextosComunes::unido($tt['barra']) }}"
      aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $tiempoJuego['limite_seg'] > 0 ? round(100 * $tiempoJuego['restante_seg'] / $tiempoJuego['limite_seg']) : 100 }}"
      data-restante="{{ (int) $tiempoJuego['restante_seg'] }}"
      data-limite="{{ (int) $tiempoJuego['limite_seg'] }}"
@@ -23,8 +24,8 @@
             width:calc(100% - 32px);max-width:420px;text-align:center;background:#FFF3C4;color:#1B3361;
             border:3px solid #FFC94D;border-radius:20px;padding:10px 14px;font-weight:700;line-height:1.3;
             box-shadow:0 4px 0 rgba(0,0,0,.2)">
-    <div>🦜 ¡Ya casi! Terminá este ejercicio y descansamos un ratito.</div>
-    <div style="font-size:.95rem">Mbyky! Emohu'ã ko ejercicio ha ñapytu'u sapy'ami.</div>
+    <div>{{ $tt['aviso']['es'] }}</div>
+    <div style="font-size:.95rem;font-style:italic" lang="gn">{{ $tt['aviso']['gn'] }}</div>
 </div>
 <script>
 (function () {

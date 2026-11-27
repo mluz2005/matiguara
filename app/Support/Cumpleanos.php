@@ -19,10 +19,14 @@ final class Cumpleanos
     public const EDAD_MIN = 4;
     public const EDAD_MAX = 14;
 
-    /** Saludo en castellano y en guaraní. ⚠️ El guaraní es BORRADOR: debe validarlo una persona hablante (RN-07). */
-    public const SALUDO_ES = '¡Feliz cumpleaños, :nombre! 🎂';
-    public const SALUDO_GN = '¡Vy\'apavẽ nde árape, :nombre!';
-    public const FRASE_ES  = 'Mati y tus amigos de la selva te desean un día lleno de alegría.';
+    /**
+     * Saludo y frase en castellano y en guaraní (COM-CUM-01/02). Guaraní REVISADO 2026-11-19:
+     * los textos viven en App\Support\TextosComunes::CUMPLE (con el marcador {nombre}).
+     */
+    public const SALUDO_ES = TextosComunes::CUMPLE['saludo']['es'];
+    public const SALUDO_GN = TextosComunes::CUMPLE['saludo']['gn'];
+    public const FRASE_ES  = TextosComunes::CUMPLE['frase']['es'];
+    public const FRASE_GN  = TextosComunes::CUMPLE['frase']['gn'];
 
     /**
      * Arma la fecha desde los tres campos del formulario.
@@ -103,11 +107,11 @@ final class Cumpleanos
 
     public static function saludoEs(string $nombre): string
     {
-        return str_replace(':nombre', $nombre, self::SALUDO_ES);
+        return TextosComunes::rellenar(self::SALUDO_ES, ['nombre' => $nombre]);
     }
 
     public static function saludoGn(string $nombre): string
     {
-        return str_replace(':nombre', $nombre, self::SALUDO_GN);
+        return TextosComunes::rellenar(self::SALUDO_GN, ['nombre' => $nombre]);
     }
 }

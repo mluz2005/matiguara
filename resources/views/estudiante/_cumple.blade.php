@@ -41,6 +41,7 @@
             <div class="cumple-gn" lang="gn">{{ \App\Support\Cumpleanos::saludoGn($est->nombre) }}</div>
             @if($modoCumple === 'tarjeta')
                 <div class="cumple-frase">{{ \App\Support\Cumpleanos::FRASE_ES }}</div>
+                <div class="cumple-frase cumple-gn" lang="gn">{{ \App\Support\Cumpleanos::FRASE_GN }}</div>
             @endif
         </div>
     </div>

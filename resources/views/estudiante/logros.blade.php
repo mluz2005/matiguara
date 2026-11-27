@@ -82,6 +82,11 @@
                     <div style="font-size:.875rem;color:#595959">
                         {{ $logro->descripcion_es }}
                     </div>
+                    @if(!empty($logro->descripcion_gn))
+                        <div class="fst-italic" style="font-size:.8rem;color:#595959">
+                            {{ $logro->descripcion_gn }}
+                        </div>
+                    @endif
                 </div>
             </div>
         @endforeach

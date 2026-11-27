@@ -184,3 +184,15 @@
   .nm-flash { width:min(40vh,230px); }
   .nm-op { min-height:64px; }
 }
+
+/* Línea en guaraní bajo el castellano (revisión 2026-11-19): chica, en cursiva, color de acento. */
+.nm-gn { display:block; font-style:italic; font-weight:700; font-size:.78em; line-height:1.15; color:#0E6B7D; margin-top:2px; }
+.nm-ciclo .nm-gn { font-size:.82rem; }
+.nm-viajes button .nm-gn { font-size:.7rem; color:inherit; opacity:.85; }
+.nm-btn .nm-gn, .nm-btn-suave .nm-gn { font-size:.7em; color:inherit; opacity:.85; font-weight:700; }
+#nm-root .nm-boton .nm-gn { font-size:.62em; color:inherit; opacity:.85; }
+#nm-root .nm-ib span { display:flex; flex-direction:column; align-items:flex-start; line-height:1.05; }
+#nm-root .nm-ib .nm-gn { font-size:.68rem; margin-top:0; color:inherit; opacity:.85; }
+#nm-root .nm-enunciado .nm-gn { font-size:.7em; }
+#nm-root .nm-globo h2 .nm-gn { font-size:.7em; }
+#nm-root .nm-aviso .nm-gn { color:#FFC94D; font-size:.85em; }

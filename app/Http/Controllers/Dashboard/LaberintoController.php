@@ -211,7 +211,7 @@ class LaberintoController extends Controller
 
         $medallas = $r['logros']->map(function ($lo) {
             $lo->loadMissing('logro');
-            return ['emoji' => $lo->logro?->emoji ?: '🏅', 'nombre' => $lo->logro?->nombre_es ?? ''];
+            return ['emoji' => $lo->logro?->emoji ?: '🏅', 'nombre' => $lo->logro?->nombre_es ?? '', 'nombre_gn' => $lo->logro?->nombre_gn ?? ''];
         })->filter(fn ($m) => $m['nombre'] !== '')->values()->all();
 
         return response()->json([

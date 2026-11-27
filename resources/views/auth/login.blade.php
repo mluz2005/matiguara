@@ -13,7 +13,7 @@
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     {{-- Fuentes Baloo 2 y Nunito (ya incluidas en el proyecto) y estilos del login --}}
     <link rel="stylesheet" href="{{ asset('css/memoria-v2.css') }}?v=1">
-    <link rel="stylesheet" href="{{ asset('css/login-v2.css') }}?v=1">
+    <link rel="stylesheet" href="{{ asset('css/login-v2.css') }}?v=2">
     <link rel="stylesheet" href="{{ asset('css/fondo-selva.css') }}?v=1">
 </head>
 <body class="lg2 lg2-adulto">

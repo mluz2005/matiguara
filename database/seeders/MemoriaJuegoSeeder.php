@@ -51,9 +51,9 @@ class MemoriaJuegoSeeder extends Seeder
         $juego = Juego::create([
             'tipo_mecanica_id' => $mecMemoria->id,
             'nombre_es'        => 'Encuentra el par',
-            'nombre_gn'        => 'Jaheka pe par ojoajúva',
+            'nombre_gn'        => 'Ejuhu iñirũ ojoguáva',
             'instrucciones_es' => 'Volteá dos cartas y encontrá los pares idénticos antes de que se acabe el tiempo.',
-            'instrucciones_gn' => 'Embojere mokõi kuatia ha ejuhu umi ojoguáva tiémpo opama mboyve.',
+            'instrucciones_gn' => "Embojere mokõi kuatia'atã ha ejuhu umi ojoguáva opa mboyve aravo.",
             'activo'           => true,
             'dias_reinicio_racha' => null,
         ]);
@@ -61,30 +61,30 @@ class MemoriaJuegoSeeder extends Seeder
         // ── 3. Pool de objetos escolares (reutilizable entre niveles) ──────
         $objetos = [
             ['valor' => 'mochila',     'es' => 'Mochila',     'gn' => 'Mochila',           'emoji' => '🎒'],
-            ['valor' => 'lapiz',       'es' => 'Lápiz',       'gn' => 'Kuatiajokuaaha',     'emoji' => '✏️'],
+            ['valor' => 'lapiz',       'es' => 'Lápiz',       'gn' => 'Haiha',     'emoji' => '✏️'],
             ['valor' => 'regla',       'es' => 'Regla',       'gn' => 'Regla',              'emoji' => '📏'],
-            ['valor' => 'tijera',      'es' => 'Tijera',      'gn' => 'Tijera',             'emoji' => '✂️'],
+            ['valor' => 'tijera',      'es' => 'Tijera',      'gn' => 'Jetapa',             'emoji' => '✂️'],
             ['valor' => 'crayon',      'es' => 'Crayón',      'gn' => 'Crayón',             'emoji' => '🖍️'],
-            ['valor' => 'cuaderno',    'es' => 'Cuaderno',    'gn' => 'Kuatiañe\'ẽ',        'emoji' => '📓'],
+            ['valor' => 'cuaderno',    'es' => 'Cuaderno',    'gn' => 'Kuatiajehaipyre',        'emoji' => '📓'],
             ['valor' => 'libro',       'es' => 'Libro',       'gn' => 'Aranduka',           'emoji' => '📚'],
-            ['valor' => 'lapicera',    'es' => 'Lapicera',    'gn' => 'Lapicera',           'emoji' => '🖊️'],
-            ['valor' => 'carpeta',     'es' => 'Carpeta',     'gn' => 'Carpeta',            'emoji' => '📁'],
-            ['valor' => 'calculadora','es' => 'Calculadora', 'gn' => 'Calculadora',        'emoji' => '🧮'],
+            ['valor' => 'lapicera',    'es' => 'Lapicera',    'gn' => 'Haiha syry',           'emoji' => '🖊️'],
+            ['valor' => 'carpeta',     'es' => 'Carpeta',     'gn' => 'Kuatiaryru',            'emoji' => '📁'],
+            ['valor' => 'calculadora','es' => 'Calculadora', 'gn' => 'Papapyhára',        'emoji' => '🧮'],
         ];
 
         // ── 4. Pool de números 0-9 (numeral ↔ cantidad) ────────────────────
-        // Guaraní corregido — ver nota de cabecera
+        // Guaraní revisado por la persona hablante (EP-NUM-0..9); fuente única: App\Support\TarjetasGuarani
         $numeros = [
-            ['valor' => '0', 'gn' => 'Zero'],     // Sin término tradicional extendido — validar
-            ['valor' => '1', 'gn' => 'Peteĩ'],
-            ['valor' => '2', 'gn' => 'Mokõi'],
-            ['valor' => '3', 'gn' => 'Mbohapy'],
-            ['valor' => '4', 'gn' => 'Irundy'],
-            ['valor' => '5', 'gn' => 'Po'],
-            ['valor' => '6', 'gn' => 'Poteĩ'],
-            ['valor' => '7', 'gn' => 'Pokõi'],
-            ['valor' => '8', 'gn' => 'Poapy'],
-            ['valor' => '9', 'gn' => 'Porundy'],
+            ['valor' => '0', 'gn' => 'Papapy 0 (mba\'eve)'],
+            ['valor' => '1', 'gn' => 'Papapy 1 (Peteĩ)'],
+            ['valor' => '2', 'gn' => 'Papapy 2 (Mokõi)'],
+            ['valor' => '3', 'gn' => 'Papapy 3 (Mbohapy)'],
+            ['valor' => '4', 'gn' => 'Papapy 4 (Irundy)'],
+            ['valor' => '5', 'gn' => 'Papapy 5 (Po)'],
+            ['valor' => '6', 'gn' => 'Papapy 6 (Poteĩ)'],
+            ['valor' => '7', 'gn' => 'Papapy 7 (Pokõi)'],
+            ['valor' => '8', 'gn' => 'Papapy 8 (Poapy)'],
+            ['valor' => '9', 'gn' => 'Papapy 9 (Porundy)'],
         ];
 
         // ── 5. Definición de los 10 niveles ────────────────────────────────

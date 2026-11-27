@@ -47,7 +47,7 @@ return new class extends Migration
         if (!DB::table('catalogo_logros')->where('nombre_es', self::FLASH)->exists()) {
             DB::table('catalogo_logros')->insert([
                 'nombre_es'      => self::FLASH,
-                'nombre_gn'      => 'Flash Ojehupyty', // texto de las semillas originales: validar con una persona hablante
+                'nombre_gn'      => 'Flash Master', // revisado por la persona hablante (CMP-MED-10), 2026-11
                 'descripcion_es' => 'Superá el último nivel de Flash Matemático. ¡Tu memoria es increíble!',
                 'tipo'           => 'nivel',
                 'condicion_tipo' => 'flash_ultimo_nivel',

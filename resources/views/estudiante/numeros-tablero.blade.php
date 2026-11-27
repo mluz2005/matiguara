@@ -12,12 +12,13 @@
     Toda la lógica vive en public/js/numeros.js y los estilos en public/css/numeros.css
     (aislados bajo #nm-root). La pantalla ocupa toda la ventana, como «El camino a la escuela».
     No hay puntos, estrellas ni resultados a la vista: solo preguntas y una figurita al final.
-    Guaraní: BORRADOR a validar con una persona hablante.
+    Guaraní revisado (planilla Guarani_MatiYLosNumeros_revisado): los textos vienen de
+    App\Support\Numeros\TextosNumeros y llegan a numeros.js por NM_CFG.tx.
     =========================================================================
 --}}
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/numeros.css') }}?v=1">
+<link rel="stylesheet" href="{{ asset('css/numeros.css') }}?v=2">
 <style>
     .decoracion-lateral,
     .header-estudiante,
@@ -47,5 +48,5 @@
 
 @push('scripts')
 <script>window.NM_CFG = @json($config);</script>
-<script src="{{ asset('js/numeros.js') }}?v=1"></script>
+<script src="{{ asset('js/numeros.js') }}?v=2"></script>
 @endpush

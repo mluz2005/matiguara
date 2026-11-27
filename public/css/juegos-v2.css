@@ -364,3 +364,8 @@
 @media (prefers-reduced-motion: reduce) {
     .mv2-menu .jcard-ico, .mv2-menu .jvista { animation: none; }
 }
+
+/* Línea en guaraní bajo el castellano (pantalla de resumen) */
+.mv2-gn-sub { font-style: italic; font-weight: 700; font-size: .92rem; color: var(--teal); line-height: 1.2; }
+.mv2-res-cartel p.sub.mv2-gn-sub { margin-top: 2px; font-size: 1.02rem; }
+.mv2-btn .mv2-gn-sub { color: inherit; opacity: .85; margin-top: 2px; }

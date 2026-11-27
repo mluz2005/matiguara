@@ -341,7 +341,7 @@
         btn.addEventListener('click', () => {
             const n = btn.dataset.requisito;
             document.getElementById('avisoBloqueoEs').textContent = '🔒 Primero superá el Nivel ' + n;
-            document.getElementById('avisoBloqueoGn').textContent = "Eñepyrũ Nivel " + n + "-pe";
+            document.getElementById('avisoBloqueoGn').textContent = "🔒 Ehasa ñepyrũ Nivel " + n;
             aviso.style.display = 'block';
             btn.classList.remove('btn-temblor'); void btn.offsetWidth; btn.classList.add('btn-temblor');
             clearTimeout(ocultar);

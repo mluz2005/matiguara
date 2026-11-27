@@ -147,16 +147,20 @@
         d.textContent = t;
         return d.innerHTML;
     }
+    // Línea en guaraní bajo el título de un cartel
+    function lineaGn(t) {
+        return '<p class="gn">' + escaparHtml(t) + '</p>';
+    }
 
     // ── Vistazo inicial (misma secuencia que antes) ──────────────────────
     function iniciarVistazo() {
         cartas.forEach(function (c) { c.classList.add('volteada'); });
-        decir('¡Mirá bien las cartas!', 'Jaikuaapaite umi kuatia...');
+        decir('¡Mirá bien las cartas!', "¡Emaña porã umi kuatia'atãre!");
 
         mostrarCartel('overlayVistazo',
             guaraGrande('feliz') +
             '<h3>¡Memorizá bien las cartas!</h3>' +
-            '<p class="gn">Jaikuaapaite umi kuatia...</p>');
+            lineaGn("¡Eñemandu'a porã umi kuatia'atãre!"));
 
         setTimeout(function () {
             quitarCartel('overlayVistazo');
@@ -166,7 +170,7 @@
             // que nada se mueve de lugar.
             const caja = $('timerRing'), barra = $('timerBarra'), etiqueta = $('timerEtiqueta');
             caja.classList.add('vistazo');
-            if (etiqueta) etiqueta.textContent = '👀 ¡Memorizá!';
+            if (etiqueta) etiqueta.textContent = "👀 ¡Memorizá! · ¡Eñemandu'a!";
             barra.style.transition = 'none';
             barra.style.width = '100%';
             void barra.offsetWidth;
@@ -176,13 +180,13 @@
             setTimeout(function () {
                 cartas.forEach(function (c) { c.classList.remove('volteada'); });
                 caja.classList.remove('vistazo');
-                if (etiqueta) etiqueta.textContent = '⏱ Tiempo';
+                if (etiqueta) etiqueta.textContent = '⏱ Tiempo · Aravo';
                 barra.style.transition = 'none';
                 barra.style.width = '100%';
                 void barra.offsetWidth;
                 barra.style.transition = '';
                 vistazoActivo = false;
-                decir('¡A jugar!', 'Jaha ñembosarái!');
+                decir('¡A jugar!', '¡Ñañembosarái!');
                 iniciarTemporizador();
             }, DURACION_CARTAS_MS);
         }, DURACION_MENSAJE_MS);
@@ -277,8 +281,8 @@
             guaraEstado('feliz', 1200);
             // Globo: la palabra en castellano y en guaraní (si son iguales, un elogio en guaraní)
             const es = a.el.dataset.es || '', gn = a.el.dataset.gn || '';
-            if (racha >= 3) decir('¡Qué racha! ×' + racha, 'Iporãiterei!');
-            else decir('¡' + es + '!', (gn && gn !== es) ? gn : 'Iporã!');
+            if (racha >= 3) decir('¡Qué racha! ×' + racha, '¡Iporãite pe joapy! ×' + racha);
+            else decir('¡' + es + '!', gn ? '¡' + gn + '!' : '¡Iporãite!');
             mostrarCombo();
         } else {
             erroresLocales++;
@@ -288,7 +292,7 @@
             b.el.classList.add('error');
             reproducirSonidoPropio('sonidoError');
             guaraEstado('uy', 700);
-            decir('¡Casi! Probá otra vez', "Eñeha'ã jey");
+            decir('¡Casi! Probá otra vez', "¡Haimete! Eha'ã jey");
             setTimeout(function () {
                 a.el.classList.remove('volteada', 'error');
                 b.el.classList.remove('volteada', 'error');
@@ -372,7 +376,8 @@
         const sube = tipo === 'sube';
         mostrarCartel('overlayTransicion',
             guaraGrande(sube ? 'feliz' : 'idle') +
-            '<h3>' + (sube ? '¡Subiste de nivel!' : 'Vamos a practicar un poco más') + '</h3>');
+            '<h3>' + (sube ? '¡Subiste de nivel!' : 'Vamos a practicar un poco más') + '</h3>' +
+            lineaGn(sube ? '¡Rejupi yvatekuépe!' : "Ñaha'ãve michĩmi"));
         if (sube) confeti($('overlayTransicion').firstChild, 30);
         setTimeout(function () { navegar(redirectUrl); }, 1800);
     }
@@ -386,7 +391,9 @@
         mostrarCartel('overlayCierre',
             guaraGrande(completadoATiempo ? 'feliz' : 'idle') +
             '<h3>' + (completadoATiempo ? '¡Encontraste todos los pares!' : '¡Se acabó el tiempo!') + '</h3>' +
-            '<p>Guardando tu resultado</p><div class="mv2-puntitos"><span></span><span></span><span></span></div>');
+            lineaGn(completadoATiempo ? '¡Rejuhupaite umi ojoguáva!' : '¡Opáma aravo!') +
+            '<p>Guardando tu resultado</p>' + lineaGn('Roñongatu hína osẽva ndéve') +
+            '<div class="mv2-puntitos"><span></span><span></span><span></span></div>');
         if (completadoATiempo) confeti($('overlayCierre').firstChild, 40);
 
         desvanecerMusica(600);
@@ -420,7 +427,9 @@
         mostrarCartel('overlayCierre',
             guaraGrande('idle') +
             '<h3>No pudimos guardar el resultado ahora</h3>' +
-            '<p>Pero, ¡jugaste muy bien! Volviendo a los juegos...</p>');
+            lineaGn("Ndaikatúi roñongatu ko'ágã") +
+            '<p>Pero, ¡jugaste muy bien! Volviendo a los juegos...</p>' +
+            lineaGn('Péro, ¡reñembosarái porãiterei! Jaha jey ñembosaraikuérape...'));
         setTimeout(function () { navegar(URL_LISTA_JUEGOS); }, 2500);
     }
 
@@ -448,28 +457,33 @@
     }
 
     function mostrarResultadoNivel(datos, completadoATiempo) {
-        let titulo, detalle = '', estado;
+        let titulo, tituloGn, detalle = '', estado;
         const nroNivel = datos.siguiente_nivel_numero ? ' ' + datos.siguiente_nivel_numero : '';
 
         if (datos.cambio_nivel === 'sube') {
             titulo = '¡Subiste al nivel' + nroNivel + '!'; estado = 'feliz';
+            tituloGn = '¡Rejupi yvatekue' + nroNivel + '-pe!';
         } else if (datos.cambio_nivel === 'baja') {
             titulo = 'Vamos a practicar en el nivel' + nroNivel; estado = 'idle';
+            tituloGn = "Ñaha'ãvéta yvatekue" + nroNivel + '-pe';
         } else if (completadoATiempo) {
             titulo = '¡Muy bien, lo lograste!'; estado = 'feliz';
-            detalle = '<p>Vas ' + datos.racha_consecutivas + ' de ' + datos.racha_meta + ' partidas seguidas para subir de nivel.</p>';
+            tituloGn = '¡Iporãiterei, rehupyty!';
+            detalle = '<p>Vas ' + datos.racha_consecutivas + ' de ' + datos.racha_meta + ' partidas seguidas para subir de nivel.</p>' +
+                lineaGn('Reho ' + datos.racha_consecutivas + ' / ' + datos.racha_meta + ' ñembosarái joapy rejupi hag̃ua yvatekuépe.');
         } else {
             titulo = '¡Casi! Seguí practicando.'; estado = 'idle';
+            tituloGn = "¡Haimete! Eha'ãve katu.";
         }
 
         if (datos.cambio_nivel && datos.medallas && datos.medallas.length) {
             const lista = datos.medallas.map(function (m) {
                 return '<div style="font-size:1.2rem;margin-top:6px">' + m.emoji + ' ' + escaparHtml(m.nombre) + '</div>';
             }).join('');
-            detalle += '<p style="margin-top:12px">¡Ganaste una medalla nueva!</p>' + lista;
+            detalle += '<p style="margin-top:12px">¡Ganaste una medalla nueva!</p>' + lineaGn('¡Regana peteĩ jeguaka pyahu!') + lista;
         }
         if (datos.cambio_nivel && datos.iniciar_url) {
-            detalle += '<p>Preparando el nivel' + nroNivel + '...</p>';
+            detalle += '<p>Preparando el nivel' + nroNivel + '...</p>' + lineaGn('Rombosako\'i hína yvatekue' + nroNivel + '...');
         }
 
         const n = estrellasLocales(completadoATiempo);
@@ -480,7 +494,7 @@
             estrellas += '</div>';
         }
 
-        mostrarCartel('overlayCierre', guaraGrande(estado) + '<h3>' + titulo + '</h3>' + estrellas + detalle);
+        mostrarCartel('overlayCierre', guaraGrande(estado) + '<h3>' + titulo + '</h3>' + lineaGn(tituloGn) + estrellas + detalle);
         if (completadoATiempo) confeti($('overlayCierre').firstChild, 36);
     }
 

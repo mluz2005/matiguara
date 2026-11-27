@@ -13,7 +13,7 @@
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     {{-- Fuentes Baloo 2 y Nunito (ya incluidas en el proyecto) y estilos del login --}}
     <link rel="stylesheet" href="{{ asset('css/memoria-v2.css') }}?v=1">
-    <link rel="stylesheet" href="{{ asset('css/login-v2.css') }}?v=1">
+    <link rel="stylesheet" href="{{ asset('css/login-v2.css') }}?v=2">
     <link rel="stylesheet" href="{{ asset('css/fondo-selva.css') }}?v=1">
 </head>
 <body class="lg2 lg2-adulto">
@@ -32,9 +32,10 @@
                 <img src="{{ asset('img/guara/guara-guino.webp') }}" alt="MatiGuarã, el guacamayo mascota" width="230" height="260">
             </div>
             <div class="lg2-saludo">
-                <h1>Acceso para familias</h1>
-                <p>Ver cómo le va a mi hijo/a</p>
-                <p class="gn">Eike</p>
+                @php $fm = \App\Support\TextosComunes::FAMILIA; @endphp
+                <h1>{{ $fm['titulo']['es'] }}<span class="lg2-gn" lang="gn">{{ $fm['titulo']['gn'] }}</span></h1>
+                <p>{{ $fm['subtitulo']['es'] }}</p>
+                <p class="gn" lang="gn">{{ $fm['subtitulo']['gn'] }}</p>
                 <small>MatiGuarã — FACAT, Universidad Autónoma de Encarnación</small>
             </div>
         </div>

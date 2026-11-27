@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="{{ asset('css/memoria-v2.css') }}?v=1">
 <link rel="stylesheet" href="{{ asset('css/juegos-v2.css') }}?v=2">
 <link rel="stylesheet" href="{{ asset('css/laberinto-v2.css') }}?v=1">
-<link rel="stylesheet" href="{{ asset('css/numeros.css') }}?v=1">
+<link rel="stylesheet" href="{{ asset('css/numeros.css') }}?v=2">
 @endpush
 
 @section('contenido')
@@ -203,7 +203,9 @@
                         <p class="text-muted small text-center mb-0">Sin niveles</p>
                     @else
                     <div class="nm-menu">
-                        <p class="nm-ciclo">🦜 Ciclo {{ $ne['ciclo'] }} <small>· Hoy toca: <b>{{ $nombresViaje[$ne['viaje']]['es'] }}</b></small></p>
+                        @php $tnUi = \App\Support\Numeros\TextosNumeros::UI; @endphp
+                        <p class="nm-ciclo">🦜 Ciclo {{ $ne['ciclo'] }} <small>· Hoy toca: <b>{{ $nombresViaje[$ne['viaje']]['es'] }}</b></small>
+                            <span class="nm-gn" lang="gn">{{ \App\Support\Numeros\TextosNumeros::rellenar($tnUi['ciclo']['gn'], ['n' => $ne['ciclo'], 'viaje' => $nombresViaje[$ne['viaje']]['gn']]) }}</span></p>
                         <div class="mv2-niveles nm-viajes">
                             @foreach($niveles as $nivel)
                                 @php
@@ -217,9 +219,10 @@
                                     <button type="{{ $toca ? 'submit' : 'button' }}"
                                             class="{{ $toca ? '' : ($hecho ? 'hecho' : 'cerrado') }}"
                                             @if(!$toca) aria-disabled="true" @endif
-                                            title="Viaje {{ $n }} · {{ $nv['es'] }}">
+                                            title="Viaje {{ $n }} · {{ $nv['es'] }} / {{ \App\Support\Numeros\TextosNumeros::rellenar($tnUi['viajeN']['gn'], ['n' => $n]) }} · {{ $nv['gn'] }}">
                                         {{ $hecho ? '✅' : ($toca ? $nv['ico'] : '🔒') }} {{ $n }}
                                         <small>{{ $nv['es'] }}</small>
+                                        @if(!empty($nv['gn']))<small class="nm-gn" lang="gn">{{ $nv['gn'] }}</small>@endif
                                     </button>
                                 </form>
                             @endforeach
@@ -452,7 +455,7 @@
         btn.addEventListener('click', () => {
             const n = btn.dataset.requisito;
             document.getElementById('avisoBloqueoEs').textContent = '🔒 Primero superá el Nivel ' + n;
-            document.getElementById('avisoBloqueoGn').textContent = "Eñepyrũ Nivel " + n + "-pe";
+            document.getElementById('avisoBloqueoGn').textContent = "🔒 Ehasa ñepyrũ Nivel " + n;
             aviso.style.display = 'block';
             btn.classList.remove('btn-temblor'); void btn.offsetWidth; btn.classList.add('btn-temblor');
             clearTimeout(ocultar);

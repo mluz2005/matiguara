@@ -174,3 +174,13 @@ a.lg2-rol:focus-visible { outline: 4px solid var(--sol); outline-offset: 3px; }
 .lg2-exito { margin-bottom: 12px; padding: 8px 12px; background: #D5F5DC; border: 3px solid var(--verde); color: var(--verde-o); border-radius: 18px; font-weight: 800; }
 .lg2-nota { margin: 12px 0 0; padding: 10px 14px; background: #FFF6D6; border: 3px solid var(--azul); border-radius: 18px; font-weight: 600; font-size: 1rem; line-height: 1.35; }
 .lg2-chico { margin: 12px 0 0; text-align: center; color: var(--gris-t); font-weight: 600; font-size: .98rem; line-height: 1.35; }
+
+/* Línea en guaraní bajo el castellano (revisión 2026-11-19): chica, en cursiva, color de acento. */
+.lg2-gn { display: block; font-style: italic; font-weight: 700; font-size: .78em; line-height: 1.15; color: var(--teal); margin-top: 2px; }
+.lg2-saludo h1 .lg2-gn { font-size: .5em; }
+.btn-jugar .lg2-gn { color: inherit; opacity: .9; font-size: .5em; margin-top: 0; }
+.lg2-error .lg2-gn { color: inherit; opacity: .9; }
+.lg2-burbuja .lg2-gn { font-size: .85em; }
+.lg2-rol .lg2-gn { font-size: .8rem; }
+.lg2-rol.actual .lg2-gn { color: var(--verde-o); }
+@media (max-width: 420px) { .lg2-rol .lg2-gn.forma { display: none; } }

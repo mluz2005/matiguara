@@ -6,6 +6,7 @@ use App\Models\CatalogoLogro;
 use App\Models\Juego;
 use App\Models\Nivel;
 use App\Models\TipoMecanica;
+use App\Support\TextosCamino;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -31,8 +32,8 @@ use Illuminate\Support\Facades\DB;
  * la solución. LaberintoService decodifica este orden. Cada partida usa una variante
  * por obstáculo, según su número de sesión, así los laberintos no se repiten igual.
  *
- * ⚠️ El guaraní (nombres, enunciados, mensajes) es BORRADOR y debe ser validado por
- * una persona hablante antes de usarse con niños.
+ * Guaraní: revisado por la persona hablante (planilla «Guarani_ElCaminoALaEscuela_revisado»);
+ * la fuente de los problemas, las instrucciones y las medallas es App\Support\TextosCamino.
  * =========================================================================
  */
 class CaminoEscuelaSeeder extends Seeder
@@ -56,7 +57,7 @@ class CaminoEscuelaSeeder extends Seeder
                 'tipo_mecanica_id'    => $mecanica->id,
                 'nombre_gn'           => "Tape mbo'ehaópe",
                 'instrucciones_es'    => 'Llevá a tu personaje de la casa a la escuela. Cuando un obstáculo te cierre el paso, resolvé el problema para abrirlo. ¡Juntá chipas en los callejones!',
-                'instrucciones_gn'    => "Eraha nde personaje óga-gui mbo'ehaópe. Oĩ ramo mba'e ojokóva, eipuru papapy ojepe'a hag̃ua.",
+                'instrucciones_gn'    => TextosCamino::INSTRUCCIONES_GN,
                 'activo'              => true,
                 'dias_reinicio_racha' => null,
             ]
@@ -136,25 +137,25 @@ class CaminoEscuelaSeeder extends Seeder
     {
         $logros = [
             [
-                'nombre_es' => 'Primer camino a la escuela', 'nombre_gn' => "Peteĩha tape mbo'ehaópe",   // gn: borrador
+                'nombre_es' => 'Primer camino a la escuela', 'nombre_gn' => TextosCamino::MEDALLAS['Primer camino a la escuela'][0],
                 'emoji' => '🏫', 'tipo' => 'especial', 'condicion_tipo' => 'laberinto_llegada', 'condicion_valor' => 1,
                 'rareza' => 'comun', 'puntos_logro' => 20,
                 'descripcion_es' => 'Llegá a la escuela por primera vez en El camino a la escuela.',
             ],
             [
-                'nombre_es' => 'Camino perfecto', 'nombre_gn' => 'Tape iporãva',                           // gn: borrador
+                'nombre_es' => 'Camino perfecto', 'nombre_gn' => TextosCamino::MEDALLAS['Camino perfecto'][0],
                 'emoji' => '🌟', 'tipo' => 'especial', 'condicion_tipo' => 'laberinto_perfecto', 'condicion_valor' => 1,
                 'rareza' => 'raro', 'puntos_logro' => 50,
                 'descripcion_es' => 'Llegá a la escuela con las 3 estrellas: sin pistas, sin flecha y sin ver soluciones.',
             ],
             [
-                'nombre_es' => 'Chipero', 'nombre_gn' => 'Chipero',                                         // gn: borrador
+                'nombre_es' => 'Chipero', 'nombre_gn' => TextosCamino::MEDALLAS['Chipero'][0],
                 'emoji' => '🥯', 'tipo' => 'especial', 'condicion_tipo' => 'laberinto_chipas', 'condicion_valor' => 1,
                 'rareza' => 'raro', 'puntos_logro' => 50,
                 'descripcion_es' => 'Juntá todas las chipas de los callejones en un camino.',
             ],
             [
-                'nombre_es' => 'Maestro del camino', 'nombre_gn' => "Tape mbo'ehára",                       // gn: borrador
+                'nombre_es' => 'Maestro del camino', 'nombre_gn' => TextosCamino::MEDALLAS['Maestro del camino'][0],
                 'emoji' => '🏆', 'tipo' => 'nivel', 'condicion_tipo' => 'laberinto_ultimo_nivel', 'condicion_valor' => 1,
                 'rareza' => 'epico', 'puntos_logro' => 150,
                 'descripcion_es' => 'Superá el último nivel de El camino a la escuela.',
@@ -162,6 +163,8 @@ class CaminoEscuelaSeeder extends Seeder
         ];
 
         foreach ($logros as $l) {
+            // Guaraní revisado: la descripción en guaraní sale de la misma fuente que el nombre.
+            $l['descripcion_gn'] = TextosCamino::MEDALLAS[$l['nombre_es']][1];
             CatalogoLogro::updateOrCreate(['nombre_es' => $l['nombre_es']], $l + ['activo' => true]);
         }
     }

@@ -52,7 +52,14 @@ use Illuminate\Support\Facades\Log;
 class DiagnosticoIAService
 {
     /**
+     * URL y versión de la API de Anthropic.
+     * La clave se configura en .env: CLAUDE_API_KEY
+     */
+    private const API_URL     = 'https://api.anthropic.com/v1/messages';
+    private const API_VERSION = '2023-06-01';
 
+    /**
+     * Modelo a usar. Configurable en .env: CLAUDE_MODEL
      */
     private string $modelo;
 
@@ -427,8 +434,8 @@ PROMPT;
      */
     private function validarYExtraer(string $textoApi): array
     {
-        // Limpiar posibles bloques de código Markdown (```json ... ```)
-        $textoLimpio = preg_replace('/```(?:json)?\s*([\s\S]*?)```/', '$1', $textoApi);
+        // Limpiar posibles bloques de código Markdown (json ... )
+        $textoLimpio = preg_replace('/(?:json)?\s*([\s\S]*?)/', '$1', $textoApi);
         $textoLimpio = trim($textoLimpio);
 
         // Intentar decodificar el JSON

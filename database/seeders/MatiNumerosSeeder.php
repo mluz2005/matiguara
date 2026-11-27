@@ -6,10 +6,11 @@ use App\Models\Juego;
 use App\Models\Nivel;
 use App\Models\TipoMecanica;
 use App\Support\Numeros\GeneradorItems;
+use App\Support\Numeros\TextosNumeros;
 use Illuminate\Database\Seeder;
 
 /**
- * SEEDER: MatiNumerosSeeder — «Mati y los números / Mati ha papapy»
+ * SEEDER: MatiNumerosSeeder — «Mati y los números / Mati ha papapykuéra»
  * =========================================================================
  * Quinto juego de MatiGuarã. NO es un juego de puntos: es una herramienta de
  * tamizaje que avisa a la docente que preste más atención a un niño. No emite
@@ -23,7 +24,8 @@ use Illuminate\Database\Seeder;
  *     No llevan banco de ejercicios en la base: las preguntas las genera
  *     App\Support\Numeros\GeneradorItems.
  *
- * ⚠️ El guaraní del nombre es BORRADOR: debe validarlo una persona hablante.
+ * Guaraní revisado 2026-11-19 (App\Support\Numeros\TextosNumeros). Si el juego ya existía,
+ * lo actualiza la migración 2026_11_19_000006.
  * =========================================================================
  */
 class MatiNumerosSeeder extends Seeder
@@ -41,9 +43,9 @@ class MatiNumerosSeeder extends Seeder
             ['nombre_es' => self::NOMBRE_ES],
             [
                 'tipo_mecanica_id'    => $mecanica->id,
-                'nombre_gn'           => 'Mati ha papapy',
+                'nombre_gn'           => TextosNumeros::NOMBRE_GN,
                 'instrucciones_es'    => 'Viajá con Mati por la selva. En cada parada hay números y cantidades: tocá la respuesta que te parezca. ¡No hay puntos ni premios, solo jugar!',
-                'instrucciones_gn'    => "Eho Mati ndive ka'aguýpe. Peteĩ teĩ hendápe oĩ papapy ha hetaha: epoko pe respuesta ndépe iporãva.",
+                'instrucciones_gn'    => TextosNumeros::INSTRUCCIONES_GN,
                 'activo'              => true,
                 'dias_reinicio_racha' => null,
             ]

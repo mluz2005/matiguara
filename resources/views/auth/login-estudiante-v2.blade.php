@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
-    <title>¡A Jugar! — MatiGuarã</title>
+    <title>{{ \App\Support\TextosComunes::unido(\App\Support\TextosComunes::INGRESO['pestana']) }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
@@ -146,6 +146,10 @@
         .lg2-rol.actual small { color: var(--verde-o); }
         @media (min-width: 900px) { .lg2-rol { flex-direction: row; justify-content: flex-start; gap: 12px; text-align: left; min-height: 74px; padding: 8px 14px; font-size: 1.05rem; } }
         @media (max-width: 420px) { .lg2-rol small { display: none; } .lg2-rol { min-height: 70px; font-size: .88rem; } }
+        .lg2-gn { display: block; font-style: italic; font-weight: 700; font-size: .78em; line-height: 1.15; color: var(--teal); margin-top: 2px; }
+        .lg2-saludo h1 .lg2-gn { font-size: .5em; }
+        .btn-jugar .lg2-gn { color: inherit; opacity: .9; font-size: .5em; margin-top: 0; }
+        .lg2-error .lg2-gn { color: inherit; opacity: .9; }
         .lg2-pie { margin: 12px 0 0; text-align: center; }
         .lg2-pie a { display: inline-block; padding: 6px 12px; border-radius: 12px; color: var(--azul); font-weight: 700; text-decoration: underline; }
         .lg2-pie a:hover { background: #fff; }
@@ -163,6 +167,7 @@
     <link rel="stylesheet" href="{{ asset('css/fondo-selva.css') }}?v=1">
 </head>
 <body class="lg2">
+@php $tx = \App\Support\TextosComunes::INGRESO; $tk = \App\Support\TextosComunes::TECLADO; @endphp
 
 {{-- Decoración de fondo: solo adorno (no la leen los lectores de pantalla) --}}
 <div class="lg2-deco" aria-hidden="true">
@@ -179,10 +184,10 @@
                 <img id="guaraImg" src="{{ asset('img/guara/guara-guino.webp') }}" alt="MatiGuarã, el guacamayo mascota, te saluda" width="230" height="260">
             </div>
             <div class="lg2-saludo">
-                <h1>¡A jugar!</h1>
-                <p>Ingresá tu código y tu PIN secreto</p>
-                <p class="gn">Mba'éichapa!</p>
-                <div class="lg2-burbuja" id="burbuja" role="status" aria-live="polite">¡Hola! Escribí tu código.</div>
+                <h1>{{ $tx['titulo']['es'] }}<span class="lg2-gn" lang="gn">{{ $tx['titulo']['gn'] }}</span></h1>
+                <p>{{ $tx['subtitulo']['es'] }}</p>
+                <p class="gn" lang="gn">{{ $tx['subtitulo']['gn'] }}</p>
+                <div class="lg2-burbuja" id="burbuja" role="status" aria-live="polite"><span>{{ $tx['burbujaInicio']['es'] }}</span><span class="lg2-gn" lang="gn">{{ $tx['burbujaInicio']['gn'] }}</span></div>
             </div>
         </div>
     </section>
@@ -192,8 +197,12 @@
 
         {{-- Error de autenticación --}}
         @if($errors->any())
+            @php
+                $errEs = $errors->first('codigo_acceso') ?: $errors->first();
+                $errGn = \App\Support\TextosComunes::errorIngresoGn($errEs);
+            @endphp
             <div class="lg2-error" id="errorServidor" role="alert">
-                😅 {{ $errors->first('codigo_acceso') }}
+                😅 {{ $errEs }}@if($errGn)<span class="lg2-gn" lang="gn">{{ $errGn }}</span>@endif
             </div>
         @endif
 
@@ -211,7 +220,7 @@
             <input type="hidden" name="pin" id="pinCompleto">
 
             <div class="mb-3">
-                <label for="codigo_acceso" class="titulo">🪪 Tu código de acceso</label>
+                <label for="codigo_acceso" class="titulo">{{ $tx['etCodigo']['es'] }}<span class="lg2-gn" lang="gn">{{ $tx['etCodigo']['gn'] }}</span></label>
                 <input type="text"
                        name="codigo_acceso"
                        id="codigo_acceso"
@@ -225,11 +234,11 @@
                        enterkeyhint="next"
                        maxlength="20"
                        required>
-                <p class="lg2-ayuda">📋 Tu maestra o maestro te dio este código</p>
+                <p class="lg2-ayuda">{{ $tx['ayudaCodigo']['es'] }}<span class="lg2-gn" lang="gn">{{ $tx['ayudaCodigo']['gn'] }}</span></p>
             </div>
 
             <div>
-                <label class="titulo d-block text-center" id="rotuloPin">🔐 Tu PIN secreto (4 números)</label>
+                <label class="titulo d-block text-center" id="rotuloPin">{{ $tx['etPin']['es'] }}<span class="lg2-gn" lang="gn">{{ $tx['etPin']['gn'] }}</span></label>
 
                 {{-- 4 cuadros: se llenan con una estrella por cada número --}}
                 <div class="lg2-pin" id="pinDisplay" aria-live="polite" aria-labelledby="rotuloPin">
@@ -243,43 +252,20 @@
                         <button type="button" class="btn-num" onclick="agregarDigito({{ $n }})">{{ $n }}</button>
                     @endforeach
                     <button type="button" class="btn-num btn-borrar" onclick="borrarDigito()"
-                            title="Borrar el último número" aria-label="Borrar el último número">⌫</button>
+                            title="{{ \App\Support\TextosComunes::unido($tk['borrarUltimo']) }}" aria-label="{{ \App\Support\TextosComunes::unido($tk['borrarUltimo']) }}">⌫</button>
                     <button type="button" class="btn-num" onclick="agregarDigito(0)">0</button>
                     <button type="button" class="btn-num btn-borrar" onclick="borrarTodo()"
-                            title="Borrar todo" aria-label="Borrar todo">🗑</button>
+                            title="{{ \App\Support\TextosComunes::unido($tk['borrarTodo']) }}" aria-label="{{ \App\Support\TextosComunes::unido($tk['borrarTodo']) }}">🗑</button>
                 </div>
             </div>
 
-            <button type="submit" class="btn-jugar" id="btnJugar" disabled>🚀 ¡Entrar a jugar!</button>
+            <button type="submit" class="btn-jugar" id="btnJugar" disabled>{{ $tx['botonEntrar']['es'] }}<span class="lg2-gn" lang="gn">{{ $tx['botonEntrar']['gn'] }}</span></button>
             <p class="lg2-aviso" id="aviso" role="status" aria-live="polite"></p>
         </form>
     </section>
 
     {{-- ═ Columna 3: ¿quién sos? ════════════════════════════════════════════ --}}
-    <nav class="lg2-roles" aria-label="Elegí quién sos">
-        <h2>¿Quién sos?</h2>
-        <ul>
-            <li>
-                <span class="lg2-rol actual" aria-current="page">
-                    <span class="ico" aria-hidden="true">🧒</span>
-                    <span>Estudiante<br><small>Estás acá</small></span>
-                </span>
-            </li>
-            <li>
-                <a class="lg2-rol" href="{{ route('login') }}">
-                    <span class="ico" aria-hidden="true">🧑‍🏫</span>
-                    <span>Docente o administrador/a<br><small>Con correo y contraseña</small></span>
-                </a>
-            </li>
-            <li>
-                <a class="lg2-rol" href="{{ route('familia.login') }}">
-                    <span class="ico" aria-hidden="true">👨‍👩‍👧</span>
-                    <span>Familia<br><small>Con correo y código</small></span>
-                </a>
-            </li>
-        </ul>
-        <p class="lg2-pie"><a href="{{ route('acerca') }}">ℹ️ Acerca de MatiGuarã</a></p>
-    </nav>
+    @include('auth._lg2-roles', ['actual' => 'estudiante'])
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -308,6 +294,16 @@ try {
  */
 let digitos = [];  // Array con los dígitos ingresados (máx 4)
 
+// Textos (castellano + guaraní) que manda el servidor: App\Support\TextosComunes::INGRESO.
+const TX = @json(\App\Support\TextosComunes::ingresoParaJs());
+function llenar(t, n) { return { es: t.es.replace('{n}', n), gn: t.gn.replace('{n}', n) }; }
+/** Castellano y, debajo, guaraní (chico, en cursiva). */
+function mostrarBi(nodo, t) {
+    nodo.textContent = '';
+    const es = document.createElement('span'); es.textContent = t.es; nodo.appendChild(es);
+    const gn = document.createElement('span'); gn.className = 'lg2-gn'; gn.lang = 'gn'; gn.textContent = t.gn; nodo.appendChild(gn);
+}
+
 // ── MatiGuarã: cambia de pose según lo que hace el niño ──────────────────
 const POSES = {
     guino:   @js(asset('img/guara/guara-guino.webp')),
@@ -322,7 +318,7 @@ const aviso    = document.getElementById('aviso');
 let poseActual = 'guino';
 function pose(nombre, texto, efecto) {
     if (nombre !== poseActual) { poseActual = nombre; guaraImg.src = POSES[nombre]; }
-    if (texto) burbuja.textContent = texto;
+    if (texto) mostrarBi(burbuja, texto);
     if (efecto) { guaraImg.classList.remove('salta', 'uy'); void guaraImg.offsetWidth; guaraImg.classList.add(efecto); }
 }
 
@@ -341,11 +337,11 @@ function actualizarDisplay() {
 
     // Reacción de la mascota
     aviso.textContent = '';
-    if (pin.length === 4 && hayCodigo) pose('festeja', '¡Listo! Tocá «Entrar a jugar».', 'salta');
-    else if (pin.length === 4)         pose('mira', 'Falta tu código de acceso.');
-    else if (pin.length > 0)           pose('mira', '¡Seguí! Te faltan ' + (4 - pin.length) + ' números.');
-    else if (hayCodigo)                pose('guino', 'Ahora tu PIN secreto.');
-    else                               pose('guino', '¡Hola! Escribí tu código.');
+    if (pin.length === 4 && hayCodigo) pose('festeja', TX.burbujaListo, 'salta');
+    else if (pin.length === 4)         pose('mira', TX.burbujaFaltaCodigo);
+    else if (pin.length > 0)           pose('mira', llenar(TX.burbujaSigue, 4 - pin.length));
+    else if (hayCodigo)                pose('guino', TX.burbujaPin);
+    else                               pose('guino', TX.burbujaInicio);
 }
 
 function agregarDigito(n) { if (digitos.length < 4) { digitos.push(n); actualizarDisplay(); } }
@@ -358,15 +354,15 @@ document.getElementById('formAcceso').addEventListener('submit', function (e) {
     const pin    = document.getElementById('pinCompleto').value;
     if (!codigo) {
         e.preventDefault();
-        aviso.textContent = '🪪 Ingresá tu código de acceso primero.';
-        pose('piensa', '¿Cuál es tu código?', 'uy');
+        mostrarBi(aviso, TX.avisoSinCodigo);
+        pose('piensa', TX.burbujaSinCodigo, 'uy');
         document.getElementById('codigo_acceso').focus();
         return;
     }
     if (pin.length !== 4) {
         e.preventDefault();
-        aviso.textContent = '🔐 Ingresá tu PIN de 4 números.';
-        pose('piensa', 'Faltan números del PIN.', 'uy');
+        mostrarBi(aviso, TX.avisoPinCorto);
+        pose('piensa', TX.burbujaPinCorto, 'uy');
     }
 });
 
@@ -389,7 +385,7 @@ campoCodigo.addEventListener('keydown', function (e) {
     e.preventDefault();                       // no enviar el formulario con el PIN vacío
     if (campoCodigo.value.trim() === '') return;
     campoCodigo.blur();                       // el foco sale del campo: los números van al PIN
-    pose('guino', 'Ahora tu PIN secreto.');
+    pose('guino', TX.burbujaPin);
 });
 document.addEventListener('keydown', function (e) {
     if (e.target === campoCodigo) return;     // escribiendo el código: no interferir
@@ -411,7 +407,7 @@ document.addEventListener('keydown', function (e) {
 
 // Si el servidor devolvió un error, MatiGuarã se muestra pensativa
 @if($errors->any())
-pose('piensa', '¡Uy! Probemos de nuevo.', 'uy');
+pose('piensa', TX.burbujaError, 'uy');
 @endif
 </script>
 </body>

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\CatalogoLogro;
+use App\Support\TextosGuaraniCompartidos;
 use Illuminate\Database\Seeder;
 
 /**
@@ -19,38 +20,38 @@ class CatalogoLogrosSeeder extends Seeder
              'tipo' => 'racha', 'condicion_tipo' => 'aciertos_consecutivos', 'condicion_valor' => 3,
              'rareza' => 'comun',     'puntos_logro' => 10],
 
-          ['nombre_es' => 'Imparable',         'nombre_gn' => 'Oky\'o-\'ymante',
+          ['nombre_es' => 'Imparable',         'nombre_gn' => 'Oky\'o\'ỹva',
              'tipo' => 'racha', 'condicion_tipo' => 'aciertos_consecutivos', 'condicion_valor' => 10,
              'rareza' => 'raro',      'puntos_logro' => 50],
 
-            ['nombre_es' => 'Maestro del Cálculo','nombre_gn' => 'Aranduka Ñemonde',
+            ['nombre_es' => 'Maestro del Cálculo','nombre_gn' => 'Papapy Mbo\'ehára',
              'tipo' => 'racha', 'condicion_tipo' => 'aciertos_consecutivos', 'condicion_valor' => 20,
              'rareza' => 'epico',     'puntos_logro' => 150],
 
             // ── PARTIDAS JUGADAS ──────────────────────────────────────
-            ['nombre_es' => 'Primer Paso',       'nombre_gn' => 'Peteĩha Guata',
+            ['nombre_es' => 'Primer Paso',       'nombre_gn' => 'Peteĩha Tape',
              'tipo' => 'partidas', 'condicion_tipo' => 'partidas_jugadas', 'condicion_valor' => 1,
              'rareza' => 'comun',     'puntos_logro' => 5],
 
-            ['nombre_es' => 'Constante',          'nombre_gn' => 'Okyje\'ỹha',
+            ['nombre_es' => 'Constante',          'nombre_gn' => 'Oñondive',
              'tipo' => 'partidas', 'condicion_tipo' => 'partidas_jugadas', 'condicion_valor' => 10,
              'rareza' => 'raro',      'puntos_logro' => 30],
 
             // ── NIVELES SUPERADOS ─────────────────────────────────────
-            ['nombre_es' => 'Nivel Conquistado',  'nombre_gn' => 'Nivel Ojapóva',
+            ['nombre_es' => 'Nivel Conquistado',  'nombre_gn' => 'Nivel Oñembojára',
              'tipo' => 'nivel', 'condicion_tipo' => 'nivel_superado', 'condicion_valor' => 1,
              'rareza' => 'comun',     'puntos_logro' => 20],
 
-            ['nombre_es' => 'Explorador',          'nombre_gn' => 'Oheka-haguã',
+            ['nombre_es' => 'Explorador',          'nombre_gn' => 'Mba\'ehecha',
              'tipo' => 'nivel', 'condicion_tipo' => 'nivel_superado', 'condicion_valor' => 5,
              'rareza' => 'raro',      'puntos_logro' => 75],
 
             // ── DÍAS CONSECUTIVOS ─────────────────────────────────────
-            ['nombre_es' => 'Semana Completa',    'nombre_gn' => 'Arapokõindy Opáva',
+            ['nombre_es' => 'Semana Completa',    'nombre_gn' => 'Arapokõindy Kue',
              'tipo' => 'racha', 'condicion_tipo' => 'dias_consecutivos', 'condicion_valor' => 7,
              'rareza' => 'epico',     'puntos_logro' => 100],
 
-            ['nombre_es' => 'Leyenda',             'nombre_gn' => 'Ñemombe\'u',
+            ['nombre_es' => 'Leyenda',             'nombre_gn' => 'Mombe\'ugua\'u',
              'tipo' => 'especial', 'condicion_tipo' => 'dias_consecutivos', 'condicion_valor' => 30,
              'rareza' => 'legendario','puntos_logro' => 500],
         ];
@@ -72,11 +73,15 @@ class CatalogoLogrosSeeder extends Seeder
 
         foreach ($logros as $l) {
             [$emoji, $descripcion] = $extra[$l['nombre_es']] ?? [null, null];
+            // Guaraní revisado (nombre y descripción): fuente única en TextosGuaraniCompartidos.
+            [$nombreGn, $descripcionGn] = TextosGuaraniCompartidos::medalla($l['nombre_es']) ?? [$l['nombre_gn'], null];
             CatalogoLogro::updateOrCreate(
                 ['nombre_es' => $l['nombre_es']],
                 array_merge($l, [
+                    'nombre_gn'      => $nombreGn,
                     'emoji'          => $emoji,
                     'descripcion_es' => $descripcion,
+                    'descripcion_gn' => $descripcionGn,
                     'icono_url'      => null,
                     'activo'         => true,
                 ])

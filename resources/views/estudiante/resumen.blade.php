@@ -11,8 +11,7 @@
     conserva las mismas rutas y formularios (incluida la regla de
     "Encuentra el par": sube / baja / repite). Solo cambia cómo se ve.
 
-    Guaraní NUEVO (borrador, validar con una persona hablante):
-      ¡Iporãiterei! · ¡Iporã! · ¡Eñeha'ã jey!
+    Guaraní: títulos y subtítulos revisados por la persona hablante (planillas de cada juego).
     =========================================================================
 --}}
 
@@ -52,17 +51,18 @@
         $escenaRes = ['🌳','🐝','🍎','🌻','🐛','🦋'];
     }
 
-    if ($pctOk >= 80)      { $estrellasRes = 3; $estadoRes = 'feliz'; $tituloEs = '¡Fantástico!'; $tituloGn = '¡Iporãiterei!'; $subRes = 'Sos un crack de las matemáticas.'; }
-    elseif ($pctOk >= 50)  { $estrellasRes = 2; $estadoRes = 'feliz'; $tituloEs = '¡Muy bien!';    $tituloGn = '¡Iporã!';        $subRes = 'Cada vez lo hacés mejor.'; }
-    else                   { $estrellasRes = 1; $estadoRes = 'idle';  $tituloEs = '¡Buen intento!'; $tituloGn = "¡Eñeha'ã jey!"; $subRes = 'La práctica te hace más fuerte.'; }
+    if ($pctOk >= 80)      { $estrellasRes = 3; $estadoRes = 'feliz'; $tituloEs = '¡Fantástico!'; $tituloGn = '¡Iporãite!'; $subRes = 'Sos un crack de las matemáticas.'; $subGn = 'Nde arandu matemátikape.'; }
+    elseif ($pctOk >= 50)  { $estrellasRes = 2; $estadoRes = 'feliz'; $tituloEs = '¡Muy bien!';    $tituloGn = '¡Iporãite!';     $subRes = 'Cada vez lo hacés mejor.'; $subGn = "Ko'ãga iporãve reapo."; }
+    else                   { $estrellasRes = 1; $estadoRes = 'idle';  $tituloEs = '¡Buen intento!'; $tituloGn = '¡Erojere porã!'; $subRes = 'La práctica te hace más fuerte.'; $subGn = 'Tembiapo omombareteve.'; }
 
     // «El camino a la escuela»: las estrellas son las del camino (no el porcentaje de aciertos)
     if ($esLaberinto && $detalleLab && $detalleLab->llego) {
+        $subGn = null; // el guaraní de estas frases se revisa con «El camino a la escuela»
         $estrellasRes = max(1, (int) $detalleLab->estrellas);
         $estadoRes    = $estrellasRes >= 2 ? 'feliz' : 'idle';
-        if ($estrellasRes === 3)     { $tituloEs = '¡Camino perfecto!';        $tituloGn = '¡Iporãiterei!';   $subRes = 'Llegaste a la escuela sin ayuda.'; }
-        elseif ($estrellasRes === 2) { $tituloEs = '¡Llegaste a la escuela!';  $tituloGn = '¡Iporã!';         $subRes = 'Usaste ayudas y llegaste igual.'; }
-        else                         { $tituloEs = '¡Llegaste a la escuela!';  $tituloGn = '¡Ereguahẽ!';      $subRes = 'Cada camino te enseña algo nuevo.'; }
+        if ($estrellasRes === 3)     { $tituloEs = '¡Camino perfecto!';        $tituloGn = '¡Tape iporãitereíva!';   $subRes = 'Llegaste a la escuela sin ayuda.'; }
+        elseif ($estrellasRes === 2) { $tituloEs = '¡Llegaste a la escuela!';  $tituloGn = "¡Reguahẽma mbo'ehaópe!";         $subRes = 'Usaste ayudas y llegaste igual.'; }
+        else                         { $tituloEs = '¡Llegaste a la escuela!';  $tituloGn = "¡Reguahẽma mbo'ehaópe!";      $subRes = 'Cada camino te enseña algo nuevo.'; }
     }
 @endphp
 
@@ -80,6 +80,7 @@
         <h2>{{ $tituloEs }}</h2>
         <h2 class="gn">{{ $tituloGn }}</h2>
         <p class="sub">{{ $subRes }}</p>
+        @if(!empty($subGn))<p class="sub mv2-gn-sub">{{ $subGn }}</p>@endif
 
         <div class="mv2-estrellas" role="img" aria-label="{{ $estrellasRes }} de 3 estrellas">
             @for($i = 0; $i < 3; $i++)
@@ -89,7 +90,9 @@
 
         {{-- Badge de nivel superado --}}
         @if($sesion->nivel_superado)
-            <div class="mv2-res-superado">🎉 ¡Nivel {{ $sesion->nivel->numero_nivel }} superado!</div>
+            <div class="mv2-res-superado">🎉 ¡Nivel {{ $sesion->nivel->numero_nivel }} superado!
+                <small class="mv2-gn-sub d-block">¡Nivel {{ $sesion->nivel->numero_nivel }} oñembohasa!</small>
+            </div>
         @endif
 
         {{-- «El camino a la escuela»: ayudas y chipas del camino --}}
@@ -127,7 +130,7 @@
         {{-- Logros nuevos --}}
         @if($logrosNuevos->isNotEmpty())
             <div class="mv2-res-logros">
-                <h5>🎖️ ¡Logros nuevos!</h5>
+                <h5>🎖️ ¡Logros nuevos! <small class="mv2-gn-sub d-block">¡Pyahurei jehecha!</small></h5>
                 <div class="mv2-res-extra" style="margin-top:0">
                     @foreach($logrosNuevos as $logro)
                         <span class="mv2-res-ficha">{{ $logro->logro->emoji ?? '🏅' }} {{ $logro->logro->nombre_es }}</span>
@@ -159,6 +162,7 @@
                     <button type="submit" class="mv2-btn amarillo">
                         <i class="bi bi-skip-forward-fill me-1"></i>
                         ¡Siguiente nivel: {{ $siguienteNivel->numero_nivel }}!
+                        <small class="mv2-gn-sub d-block">¡Nivel oúva: {{ $siguienteNivel->numero_nivel }}!</small>
                     </button>
                 </form>
             </div>
@@ -181,6 +185,7 @@
                     @else
                         <i class="bi bi-arrow-clockwise me-1"></i>
                         ¡Jugar de nuevo!
+                        <small class="mv2-gn-sub d-block">¡Juego jevy!</small>
                     @endif
                 </button>
             </form>

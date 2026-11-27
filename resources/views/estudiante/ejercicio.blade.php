@@ -50,13 +50,13 @@
     // así que NO se muestra: mientras los números están a la vista se pide
     // memorizar, y cuando desaparecen el texto cambia a la pregunta. Así el niño
     // no puede leer la cuenta en el texto (ni escucharla con el botón 🔊).
-    // Guaraní: frases tomadas de los ejercicios originales; validar con una persona hablante.
+    // Guaraní revisado por la persona hablante (FM-UI-02 y FM-UI-04).
     $esFlash       = (bool) $nivel->tiempo_mostrar_ms;
     $flashOcultoEs = '¿Cuánto da?';
-    $flashOcultoGn = "¿Mboy'e pa?";
+    $flashOcultoGn = '¿Mboýpa osẽ?';
     if ($esFlash) {
         $textoEs = '¡Mirá! ¡Memorizalo!';
-        $textoGn = '¡Ehecha! ¡Eñangarekoite!';
+        $textoGn = "¡Emaña! ¡Eñemandu'a hese!";
     }
     $mundoEj = $esFlash ? 'F' : 'S';
     $ult     = session('ultimo_resultado');
@@ -79,13 +79,17 @@
             @if($ult)
                 <div class="mv2-burbuja {{ $ult['es_correcto'] ? 'bien' : 'casi' }}" id="burbuja" role="status" aria-live="polite">
                     <b>{{ $ult['es_correcto'] ? '⭐' : '💪' }} {{ $ult['mensaje_es'] ?? ($ult['es_correcto'] ? '¡Muy bien!' : '¡Intentalo de nuevo!') }}</b>
-                    @if(!empty($ult['mensaje_gn']))<i>{{ $ult['mensaje_gn'] }}</i>@endif
+                    @php
+                        // Si no hay mensaje en la base, se usa el texto de respaldo (SF-UI-02 / SF-UI-03).
+                        $gnBurbuja = $ult['mensaje_gn'] ?? (empty($ult['mensaje_es']) ? ($ult['es_correcto'] ? '¡Iporãite!' : '¡Erojere jevy!') : null);
+                    @endphp
+                    @if(!empty($gnBurbuja))<i>{{ $gnBurbuja }}</i>@endif
                     @if($ult['es_correcto'] && ($ult['puntos'] ?? 0) > 0)<span class="pts">+{{ $ult['puntos'] }} puntos</span>@endif
                 </div>
             @else
                 <div class="mv2-burbuja" id="burbuja" role="status" aria-live="polite">
                     <b>¡Vos podés, {{ $nombreCorto }}!</b>
-                    <i>¡Ikatu nde!</i>
+                    <i>¡Ikatu nde, {{ $nombreCorto }}!</i>
                 </div>
             @endif
         </div>
@@ -99,6 +103,9 @@
     <div class="mv2-ej-prog">
         <div class="mv2-ej-juego mv2-pegatina">
             {{ $esFlash ? '⚡' : '🍎' }} {{ $sesion->juego->nombre_es }} · Nivel {{ $nivel->numero_nivel }}
+            @if(!empty($sesion->juego->nombre_gn))
+                <small class="d-block fst-italic">{{ $sesion->juego->nombre_gn }} · Nivel {{ $nivel->numero_nivel }}</small>
+            @endif
             <span class="dif" aria-label="Dificultad {{ $nivel->dificultad }} de 5">{{ str_repeat('★', $nivel->dificultad) }}{{ str_repeat('☆', 5 - $nivel->dificultad) }}</span>
         </div>
         <div class="mv2-camino" role="img" aria-label="Pregunta {{ $respondidos + 1 }} de {{ $totalEjercicios }}">
@@ -108,7 +115,7 @@
         {{-- Música de fondo — propia de cada juego (Suma de Frutas y Flash Matemático) --}}
         @if($musicaJuego)
             <button type="button" class="btn-musica-ejercicio" id="btnMusicaJuego" onclick="toggleMusicaJuego()">
-                🔇 Música
+                🔇 Música · Pu
             </button>
             <audio id="musicaJuego" loop preload="none">
                 <source src="{{ asset('audio/musica/' . $musicaJuego['archivo']) }}" type="audio/mpeg">
@@ -122,7 +129,7 @@
         {{-- COUNTDOWN — solo para Flash Matemático ─────────────────────── --}}
         @if($nivel->tiempo_mostrar_ms)
             <div class="mv2-cuenta" id="countdownRing">
-                <span class="et" id="countdownEtiqueta">⚡ ¡Memorizá!</span>
+                <span class="et" id="countdownEtiqueta">⚡ ¡Memorizá! · ¡Eñemandu'a!</span>
                 <div class="pista"><div id="countdownBarra"></div></div>
                 <b class="n" id="countdownNumero">{{ intdiv($tiempoFlashMs, 1000) }}</b>
             </div>
@@ -203,12 +210,13 @@
             <div class="mv2-pista" role="note" aria-live="polite"
                  style="margin:.7rem auto;max-width:34rem;padding:.75rem 1rem;border-radius:1rem;background:#FFF6D6;border:2px dashed #E9B824;text-align:left;line-height:1.4;">
                 <b>💡 Pista · ¡Tenés otra oportunidad!</b>
+                <div style="font-size:.95rem;font-style:italic;color:#7a5a00;">💡 Pista · ¡Rechase peteĩ oportunidad pyahu!</div>
                 <div style="font-size:1.08rem;">{{ $pista['es'] }}</div>
                 <div style="font-size:1.08rem;font-style:italic;">{{ $pista['gn'] }}</div>
                 <button type="button" class="mv2-btn-audio" style="margin-top:.4rem;"
                         onclick="AudioService.leerEnunciado({{ \Illuminate\Support\Js::from($pista['es']) }}, 'es')"
                         title="Escuchar la pista">
-                    🔊 Escuchar la pista
+                    🔊 Escuchar la pista <small style="font-style:italic;">· 🔊 Ehendu pista</small>
                 </button>
             </div>
         @endif
@@ -248,7 +256,8 @@
         <input type="hidden" name="tiempo_ms" id="tiempoMs">
         <input type="hidden" name="respuesta" id="respuestaSeleccionada">
 
-        <div class="mv2-pregunta">👇 Elegí la respuesta correcta</div>
+        <div class="mv2-pregunta">👇 Elegí la respuesta correcta
+            <small class="d-block fst-italic" style="font-size:.85em;">👇 Eiporavo mbohovái oĩporãva</small></div>
 
         @if($opciones->isNotEmpty())
             <div class="mv2-opciones">
@@ -267,6 +276,7 @@
                  después de un instante (ver script), por si el niño quiere corregir. --}}
             <p class="ayuda-respuesta" id="ayudaRespuesta" aria-live="polite">
                 Tocá tu respuesta. Si te equivocaste, tocá otra.
+                <span class="d-block fst-italic">Ehetũ mbohovái. Ndaikatúi ramo, eiporavo ambue.</span>
             </p>
         @else
             {{-- Respuesta libre --}}
@@ -394,7 +404,7 @@ window.textoEsActual = @js($textoEs);
             barra.style.width = '0%';
             barra.className = 'poco';
             caja.classList.add('fin');
-            etiqueta.textContent = '¡Ya!';
+            etiqueta.textContent = "¡Ya! · ¡Ko'ágã!";
             numero.textContent  = '⚡';
 
             // Sonido de "¡ya!" cuando desaparecen los números
@@ -437,7 +447,7 @@ window.textoEsActual = @js($textoEs);
         || (guardado === null && localStorage.getItem('matiguara_musica') !== '0');
 
     function actualizarBoton() {
-        btn.textContent = musicaActiva ? '🎵 Música' : '🔇 Música';
+        btn.textContent = musicaActiva ? '🎵 Música · Pu' : '🔇 Música · Pu';
     }
 
     function guardarProgreso() {

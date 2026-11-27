@@ -3,7 +3,7 @@
    Juego en el navegador. El servidor entrega la semilla del laberinto y los
    ejercicios (window.LB_CFG); acá solo se dibuja, se camina y se responde.
    Cada respuesta se envía a /movimiento y al llegar se cierra con /cerrar.
-   Los textos en guaraní son BORRADORES a validar con una persona hablante.
+   Guaraní revisado por la persona hablante (planilla Guarani_ElCaminoALaEscuela).
    ========================================================================= */
 (function(){
 'use strict';
@@ -23,6 +23,8 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a
 function rint(r,a,b){return a+Math.floor(r()*(b-a+1))}
 function pick(r,arr){return arr[Math.floor(r()*arr.length)]}
 function shuffle(r,arr){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+/* botón de dos líneas: castellano + guaraní */
+function bl(es,gn){return '<span class="bl">'+es+'<small class="gn">'+gn+'</small></span>'}
 function lowerFirst(s){return s.charAt(0).toLowerCase()+s.slice(1)}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
 var REDUCE=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -30,44 +32,44 @@ var REDUCE=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').mat
 /* ================= datos del juego ================= */
 var GRADOS={1:{max:20,txt:'hasta 20'},2:{max:100,txt:'hasta 100'},3:{max:1000,txt:'hasta 1000'}};
 var NIVELES=[
- {n:1,nombre:'Sumas simples',op:'suma',dur:'easy'},
- {n:2,nombre:'Sumas con llevada',op:'suma',dur:'hard'},
- {n:3,nombre:'Restas simples',op:'resta',dur:'easy'},
- {n:4,nombre:'Restas con préstamo',op:'resta',dur:'hard'},
- {n:5,nombre:'Sumas y restas',op:'mezcla'},
- {n:6,nombre:'¿Cuánto falta?',op:'falta'},
- {n:7,nombre:'Dos pasos',op:'dos'},
- {n:8,nombre:'Dos pasos y cuánto falta',op:'dos_falta'}
+ {n:1,nombre:'Sumas simples',gn:'Mbojuaju ndahasýiva',op:'suma',dur:'easy'},
+ {n:2,nombre:'Sumas con llevada',gn:'Mbojuaju jeraha ndive',op:'suma',dur:'hard'},
+ {n:3,nombre:'Restas simples',gn:"Jepe'a ndahasýiva",op:'resta',dur:'easy'},
+ {n:4,nombre:'Restas con préstamo',gn:"Jepe'a jerure ndive",op:'resta',dur:'hard'},
+ {n:5,nombre:'Sumas y restas',gn:"Mbojuaju ha jepe'a",op:'mezcla'},
+ {n:6,nombre:'¿Cuánto falta?',gn:'¿Mboy piko ofalta?',op:'falta'},
+ {n:7,nombre:'Dos pasos',gn:'Mokõi jehasa',op:'dos'},
+ {n:8,nombre:'Dos pasos y cuánto falta',gn:'Mokõi jehasa ha mboy piko ofalta',op:'dos_falta'}
 ];
 var ESC=['chacra','arroyo','campo','pueblo'];
 var ESCDATA={
- chacra:{nombre:'Chacra y mandiocal',emo:'🌱',bg:'#7DB46A',wall:'#2F8F4E',wallD:'#216B38',path:'#C9683F',pathD:'#B25A35',deco:'🌿',
-   obs:[['🧺','Canasto de mandioca'],['🪵','Árbol caído']],o:{sg:'mandioca',pl:'mandiocas',fem:true,gn:"mandi'o"}},
- arroyo:{nombre:'Arroyo',emo:'💧',bg:'#8FCBE0',wall:'#3F8FD2',wallD:'#2B6FAE',path:'#E8C98A',pathD:'#D6B472',deco:'🐟',
-   obs:[['🪨','Piedras del arroyo'],['🚧','Puente roto']],o:{sg:'pez',pl:'peces',fem:false,gn:'pira'}},
- campo:{nombre:'Campo con ganado',emo:'🐄',bg:'#A5D170',wall:'#4F9A3A',wallD:'#3A7A2B',path:'#D9B27A',pathD:'#C69E64',deco:'🌳',
-   obs:[['🐄','Vacas en el camino'],['🐂','Toro en el portón']],o:{sg:'vaca',pl:'vacas',fem:true,gn:'vaka'}},
- pueblo:{nombre:'Pueblo y chipería',emo:'🏘️',bg:'#C9B79B',wall:'#D98B6C',wallD:'#B76A4D',path:'#CFC6B6',pathD:'#BDB3A1',deco:'🪟',
-   obs:[['🚪','Portón cerrado'],['🛒','Compra de chipas']],o:{sg:'chipa',pl:'chipas',fem:true,gn:'chipa'}}
+ chacra:{nombre:'Chacra y mandiocal',gn:"Kokue ha mandi'oty",emo:'🌱',bg:'#7DB46A',wall:'#2F8F4E',wallD:'#216B38',path:'#C9683F',pathD:'#B25A35',deco:'🌿',
+   obs:[['🧺','Canasto de mandioca','Ajaka mandi\'o rehegua'],['🪵','Árbol caído','Yvyramáta ho\'áva']],o:{sg:'mandioca',pl:'mandiocas',fem:true,gn:"mandi'o"}},
+ arroyo:{nombre:'Arroyo',gn:"Ysyry'i",emo:'💧',bg:'#8FCBE0',wall:'#3F8FD2',wallD:'#2B6FAE',path:'#E8C98A',pathD:'#D6B472',deco:'🐟',
+   obs:[['🪨','Piedras del arroyo','Ita ysyry\'ipegua'],['🚧','Puente roto','Yvyra\'i hasaha oñembyaíva']],o:{sg:'pez',pl:'peces',fem:false,gn:'pira'}},
+ campo:{nombre:'Campo con ganado',gn:'Ñu mymba ndive',emo:'🐄',bg:'#A5D170',wall:'#4F9A3A',wallD:'#3A7A2B',path:'#D9B27A',pathD:'#C69E64',deco:'🌳',
+   obs:[['🐄','Vacas en el camino','Vaka tapépe'],['🐂','Toro en el portón','Tóro okẽme']],o:{sg:'vaca',pl:'vacas',fem:true,gn:'vaka'}},
+ pueblo:{nombre:'Pueblo y chipería',gn:'Táva ha chipa apo',emo:'🏘️',bg:'#C9B79B',wall:'#D98B6C',wallD:'#B76A4D',path:'#CFC6B6',pathD:'#BDB3A1',deco:'🪟',
+   obs:[['🚪','Portón cerrado','Okẽ oñembotýva'],['🛒','Compra de chipas','Chipa jegua']],o:{sg:'chipa',pl:'chipas',fem:true,gn:'chipa'}}
 };
 function escDe(nivel){return ESC[Math.ceil(nivel/2)-1]}
 
-/* mensajes (borrador en guaraní: pendiente de validar) */
+/* mensajes de Mati: castellano + guaraní revisado (CE-MSG-*) */
 var MSG={
- inicio:[['¡Buen día! Hay obstáculos en el camino. ¡Vamos a la escuela!','Mba\'éichapa! Ñande rape henyhẽ mba\'e rehe. Jaha mbo\'ehaópe!'],['Tocá un lugar del camino y caminamos juntos.','Eikutu ñande rape ha jaha oñondive.']],
- obstaculo:[['¡Ey, algo bloquea el camino! Resolvamos este problema.','Oĩ mba\'e ojokóva ñande rape. Jajapo ko problema!'],['Un obstáculo. ¡Con números lo arreglamos!','Peteĩ mba\'e ojokóva. Papapy ndive jajapo!']],
- acierto:[['¡Muy bien! El camino se abre.','Iporãiterei! Ñande rape ojepe\'a.'],['¡Eso es! Seguimos para la escuela.','Upéicha! Jaha gueteri mbo\'ehaópe.']],
- error:[['Casi. Mirá la pista y probá de nuevo.','Sapy\'ami. Ehecha pe pytyvõ ha eha\'ã jey.'],['Está cerca. ¡Probá otra vez!','Hi\'aguĩma. Eha\'ã jey!']],
- solucion:[['No pasa nada. Mirá cómo se resuelve; luego va uno parecido.','Ndaipóri problema. Ehecha mba\'éichapa ojejapo; upéi oúta ambue.'],['Entre todos lo arreglamos. Después va uno parecido.','Ñande ñepytyvõ jajapo. Upéi oúta ambue ojogua.']],
- reparacion:[['En reparación. Tocalo cuando quieras probar uno parecido.','Ojejapo gueteri. Eikutu eipota ramo ambue.']],
- atencion:[['¡Mirá bien!','Ehecha porã!']],
- chipa:[['¡Una chipa! Se la llevamos a la maestra.','Peteĩ chipa! Jaru ñande mbo\'ehárape.'],['¡Qué rica! La guardamos para el recreo.','Chipa ipirũ! Jajapyhy recreo guarã.']],
- pista:[['Te doy una pista.','Ame\'ẽta ndéve peteĩ pytyvõ.']],
- flecha:[['¡Por acá se llega a la escuela!','Péva rupi jaguahẽ mbo\'ehaópe!']],
- llegada:[['¡Llegaste a la escuela! ¡Suena la campana!','Ereguahẽ mbo\'ehaópe! Oñembopu pe campana!']],
- maestra:[['¡Llegaste justo para el recreo! ¿Compartimos las chipas?','Ereguahẽ recreo guarã! Jaja\'o chipa?'],['¡Qué bien caminaste! Gracias por las chipas.','Iporãiterei reguata! Aguyje chipa rehe.']],
- poco:[['Falta poquito para terminar por hoy. ¡Sigamos!','Sapy\'ami opa hag̃ua ko árape. Jaha gueteri!']],
- sinChipas:[['¡Llegaste! Otro día buscamos chipas en los callejones.','Ereguahẽ! Ambue árape jaheka chipa.']]
+ inicio:[['¡Buen día! Hay obstáculos en el camino. ¡Vamos a la escuela!','¡Mba\'éichapa! Oĩ jokoha tapépe. ¡Jaha mbo\'ehaópe!'],['Tocá un lugar del camino y caminamos juntos.','Epoko peteĩ tenda tapépe ha jaguata oñondive.']],
+ obstaculo:[['¡Ey, algo bloquea el camino! Resolvamos este problema.','¡Áina, peteĩ mba\'e ojoko ñande rape! Ñamyengovia ko apañuãi.'],['Un obstáculo. ¡Con números lo arreglamos!','Peteĩ jokoha. ¡Papapy ndive ñamyatyrõta!']],
+ acierto:[['¡Muy bien! El camino se abre.','¡Iporãiterei! Ñande rape ojepe\'a.'],['¡Eso es! Seguimos para la escuela.','¡Upéichaite! Jaha tenonde mbo\'ehaópe.']],
+ error:[['Casi. Mirá la pista y probá de nuevo.','Haimete. Ehecha pe pytyvõrã ha eha\'ã jey.'],['Está cerca. ¡Probá otra vez!','Hi\'ag̃uíma. ¡Eha\'ã jey!']],
+ solucion:[['No pasa nada. Mirá cómo se resuelve; luego va uno parecido.','Ndaipóri apañuãi. Ehecha mba\'éichapa oñemyengovia; upéi oúta peteĩ ojoguáva.'],['Entre todos lo arreglamos. Después va uno parecido.','Oñondive ñamyatyrõ. Upéi oúta peteĩ ojoguáva.']],
+ reparacion:[['En reparación. Tocalo cuando quieras probar uno parecido.','Oñemyatyrõ hína. Epoko hese reha\'ãse vove peteĩ ojoguáva.']],
+ atencion:[['¡Mirá bien!','¡Emaña porã!']],
+ chipa:[['¡Una chipa! Se la llevamos a la maestra.','¡Peteĩ chipa! Jaraháta ñane mbo\'ehárape.'],['¡Qué rica! La guardamos para el recreo.','¡Héterei! Ñañongatu pytu\'u aravórã.']],
+ pista:[['Te doy una pista.','Ame\'ẽta ndéve peteĩ pytyvõrã.']],
+ flecha:[['¡Por acá se llega a la escuela!','¡Ko\'árupi oñeguahẽ mbo\'ehaópe!']],
+ llegada:[['¡Llegaste a la escuela! ¡Suena la campana!','¡Reguahẽma mbo\'ehaópe! ¡Oñembopu itapu!']],
+ maestra:[['¡Llegaste justo para el recreo! ¿Compartimos las chipas?','¡Reguahẽite pytu\'u aravórã! ¿Ñamboja\'o piko umi chipa?'],['¡Qué bien caminaste! Gracias por las chipas.','¡Iporãiterei reguata! Aguyje umi chipa rehe.']],
+ poco:[['Falta poquito para terminar por hoy. ¡Sigamos!','Michĩmi opyta opa hag̃ua ko árape. ¡Jaha tenonde!']],
+ sinChipas:[['¡Llegaste! Otro día buscamos chipas en los callejones.','¡Reguahẽma! Ambue árape jahekáta chipa tape po\'ípe.']]
 };
 
 /* ================= utilidades de aritmética (pistas) ================= */
@@ -86,74 +88,77 @@ function eqText(d){return eqHTML(d).replace(/<[^>]+>/g,'')}
 
 /* ---- pistas y soluciones ---- */
 var PLACE=['Unidades','Decenas','Centenas'];
+var PLACEG=['Peteĩha','Paha','Saha'];
 function addSteps(a,b){
-  var lines=[],c=0,da=digits(a),db=digits(b),n=Math.max(da.length,db.length);
+  var lines=[],gl=[],c=0,da=digits(a),db=digits(b),n=Math.max(da.length,db.length);
   for(var i=0;i<n;i++){
     var x=da[i]||0,y=db[i]||0;if(!x&&!y&&!c)continue;
-    var s=x+y+c,t=PLACE[i]+': '+x+' + '+y+(c?' + '+c:'')+' = '+s+'.';
-    if(s>=10){t+=' Escribo '+(s-10)+' y llevo 1.';c=1}else c=0;
-    lines.push(t);
+    var s=x+y+c,m=x+' + '+y+(c?' + '+c:'')+' = '+s+'.',t=PLACE[i]+': '+m,tg=PLACEG[i]+': '+m;
+    if(s>=10){t+=' Escribo '+(s-10)+' y llevo 1.';tg+=' Ahai '+(s-10)+' ha araha 1.';c=1}else c=0;
+    lines.push(t);gl.push(tg);
   }
-  return lines;
+  return{es:lines,gn:gl};
 }
 function subSteps(a,b){
-  var lines=[],br=0,da=digits(a),db=digits(b);
+  var lines=[],gl=[],br=0,da=digits(a),db=digits(b);
   for(var i=0;i<da.length;i++){
-    var base=da[i],y=db[i]||0,P=PLACE[i],cur,t;
+    var base=da[i],y=db[i]||0,P=PLACE[i],G=PLACEG[i],cur,t,tg;
     if(i>0&&base===0&&y===0&&!br&&i>=db.length&&i===da.length-1)break;
-    if(br&&base===0){t=P+': hay 0 y ya presté 1. Pido 1 a la columna siguiente: queda 9. 9 − '+y+' = '+(9-y)+'.';br=1}
+    if(br&&base===0){t=P+': hay 0 y ya presté 1. Pido 1 a la columna siguiente: queda 9. 9 − '+y+' = '+(9-y)+'.';tg=G+": oĩ 0 ha ame'ẽma 1. Ajerure 1 pe tenda oúvape: opyta 9. 9 − "+y+' = '+(9-y)+'.';br=1}
     else if(br){
       cur=base-1;
-      if(cur<y){t=P+': '+base+' − 1 que presté = '+cur+'. '+cur+' − '+y+' no alcanza: pido 1 prestado y hago '+(cur+10)+' − '+y+' = '+(cur+10-y)+'.';br=1}
-      else{t=P+': '+base+' − 1 que presté = '+cur+'. '+cur+' − '+y+' = '+(cur-y)+'.';br=0}
-    }else if(base<y){t=P+': '+base+' − '+y+' no alcanza. Pido 1 prestado y hago '+(base+10)+' − '+y+' = '+(base+10-y)+'.';br=1}
-    else{t=P+': '+base+' − '+y+' = '+(base-y)+'.';br=0}
-    lines.push(t);
+      if(cur<y){t=P+': '+base+' − 1 que presté = '+cur+'. '+cur+' − '+y+' no alcanza: pido 1 prestado y hago '+(cur+10)+' − '+y+' = '+(cur+10-y)+'.';tg=G+': '+base+' − 1 = '+cur+'. Ajerure 1 ha ajapo '+(cur+10)+' − '+y+' = '+(cur+10-y)+'.';br=1}
+      else{t=P+': '+base+' − 1 que presté = '+cur+'. '+cur+' − '+y+' = '+(cur-y)+'.';tg=G+': '+base+' − 1 = '+cur+'. '+cur+' − '+y+' = '+(cur-y)+'.';br=0}
+    }else if(base<y){t=P+': '+base+' − '+y+' no alcanza. Pido 1 prestado y hago '+(base+10)+' − '+y+' = '+(base+10-y)+'.';tg=G+': '+base+' − '+y+'. Ajerure 1 ha ajapo '+(base+10)+' − '+y+' = '+(base+10-y)+'.';br=1}
+    else{t=P+': '+base+' − '+y+' = '+(base-y)+'.';tg=G+': '+base+' − '+y+' = '+(base-y)+'.';br=0}
+    lines.push(t);gl.push(tg);
   }
-  return lines;
+  return{es:lines,gn:gl};
 }
 function solFor(d,g){
-  var a=d.a,b=d.b,c=d.c,s=d.s,ans=d.ans,es=[],eq=[],t,u;
+  var a=d.a,b=d.b,c=d.c,s=d.s,ans=d.ans,es=[],gn=[],eq=[],t,u,st;
   if(d.tipo==='suma'){
     if(g===1){
-      if(ans<=10)es=['Empezá en '+a+' y contá '+b+' más: llegás a '+ans+'.'];
-      else{t=10-a;es=['Completá hasta 10: '+a+' + '+t+' = 10.','Te sobran '+(b-t)+': 10 + '+(b-t)+' = '+ans+'.']}
+      if(ans<=10){es=['Empezá en '+a+' y contá '+b+' más: llegás a '+ans+'.'];gn=['Eñepyrũ '+a+'-gui ha eipapa '+b+' ve: reguahẽ '+ans+'-pe.']}
+      else{t=10-a;es=['Completá hasta 10: '+a+' + '+t+' = 10.','Te sobran '+(b-t)+': 10 + '+(b-t)+' = '+ans+'.'];gn=['Embojuaju 10 peve: '+a+' + '+t+' = 10.','Hemby ndéve '+(b-t)+': 10 + '+(b-t)+' = '+ans+'.']}
       eq=[a+' + '+b+' = '+ans];
     }else{
-      es=addSteps(a,b).concat(['Resultado: '+a+' + '+b+' = '+ans+'.']);
+      st=addSteps(a,b);es=st.es.concat(['Resultado: '+a+' + '+b+' = '+ans+'.']);gn=st.gn.concat(['Osẽva: '+a+' + '+b+' = '+ans+'.']);
       var ua=a%10,ub=b%10;eq=[ua+' + '+ub+' = '+(ua+ub),(a-ua)+' + '+(b-ub)+' = '+(a-ua+b-ub),(a-ua+b-ub)+' + '+(ua+ub)+' = '+ans];
     }
   }else if(d.tipo==='resta'){
     if(g===1){
-      if(a<=10)es=['Empezá en '+a+' y contá '+b+' hacia atrás: llegás a '+ans+'.'];
-      else{u=a-10;es=['Primero quitá '+u+' para llegar a 10: '+a+' − '+u+' = 10.','Todavía quitá '+(b-u)+': 10 − '+(b-u)+' = '+ans+'.']}
-    }else es=subSteps(a,b).concat(['Resultado: '+a+' − '+b+' = '+ans+'.']);
+      if(a<=10){es=['Empezá en '+a+' y contá '+b+' hacia atrás: llegás a '+ans+'.'];gn=['Eñepyrũ '+a+'-gui ha eipapa '+b+' tapykuépe: reguahẽ '+ans+'-pe.']}
+      else{u=a-10;es=['Primero quitá '+u+' para llegar a 10: '+a+' − '+u+' = 10.','Todavía quitá '+(b-u)+': 10 − '+(b-u)+' = '+ans+'.'];gn=["Eipe'a raẽ "+u+' reguahẽ hag̃ua 10-pe: '+a+' − '+u+' = 10.',"Eipe'a gueteri "+(b-u)+': 10 − '+(b-u)+' = '+ans+'.']}
+    }else{st=subSteps(a,b);es=st.es.concat(['Resultado: '+a+' − '+b+' = '+ans+'.']);gn=st.gn.concat(['Osẽva: '+a+' − '+b+' = '+ans+'.'])}
     eq=[a+' − '+b+' = '+ans];
   }else if(d.tipo==='cuanto_falta'){
     es=['Contá desde '+a+' hasta '+c+': '+c+' − '+a+' = '+ans+'.','Comprobamos: '+a+' + '+ans+' = '+c+'.'];
+    gn=['Eipapa '+a+' guive '+c+' peve: '+c+' − '+a+' = '+ans+'.','Jahecha porã: '+a+' + '+ans+' = '+c+'.'];
     eq=[c+' − '+a+' = '+ans,a+' + '+ans+' = '+c];
   }else if(d.tipo==='dos_pasos'){
-    if(d.sg==='+-'){es=['Primero: '+a+' + '+b+' = '+s+'.','Después: '+s+' − '+c+' = '+ans+'.'];eq=[a+' + '+b+' = '+s,s+' − '+c+' = '+ans]}
-    else{es=['Primero: '+a+' − '+b+' = '+s+'.','Después: '+s+' + '+c+' = '+ans+'.'];eq=[a+' − '+b+' = '+s,s+' + '+c+' = '+ans]}
+    if(d.sg==='+-'){es=['Primero: '+a+' + '+b+' = '+s+'.','Después: '+s+' − '+c+' = '+ans+'.'];gn=['Peteĩha: '+a+' + '+b+' = '+s+'.','Upéi: '+s+' − '+c+' = '+ans+'.'];eq=[a+' + '+b+' = '+s,s+' − '+c+' = '+ans]}
+    else{es=['Primero: '+a+' − '+b+' = '+s+'.','Después: '+s+' + '+c+' = '+ans+'.'];gn=['Peteĩha: '+a+' − '+b+' = '+s+'.','Upéi: '+s+' + '+c+' = '+ans+'.'];eq=[a+' − '+b+' = '+s,s+' + '+c+' = '+ans]}
   }else{
     es=['Primero juntamos: '+a+' + '+b+' = '+s+'.','Para llegar a '+c+' faltan: '+c+' − '+s+' = '+ans+'.'];
+    gn=['Ñambyaty raẽ: '+a+' + '+b+' = '+s+'.','Reguahẽ hag̃ua '+c+'-pe ofalta: '+c+' − '+s+' = '+ans+'.'];
     eq=[a+' + '+b+' = '+s,c+' − '+s+' = '+ans];
   }
-  return{es:es,gn:'Ñemyesakã: '+eq.join(' · ')};
+  return{es:es,gn:gn.concat(['Ñemyesakã: '+eq.join(' · ')])};
 }
 function hintFor(d,g){
   var a=d.a,b=d.b,c=d.c;
   if(d.tipo==='suma'){
-    if(g===1)return d.hard?['Primero completá hasta 10 y después sumá lo que sobra.','Eipapa raẽ 10 peve, upéi embojoaju pe hembýva.']:['Empezá en el número más grande y contá lo que falta con los dedos.','Eñepyrũ pe tuichavéva-gui ha eipapa pe hembýva.'];
-    return[d.hard?'Sumá primero las unidades. Si pasan de 9, llevás 1 a la columna siguiente.':'Sumá unidades con unidades, decenas con decenas'+(g===3?' y centenas con centenas':'')+'.','Embojoaju raẽ '+(a%10)+' + '+(b%10)+'. Upéi pe ambue.'];
+    if(g===1)return d.hard?['Primero completá hasta 10 y después sumá lo que sobra.','Embojuaju raẽ 10 peve ha upéi embojuaju pe hembýva.']:['Empezá en el número más grande y contá lo que falta con los dedos.','Eñepyrũ pe papapy tuichavévagui ha eipapa ne kuãme pe ofaltáva.'];
+    return[d.hard?'Sumá primero las unidades. Si pasan de 9, llevás 1 a la columna siguiente.':'Sumá unidades con unidades, decenas con decenas'+(g===3?' y centenas con centenas':'')+'.',d.hard?'Embojuaju raẽ umi peteĩha. Ohasáramo 9-gui, eraha 1 pe tenda oúvape.':'Embojuaju peteĩha peteĩha ndive, paha paha ndive'+(g===3?' ha saha saha ndive':'')+'.'];
   }
   if(d.tipo==='resta'){
-    if(g===1)return d.hard?['Primero quitá hasta llegar a 10.','Eipe\'a raẽ 10 peve.']:['Empezá en '+a+' y contá '+b+' hacia atrás.','Eñepyrũ '+a+'-gui ha eipapa '+b+' tapykuépe.'];
-    return[d.hard?'Si en las unidades no alcanza, pedí una decena prestada.':'Restá unidades con unidades y decenas con decenas'+(g===3?' y centenas con centenas':'')+'.',d.hard?'Ndoikói ramo, ejerure peteĩ decena.':'Eipe\'a raẽ '+(b%10)+' '+(a%10)+'-gui. Upéi pe ambue.'];
+    if(g===1)return d.hard?['Primero quitá hasta llegar a 10.',"Eipe'a raẽ reguahẽ meve 10-pe."]:['Empezá en '+a+' y contá '+b+' hacia atrás.','Eñepyrũ '+a+'-gui ha eipapa '+b+' tapykuépe.'];
+    return[d.hard?'Si en las unidades no alcanza, pedí una decena prestada.':'Restá unidades con unidades y decenas con decenas'+(g===3?' y centenas con centenas':'')+'.',d.hard?"Umi peteĩhápe noĩmbáiramo, ejerure peteĩ paha oñemboja'óva.":"Eipe'a peteĩha peteĩhagui ha paha pahágui"+(g===3?' ha saha sahágui':'')+'.'];
   }
-  if(d.tipo==='cuanto_falta')return['Pensá: ¿cuánto le sumás a '+a+' para llegar a '+c+'? Contá desde '+a+'.','Eipapa '+a+'-gui '+c+' peve.'];
-  if(d.tipo==='dos_pasos')return['Hacelo en dos pasos. Primero: '+a+(d.sg==='+-'?' + ':' − ')+b+'.','Ejapo mokõi ñepyrũ. Peteĩha: '+a+(d.sg==='+-'?' + ':' − ')+b+'.'];
-  return['Primero juntá lo que ya hay: '+a+' + '+b+'. Después pensá cuánto falta para '+c+'.','Embojoaju raẽ '+a+' + '+b+'. Upéi eipapa '+c+' peve.'];
+  if(d.tipo==='cuanto_falta')return['Pensá: ¿cuánto le sumás a '+a+' para llegar a '+c+'? Contá desde '+a+'.',"Ejepy'amongeta: ¿mboy piko rembojuaju "+a+'-re reguahẽ hag̃ua '+c+'-pe? Eipapa '+a+' guive.'];
+  if(d.tipo==='dos_pasos')return['Hacelo en dos pasos. Primero: '+a+(d.sg==='+-'?' + ':' − ')+b+'.','Ejapo mokõi jehasápe. Peteĩha: '+a+(d.sg==='+-'?' + ':' − ')+b+'.'];
+  return['Primero juntá lo que ya hay: '+a+' + '+b+'. Después pensá cuánto falta para '+c+'.',"Embyaty raẽ pe oĩmava: "+a+' + '+b+". Upéi ejepy'amongeta mboy piko ofalta "+c+'-pe guarã.'];
 }
 
 /* ---- material de apoyo visual ---- */
@@ -283,7 +288,7 @@ function newGame(land){
   if(!maze){S=null;return false}
   S={grado:CFG.grado,nivel:CFG.nivel,avatar:CFG.avatar,seed:CFG.semilla,land:!!land,maze:maze,sc:sc,
     tx:maze.house[0],ty:maze.house[1],px:maze.house[0],py:maze.house[1],step:null,queue:[],mode:'walk',
-    obs:maze.obstacles.map(function(o,i){var pr=ESCDATA[sc].obs[i%2];return{idx:i,x:o.x,y:o.y,emo:pr[0],name:pr[1],state:'pending',round:0,ex:null,exRound:-1}}),
+    obs:maze.obstacles.map(function(o,i){var pr=ESCDATA[sc].obs[i%2];return{idx:i,x:o.x,y:o.y,emo:pr[0],name:pr[1],gn:pr[2],state:'pending',round:0,ex:null,exRound:-1}}),
     chip:maze.chipas.map(function(c){return{x:c.x,y:c.y,got:false}}),
     st:{puntos:0,racha:0,mejor:0,hintEx:0,arrow:false,solObs:{},first:0,done:0,att:null},
     arrowOk:false,arrowFx:null,mark:null,fx:[],bump:0,shift:0,shiftT:0,warned:false,timeUp:false,
@@ -537,7 +542,7 @@ function updateHUD(){
 function setupGameUI(){
   var e=ESCDATA[S.sc];
   $('#h-nivel').textContent='Nivel '+S.nivel+' · '+e.nombre;
-  $('#h-grado').textContent=S.grado+'.° grado · '+GRADOS[S.grado].txt;
+  $('#h-grado').textContent=S.grado+'.° grado · '+GRADOS[S.grado].txt+' · '+e.gn;
   $('#panel').hidden=true;$('#modal').hidden=true;$('#rest').hidden=true;$('#arr').hidden=true;
   updateHUD();
 }
@@ -551,8 +556,8 @@ function openObstacle(o){
   var ex=o.ex;
   P={o:o,ex:ex,attempts:0,hint:false,hintCounted:false,aid:false,done:false,locked:false,t0:performance.now(),pause:null,solved:false,shown:false};
   if(S.st.att&&S.st.att.i===o.idx&&S.st.att.r===o.round)P.attempts=Math.min(1,S.st.att.n);
-  $('#p-emo').textContent=o.emo;$('#p-title').textContent=o.name;
-  $('#p-att').textContent='Obstáculo '+(o.idx+1)+' de '+S.obs.length+(o.round>0?' · uno parecido':'');
+  $('#p-emo').textContent=o.emo;$('#p-title').innerHTML=o.name+' <span class="gn">· '+o.gn+'</span>';
+  $('#p-att').innerHTML='Obstáculo '+(o.idx+1)+' de '+S.obs.length+(o.round>0?' · uno parecido':'')+' <span class="gn">· Jokoha '+(o.idx+1)+' / '+S.obs.length+(o.round>0?' · peteĩ ojoguáva':'')+'</span>';
   $('#p-es').textContent=ex.enunciado_es;$('#p-gn').textContent=ex.enunciado_gn;
   $('#p-eq').innerHTML=ex.eq;
   ['p-aid','p-hint','p-sol'].forEach(function(id){$('#'+id).hidden=true;$('#'+id).innerHTML=''});
@@ -628,13 +633,13 @@ function wrong(i,ms,val){
     var ex=P.ex;
     optBtns.forEach(function(b,k){b.disabled=true;if(ex.opciones_json[k]===ex.respuesta_correcta){b.classList.add('good');b.insertAdjacentHTML('beforeend','<span aria-hidden="true">✔</span>')}});
     var sol=$('#p-sol');sol.hidden=false;
-    sol.innerHTML='<b>Así se resuelve</b><br>'+ex.sol_es.join('<br>')+'<br><span class="gn">'+ex.sol_gn+'</span>';
+    sol.innerHTML='<b>Así se resuelve <span class="gn">· Péicha oñemyengovia</span></b><br>'+ex.sol_es.join('<br>')+'<br><span class="gn">'+ex.sol_gn.join('<br>')+'</span>';
     $('#p-hint').hidden=true;
     var m2=MSG.solucion[Math.floor(Math.random()*MSG.solucion.length)];
     setFb('no',m2[0]+' <span class="gn">'+m2[1]+'</span>');
     $('#g-es').textContent=m2[0];$('#g-gn').textContent=m2[1];setPose('cara');
     $('#t-hint').disabled=true;$('#t-aid').disabled=true;
-    var btn=$('#t-next');btn.hidden=false;btn.textContent='Seguir ➜';
+    var btn=$('#t-next');btn.hidden=false;btn.innerHTML=bl('Seguir ➜','Eseguí ➜');
     $('#panel').scrollTop=$('#panel').scrollHeight;
     updateHUD();
   }
@@ -644,7 +649,7 @@ function showHint(auto){
   if(!P||P.done)return;
   if(!P.hintCounted){P.hintCounted=true;S.st.hintEx++}
   P.hint=true;var h=$('#p-hint');h.hidden=false;
-  h.innerHTML='<b>Pista</b><br>'+P.ex.pista_es+'<br><span class="gn">'+P.ex.pista_gn+'</span>';
+  h.innerHTML='<b>Pista <span class="gn">· Pytyvõrã</span></b><br>'+P.ex.pista_es+'<br><span class="gn">'+P.ex.pista_gn+'</span>';
   if(!auto){say('pista','guino')}
   $('#t-hint').disabled=true;updateHUD();
 }
@@ -682,7 +687,7 @@ function tickLimit(){
 function showRest(){
   S.mode='rest';S.queue.length=0;saveSession();
   var m=Math.max(1,Math.round(CFG.limiteSeg/60));
-  $('#rest-t').textContent='Jugaste '+m+(m===1?' minuto':' minutos')+'. ¡Buen trabajo!';
+  $('#rest-t').innerHTML='Jugaste '+m+(m===1?' minuto':' minutos')+'. ¡Buen trabajo!<br><span class="gn">Reñembosarái '+m+" aravo'i. ¡Tembiapo porã!</span>";
   $('#rest-img').src=IMG.guino;$('#rest').hidden=false;$('#rest-go').focus();bell();
 }
 function salirADescansar(){
@@ -704,20 +709,20 @@ function cerrarPartida(){
   var n=starsFor();
   $('#arr').hidden=false;
   $('#arr-stars').innerHTML=starsSVG(n,3);
-  $('#arr-msg').textContent='Guardando tu camino…';
+  $('#arr-msg').textContent='Guardando tu camino…';$('#arr-gn').textContent='Roñongatu hína nde rape…';
   $('#arr-medals').innerHTML='';$('#arr-retry').hidden=true;$('#arr-go').hidden=true;
   var payload={pistas:st.hintEx,flecha:!!st.arrow,chipas_recogidas:got,chipas_total:tot,duracion_s:Math.min(7200,Math.round(elapsed()/1000))};
   whenEmpty(8000).then(function(){return post(CFG.urls.cerrar,payload)}).then(function(r){
     var dest=r.redirect_url;
     $('#arr-stars').innerHTML=starsSVG(r.estrellas||n,3);
-    $('#arr-msg').textContent=(r.estrellas===3?'¡Camino perfecto!':'¡Llegaste a la escuela!');
-    $('#arr-medals').innerHTML=(r.medallas||[]).map(function(m){return '<div class="lb-medal"><span aria-hidden="true">'+(m.emoji||'🏅')+'</span> '+m.nombre+'</div>'}).join('');
+    $('#arr-msg').textContent=(r.estrellas===3?'¡Camino perfecto!':'¡Llegaste a la escuela!');$('#arr-gn').textContent=(r.estrellas===3?'¡Tape iporãitereíva!':"¡Reguahẽma mbo'ehaópe!");
+    $('#arr-medals').innerHTML=(r.medallas||[]).map(function(m){return '<div class="lb-medal"><span aria-hidden="true">'+(m.emoji||'🏅')+'</span> '+m.nombre+(m.nombre_gn?' <span class="gn">· '+m.nombre_gn+'</span>':'')+'</div>'}).join('');
     var b=$('#arr-go');b.hidden=false;b.onclick=function(){location.href=dest};
     lsDel(KS);
     setTimeout(function(){location.href=dest},REDUCE?1500:2600);
   }).catch(function(e){
     if(e&&(e.status===403||e.status===401)){location.href=CFG.urls.juegos;return}
-    $('#arr-msg').textContent='No pudimos guardar. Revisá tu conexión.';
+    $('#arr-msg').textContent='No pudimos guardar. Revisá tu conexión.';$('#arr-gn').textContent="Ndaikatúi roñongatu. Ehecha ne ñanduti.";
     var b=$('#arr-retry');b.hidden=false;b.onclick=function(){cerrarPartida()};
   });
 }

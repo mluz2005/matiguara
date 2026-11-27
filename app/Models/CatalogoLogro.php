@@ -21,7 +21,7 @@ class CatalogoLogro extends Model
     protected $table = 'catalogo_logros';
 
     protected $fillable = [
-        'nombre_es', 'nombre_gn', 'emoji', 'descripcion_es', 'tipo',
+        'nombre_es', 'nombre_gn', 'emoji', 'descripcion_es', 'descripcion_gn', 'tipo',
         'condicion_tipo', 'condicion_valor', 'puntos_logro',
         'rareza', 'icono_url', 'activo',
     ];

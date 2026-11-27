@@ -48,9 +48,9 @@ class JuegosSeeder extends Seeder
         $sumaFrutas = Juego::create([
             'tipo_mecanica_id'   => $mecSuma->id,
             'nombre_es'          => 'Suma de Frutas',
-            'nombre_gn'          => 'Tesãi Rendápe Ñemongu\'e',
+            'nombre_gn'          => 'Yva Ñemongu\'e',
             'instrucciones_es'   => 'Sumá las frutas que ves y elegí el resultado correcto. ¡Vos podés!',
-            'instrucciones_gn'   => 'Embojuaju tesãirã rehecháva ha eiporavo mba\'e oikóva. ¡Ikatu nde!',
+            'instrucciones_gn'   => 'Embojuaju umi yva rehecháva ha eiporavo mbohovái oĩporãva. ¡Ikatu nde!',
             'activo'             => true,
             'dias_reinicio_racha'=> null, // Usa el default de la institución (RN-08)
         ]);
@@ -67,7 +67,7 @@ class JuegosSeeder extends Seeder
             'nombre_es'          => 'Flash Matemático',
             'nombre_gn'          => 'Papapy Pya\'e',
             'instrucciones_es'   => '¡Mirá bien los números, van a desaparecer! Recordalos y elegí el resultado.',
-            'instrucciones_gn'   => '¡Ehecháke porã papapy, ojepe\'a-ta! Ejekuaave ha eiporavo mba\'e oikóva.',
+            'instrucciones_gn'   => '¡Emaña porã umi papapýre, okañýta hína! Eñemandu\'a hesekuéra ha eiporavo osẽva.',
             'activo'             => true,
             'dias_reinicio_racha'=> null,
         ]);
@@ -95,11 +95,11 @@ class JuegosSeeder extends Seeder
         ]);
 
         $this->insertarEjercicios($n1->id, [
-            [2, 3,  '5',  '¿Cuánto es 2 más 3?',         '¿Mboy\'e pa mokõi más mbohapy?',          [5,4,6,3]],
-            [4, 1,  '5',  '¿Cuánto es 4 más 1?',         '¿Mboy\'e pa irundy más peteĩ?',           [5,6,4,7]],
-            [3, 2,  '5',  '¿Cuánto es 3 más 2?',         '¿Mboy\'e pa mbohapy más mokõi?',          [5,4,6,3]],
-            [1, 4,  '5',  '¿Cuánto es 1 más 4?',         '¿Mboy\'e pa peteĩ más irundy?',           [5,3,6,4]],
-            [2, 2,  '4',  '¿Cuánto es 2 más 2?',         '¿Mboy\'e pa mokõi más mokõi?',            [4,5,3,6]],
+            [2, 3,  '5',  '¿Cuánto es 2 más 3?',         '¿Mboy\'e pa mokõi ha mbohapy?',          [5,4,6,3]],
+            [4, 1,  '5',  '¿Cuánto es 4 más 1?',         '¿Mboy\'e pa irundy ha peteĩ?',           [5,6,4,7]],
+            [3, 2,  '5',  '¿Cuánto es 3 más 2?',         '¿Mboy\'e pa mbohapy ha mokõi?',          [5,4,6,3]],
+            [1, 4,  '5',  '¿Cuánto es 1 más 4?',         '¿Mboy\'e pa peteĩ ha irundy?',           [5,3,6,4]],
+            [2, 2,  '4',  '¿Cuánto es 2 más 2?',         '¿Mboy\'e pa mokõi ha mokõi?',            [4,5,3,6]],
         ]);
 
         // ── NIVEL 2 — Sumas hasta 10 (dificultad 2) ──────────────────────
@@ -115,11 +115,11 @@ class JuegosSeeder extends Seeder
         ]);
 
         $this->insertarEjercicios($n2->id, [
-            [7, 3,  '10', '¿Cuánto es 7 más 3?',         '¿Mboy\'e pa poteĩ más mbohapy?',          [10,9,11,8]],
-            [5, 4,  '9',  '¿Cuánto es 5 más 4?',         '¿Mboy\'e pa po más irundy?',              [9,8,10,7]],
-            [6, 2,  '8',  '¿Cuánto es 6 más 2?',         '¿Mboy\'e pa poteĩ más mokõi?',            [8,7,9,6]],
-            [4, 5,  '9',  '¿Cuánto es 4 más 5?',         '¿Mboy\'e pa irundy más po?',              [9,8,10,11]],
-            [3, 7,  '10', '¿Cuánto es 3 más 7?',         '¿Mboy\'e pa mbohapy más poteĩ?',          [10,9,11,8]],
+            [7, 3,  '10', '¿Cuánto es 7 más 3?',         '¿Mboy\'e pa pokõi ha mbohapy?',          [10,9,11,8]],
+            [5, 4,  '9',  '¿Cuánto es 5 más 4?',         '¿Mboy\'e pa po ha irundy?',              [9,8,10,7]],
+            [6, 2,  '8',  '¿Cuánto es 6 más 2?',         '¿Mboy\'e pa poteĩ ha mokõi?',            [8,7,9,6]],
+            [4, 5,  '9',  '¿Cuánto es 4 más 5?',         '¿Mboy\'e pa irundy ha po?',              [9,8,10,11]],
+            [3, 7,  '10', '¿Cuánto es 3 más 7?',         '¿Mboy\'e pa mbohapy ha pokõi?',          [10,9,11,8]],
         ]);
 
         // ── NIVEL 3 — Sumas hasta 15, mezcla (dificultad 3) ──────────────
@@ -135,11 +135,11 @@ class JuegosSeeder extends Seeder
         ]);
 
         $this->insertarEjercicios($n3->id, [
-            [8, 5,  '13', '¿Cuánto es 8 más 5?',         '¿Mboy\'e pa poapy más po?',               [13,12,14,11]],
-            [9, 4,  '13', '¿Cuánto es 9 más 4?',         '¿Mboy\'e pa pokõi más irundy?',           [13,12,14,15]],
-            [7, 6,  '13', '¿Cuánto es 7 más 6?',         '¿Mboy\'e pa poteĩ más poapy?',            [13,12,14,11]],
-            [6, 8,  '14', '¿Cuánto es 6 más 8?',         '¿Mboy\'e pa poapy más poapy?',            [14,13,15,12]],
-            [9, 6,  '15', '¿Cuánto es 9 más 6?',         '¿Mboy\'e pa pokõi más poapy?',            [15,14,16,13]],
+            [8, 5,  '13', '¿Cuánto es 8 más 5?',         '¿Mboy\'e pa poapy ha po?',               [13,12,14,11]],
+            [9, 4,  '13', '¿Cuánto es 9 más 4?',         '¿Mboy\'e pa porundy ha irundy?',           [13,12,14,15]],
+            [7, 6,  '13', '¿Cuánto es 7 más 6?',         '¿Mboy\'e pa pokõi ha poteĩ?',            [13,12,14,11]],
+            [6, 8,  '14', '¿Cuánto es 6 más 8?',         '¿Mboy\'e pa poteĩ ha poapy?',            [14,13,15,12]],
+            [9, 6,  '15', '¿Cuánto es 9 más 6?',         '¿Mboy\'e pa porundy ha poteĩ?',            [15,14,16,13]],
         ]);
     }
 
@@ -162,11 +162,11 @@ class JuegosSeeder extends Seeder
         ]);
 
         $this->insertarEjercicios($n1->id, [
-            [3, 4, '7',  '¡Mirá! 3 más 4. ¡Memorizalo!', '¡Ehecha! mbohapy más irundy. ¡Eñangarekoite!', [7,6,8,5]],
-            [2, 5, '7',  '¡Mirá! 2 más 5. ¡Memorizalo!', '¡Ehecha! mokõi más po. ¡Eñangarekoite!',       [7,8,6,9]],
-            [4, 3, '7',  '¡Mirá! 4 más 3. ¡Memorizalo!', '¡Ehecha! irundy más mbohapy. ¡Eñangarekoite!',[7,6,8,5]],
-            [1, 5, '6',  '¡Mirá! 1 más 5. ¡Memorizalo!', '¡Ehecha! peteĩ más po. ¡Eñangarekoite!',      [6,5,7,4]],
-            [5, 3, '8',  '¡Mirá! 5 más 3. ¡Memorizalo!', '¡Ehecha! po más mbohapy. ¡Eñangarekoite!',    [8,7,9,6]],
+            [3, 4, '7',  '¡Mirá! 3 más 4. ¡Memorizalo!', '¡Emaña! mbohapy ha irundy. ¡Eñemandu\'a hese!', [7,6,8,5]],
+            [2, 5, '7',  '¡Mirá! 2 más 5. ¡Memorizalo!', '¡Emaña! mokõi ha po. ¡Eñemandu\'a hese!',       [7,8,6,9]],
+            [4, 3, '7',  '¡Mirá! 4 más 3. ¡Memorizalo!', '¡Emaña! irundy ha mbohapy. ¡Eñemandu\'a hese!',[7,6,8,5]],
+            [1, 5, '6',  '¡Mirá! 1 más 5. ¡Memorizalo!', '¡Emaña! peteĩ ha po. ¡Eñemandu\'a hese!',      [6,5,7,4]],
+            [5, 3, '8',  '¡Mirá! 5 más 3. ¡Memorizalo!', '¡Emaña! po ha mbohapy. ¡Eñemandu\'a hese!',    [8,7,9,6]],
         ]);
 
         // ── NIVEL 2 — 6 segundos visibles (dificultad 3) ─────────────────
@@ -182,11 +182,11 @@ class JuegosSeeder extends Seeder
         ]);
 
         $this->insertarEjercicios($n2->id, [
-            [6, 4, '10', '¡Rápido! 6 más 4.', '¡Pya\'e! poapy más irundy.',  [10,9,11,8]],
-            [7, 2, '9',  '¡Rápido! 7 más 2.', '¡Pya\'e! poteĩ más mokõi.',   [9,8,10,7]],
-            [5, 5, '10', '¡Rápido! 5 más 5.', '¡Pya\'e! po más po.',         [10,9,11,8]],
-            [8, 2, '10', '¡Rápido! 8 más 2.', '¡Pya\'e! poapy más mokõi.',   [10,9,11,12]],
-            [4, 6, '10', '¡Rápido! 4 más 6.', '¡Pya\'e! irundy más poapy.',  [10,9,11,8]],
+            [6, 4, '10', '¡Rápido! 6 más 4.', '¡Pya\'e! poteĩ ha irundy.',  [10,9,11,8]],
+            [7, 2, '9',  '¡Rápido! 7 más 2.', '¡Pya\'e! pokõi ha mokõi.',   [9,8,10,7]],
+            [5, 5, '10', '¡Rápido! 5 más 5.', '¡Pya\'e! po ha po.',         [10,9,11,8]],
+            [8, 2, '10', '¡Rápido! 8 más 2.', '¡Pya\'e! poapy ha mokõi.',   [10,9,11,12]],
+            [4, 6, '10', '¡Rápido! 4 más 6.', '¡Pya\'e! irundy ha poteĩ.',  [10,9,11,8]],
         ]);
 
         // ── NIVEL 3 — 4 segundos visibles (dificultad 5) ─────────────────
@@ -202,11 +202,11 @@ class JuegosSeeder extends Seeder
         ]);
 
         $this->insertarEjercicios($n3->id, [
-            [9, 3, '12', '¡Flash! 9 más 3.',  '¡Flash! pokõi más mbohapy.', [12,11,13,10]],
-            [8, 4, '12', '¡Flash! 8 más 4.',  '¡Flash! poapy más irundy.',  [12,11,13,14]],
-            [7, 5, '12', '¡Flash! 7 más 5.',  '¡Flash! poteĩ más po.',      [12,11,13,10]],
-            [6, 7, '13', '¡Flash! 6 más 7.',  '¡Flash! poapy más poteĩ.',   [13,12,14,11]],
-            [9, 5, '14', '¡Flash! 9 más 5.',  '¡Flash! pokõi más po.',      [14,13,15,12]],
+            [9, 3, '12', '¡Flash! 9 más 3.',  '¡Flash! porundy ha mbohapy.', [12,11,13,10]],
+            [8, 4, '12', '¡Flash! 8 más 4.',  '¡Flash! poapy ha irundy.',  [12,11,13,14]],
+            [7, 5, '12', '¡Flash! 7 más 5.',  '¡Flash! pokõi ha po.',      [12,11,13,10]],
+            [6, 7, '13', '¡Flash! 6 más 7.',  '¡Flash! poteĩ ha pokõi.',   [13,12,14,11]],
+            [9, 5, '14', '¡Flash! 9 más 5.',  '¡Flash! porundy ha po.',      [14,13,15,12]],
         ]);
     }
 

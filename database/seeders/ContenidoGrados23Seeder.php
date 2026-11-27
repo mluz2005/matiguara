@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Support\EnunciadosGuarani;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -105,7 +106,7 @@ class ContenidoGrados23Seeder extends Seeder
                         'nivel_id'           => $nivelId,
                         'tipo_operacion'     => $tipo,
                         'enunciado_es'       => "¿Cuánto es {$a} {$palabra} {$b}?",
-                        'enunciado_gn'       => "¿Mboy'e pa {$a} {$palabra} {$b}?",
+                        'enunciado_gn'       => EnunciadosGuarani::plantilla($a, $op, $b),
                         'valor_a'            => $a,
                         'operador'           => $op,
                         'valor_b'            => $b,

@@ -211,6 +211,9 @@
             <div class="alert rounded-4 text-center fw-bold mb-0 py-2"
                  style="background:#D5E8D4;border:2px solid #177040;color:#177040;font-size:1.1rem">
                 🦜 {{ session('bienvenida') }}
+                @if(session('bienvenida_gn'))
+                    <div class="fst-italic" style="font-size:.95rem" lang="gn">{{ session('bienvenida_gn') }}</div>
+                @endif
             </div>
         </div>
     @endif

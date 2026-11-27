@@ -132,7 +132,8 @@ class LoginEstudianteController extends Controller
 
         return redirect()
             ->route('estudiante.juegos')
-            ->with('bienvenida', "¡Hola, {$estudiante->nombre}! 🎮");
+            ->with('bienvenida', \App\Support\TextosComunes::rellenar(\App\Support\TextosComunes::INGRESO['bienvenida']['es'], ['nombre' => $estudiante->nombre]))
+            ->with('bienvenida_gn', \App\Support\TextosComunes::rellenar(\App\Support\TextosComunes::INGRESO['bienvenida']['gn'], ['nombre' => $estudiante->nombre]));
     }
 
     /**
